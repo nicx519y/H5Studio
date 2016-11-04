@@ -11,18 +11,22 @@ export class ToolsbarComponent implements OnInit {
   public state: EditorState = EditorState.none;
 	public states = [
 		{
+			name: '选择元素',
 			state: EditorState.choise,
 			class: 'glyphicon-screenshot'
 		},
 		{
+			name: '插入文本',
 			state: EditorState.font,
 			class: 'glyphicon-font'
 		},
 		{
+			name: '缩放视图',
 			state: EditorState.zoom,
 			class: 'glyphicon-zoom-in'
 		},
 		{
+			name: '绘制图形',
 			state: EditorState.draw,
 			class: 'glyphicon-pencil'
 		},
