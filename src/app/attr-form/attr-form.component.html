@@ -1,0 +1,29 @@
+<div class="attr-form {{options.controlType}}" >
+	<label [attr.for]="options.key"  >{{options.label}}</label>
+	<div [ngSwitch]="options.controlType" class="attr-field" >
+
+		<input *ngSwitchCase="0" type="text" [id]="options.key" [(ngModel)]="options.value"  />
+
+		<input *ngSwitchCase="1" type="number" [id]="options.key" [min]="options.min" [max]="options.max" [step]="options.step"  [(ngModel)]="options.value" />
+
+		<span *ngSwitchCase="2">
+			<input  type="range" [id]="options.key"  [(ngModel)]="options.value" [min]="options.min" [max]="options.max" [step]="options.step" />
+			<span class="range-value" >{{options.value}}</span>
+		</span>
+
+		<span *ngSwitchCase="3" >
+			<input type="color" [id]="options.key"  [(ngModel)]="options.value" />
+			<input class="color-value" type="text" [(ngModel)]="options.value" onfocus="this.select()" />
+		</span>
+
+		<select *ngSwitchCase="4" [id]="options.key"  [(ngModel)]="options.value" >
+			<option *ngFor="let opt of options.options" [value]="opt.value"  >{{opt.key}}</option>
+		</select>
+
+		<span *ngSwitchCase="5" class="state-btn {options.iconClass}" [ngClass]="{ true: 'active' }[options.value]" (click)="options.toggleValue()"  ></span>
+
+		<span *ngSwitchCase="6" class="single-selection-btns" >
+			<span *ngFor="let opt of options.options" [class]="opt.class" [ngClass]="{true: 'active'}[options.value===opt.value]" (click)="options.value=opt.value" ></span>
+		</span>
+	</div>
+</div>

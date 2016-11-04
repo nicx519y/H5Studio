@@ -1,0 +1,37 @@
+<div class="timeline" #container >
+	<div class="topnav flexbox" >
+		<div class="left" ></div>
+		<div class="right" >
+			<div class="rouler"></div>
+		</div>
+	</div>
+	<div class="main" >
+		<div class="flexbox" >
+			<div class="left list" >
+				<div *ngFor="let layer of service.timeline.layers" class="layer-item" 
+				[ngClass]="{true: 'active'}[service.timeline.actionOption.layer==layer.id]"  >
+					<span [ngClass]="{
+						'0' : 'glyphicon glyphicon-file',
+						'1' : 'glyphicon glyphicon-adjust',
+						'2' : 'glyphicon glyphicon-wrench'
+					}[layer.type]"></span>
+					<form #layerForm="ngForm" >
+						<input class="layer-name" [(ngModel)]="layer.name" id="layer-name" name="layer-name" type="text" onfocus="this.select()" autocomplete="off" />
+					</form>
+					<span style="cursor: pointer" (click)="toggleVisible(layer.id)" [ngClass]="{
+						true: 'glyphicon glyphicon-eye-open',
+						false: 'glyphicon glyphicon-eye-close'
+					}[layer.visible]" ></span>
+				</div>
+			</div>
+			<div class="right list"  >
+				<div class="timeline-list" [style.minWidth]="(service.timeline.frameCount + 100) * 9 + 'px'"  >
+					<ide-layer *ngFor="let layer of service.timeline.layers" [option]="layer" 
+					(hoverChangeEvent)="layerHoverChangeHandler($event)"
+					(actionChangeEvent)="layerActionChangeHandler($event)"
+					(actionMoveEvent)="layerActionMoveHandler($event)"   ></ide-layer>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

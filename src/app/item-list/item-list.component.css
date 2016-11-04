@@ -1,0 +1,86 @@
+.itemslist {
+	flex-grow: 1;
+	overflow-y: auto;
+	font-size: 10px;
+	margin: 0;
+	padding: 0;
+}
+li {
+	margin: 0;
+	padding: 5px 8px;
+	border-radius: 0;
+	border-bottom: dotted 1px #eee;
+	list-style: none;
+}
+li.unactive:hover {
+	background: #f5f5f5;
+	color: #000;
+	cursor: pointer;
+}
+.active {
+	background: #fff;
+	color: #000;
+	cursor: default;
+}
+.activebox {
+	display: flex;
+}
+.item-pic {
+	display: block;
+	flex-grow: 0;
+	font-size: 0;
+}
+.item-pic ide-previewer {
+	border: solid 1px #e5e5e5;
+	border-radius: 2px;
+}
+.item-desc {
+	display: block;
+	flex-grow: 1;
+	padding: 0 0 0 5px;
+}
+
+.item-desc form {
+	margin: 0;
+}
+
+.item-desc input {
+	padding: 0 5px;
+	width: 150px;
+	/*border: solid 1px #e5e5e5;*/
+	border: 0;
+	word-break:break-all;
+	overflow:hidden;
+	-webkit-text-overflow:ellipsis;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+}
+
+.item-type {
+	display: inline-block;
+	font-size: 11px;
+	color: #999;
+	padding: 3px 6px;
+}
+
+.item-name {
+	display: block;
+}
+
+.glyphicon {
+	vertical-align: middle;
+	margin-top: -3px;
+}
+
+.item-name-inner {
+	display: inline-block;
+	width: 200px;
+	height: 18px;
+	line-height: 18px;
+	vertical-align: middle;
+	word-break:break-all;
+	overflow:hidden;
+	-webkit-text-overflow:ellipsis;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+}

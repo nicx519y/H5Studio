@@ -1,0 +1,5 @@
+<ul class="toolsbar" >
+	<li *ngFor="let s of states" [ngClass]="{true: 'active'}[s.state==state]" (click)="changeState(s.state)" >
+		<span class="glyphicon" [ngClass]="s.class" ></span>
+	</li>
+</ul>

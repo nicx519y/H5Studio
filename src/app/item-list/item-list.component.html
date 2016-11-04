@@ -1,0 +1,53 @@
+<ul class="itemslist"  >
+	<li *ngFor="let opt of options; let idx = index;" 
+		[ngClass]="{true: 'active', false: 'unactive'}[idx===service.active]"
+		(click)="changeActive(idx); " #itemContainer >
+		<div *ngIf="idx===service.active" class="activebox" >
+			<div class="item-pic" >
+				<ide-previewer [src]="opt.thumbnail" [width]="38" [height]="38" ></ide-previewer>
+			</div>
+			<div class="item-desc" >
+				<form #itemForm="ngForm" >
+					<input #nameInput name="name" type="text" class="item-name" [(ngModel)]="opt.name" on  onfocus="this.select()" (keyup.enter)="nameInput.blur()" autocomplete="off" />
+					<div [ngSwitch]="opt.type" class="item-type" >
+						<span *ngSwitchCase="0" >Movie Clip</span>
+						<span *ngSwitchCase="1" >Bitmap</span>
+						<span *ngSwitchCase="2" >Text</span>
+						<span *ngSwitchCase="3" >Video</span>
+						<span *ngSwitchCase="4" >Shape</span>
+					</div>
+				</form>
+			</div>
+		</div>
+		<span *ngIf="idx!==service.active" class="item-name" >
+			<span class="glyphicon" [ngClass]="{ 
+				'0': 'glyphicon-film', 
+				'1': 'glyphicon-picture',
+				'2': 'glyphicon glyphicon-font',
+				'3': 'glyphicon glyphicon-facetime-video',
+				'4': 'glyphicon-th-large'
+			}[opt.type]" ></span>&nbsp;
+			<span class="item-name-inner" >{{opt.name}}</span>
+		</span>
+	</li>
+</ul>
+
+<ide-modal #modal [title]="'添加库元素'" [width]="400" (onShown)="nameInput.focus(); name='';"  >
+	<form #addItemForm="ngForm" (ngSubmit)="addNewItem(addItemForm.value)" class="modal-form" >
+		<div class="form-row" >
+			<label>名称：</label>
+			<input class="form-input" type="text" name="name" [(ngModel)]="name" ngControl="name" autocomplete="off" required #nameInput />
+		</div>
+		<div class="form-row" >
+			<label>类型：</label>
+			<select class="form-select" name="type" ngModel="0" ngControl="type" required >
+				<option value="0" >Movie Clip</option>
+				<option value="4" >Shape</option>
+			</select>
+		</div>
+		<div class="form-row buttons" >
+			<button  type="submit" class="btn btn-primary confrim" >确&nbsp;定</button>
+			<button  type="button" class="btn btn-primary cancel" (click)="modal.hide()" >取&nbsp;消</button>
+		</div>
+	</form>
+</ide-modal>

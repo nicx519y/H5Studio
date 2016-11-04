@@ -1,3 +1,112 @@
-<h1>
-  {{title}}
-</h1>
+<ide-layout>
+	<div block="top" >
+		<ide-nav></ide-nav>
+	</div>
+	<div block="left" >
+		<ide-accordion>
+			<ide-panel [title]="'场景'" [isOpen]="true" [closeAble]="false" [hasTools]="true" >
+				<div block="main" >
+					<ide-page-list #pageList ></ide-page-list>
+				</div>
+				<div block="tools" >
+					<div>
+						<a href="#" (click)="pageList.addEmptyPageAfterActive()" title="新增场景" >
+							[新增]
+						</a>
+						<a href="#" (click)="pageList.removeActivePage()" title="删除场景" >
+							[删除]
+						</a>
+						<a href="#" (click)="pageList.upActivePage()" title="上移" >
+							[上移]
+						</a>
+						<a href="#" (click)="pageList.downActivePage()" title="下移" >
+							[下移]
+						</a>
+					</div>
+				</div>
+			</ide-panel>
+		</ide-accordion>
+	</div>
+	<div block="centerleft" >
+		<ide-toolsbar #toolsbar ></ide-toolsbar>
+	</div>
+	<div block="center" >
+	</div>
+	<div block="bottom" >
+		<ide-accordion>
+			<ide-panel [title]="'时间轴'" [hasTitle]="false" [isOpen]="true" [hasTools]="true" [closeAble]="false" [autoHeight]="300" #timelinepanel >
+				<div block="main" >
+					<ide-timeline #timeline ></ide-timeline>
+				</div>
+				<div block="tools" >
+					<div class="tools-left" style="width: 180px;" >
+						<a href="#" title="删除图层" (click)="timeline.removeLayer()" >
+							[删除图层]
+						</a>
+						<a href="#" title="上移" (click)="timeline.upLayer()" >
+							[上移]
+						</a>
+						<a href="#" title="下移" (click)="timeline.downLayer()" >
+							[下移]
+						</a>
+					</div>
+					<div class="tools-right" >
+						<a href="#" (click)="timeline.changeToKeyFrames()"  >
+							[转换关键帧]
+						</a>
+						<a href="#" (click)="timeline.changeToEmptyKeyFrames()"  >
+							[转换空白关键帧]
+						</a>
+						<a href="#" (click)="timeline.removeKeyFrames()"  >
+							[删除关键帧]
+						</a>
+						<a href="#" (click)="timeline.changeToFrames()"  >
+							[转换帧]
+						</a>
+						<a href="#" (click)="timeline.removeFrames()"  >
+							[删除帧]
+						</a>
+						<a href="#" (click)="timeline.createTweens()"  >
+							[新建动画]
+						</a>
+						<a href="#" (click)="timeline.removeTweens()"  >
+							[删除动画]
+						</a>
+					</div>
+				</div>
+			</ide-panel>
+		</ide-accordion>
+	</div>
+	<div block="right" >
+		<ide-accordion>
+			<ide-panel [title]="'素材库'" [isOpen]="true" [hasTools]="true" [autoHeight]="300" #itempanel  >
+				<div block="main" >
+					<ide-item-list #itemList (itemAdded)="itempanel.scrollTo(100000)" ></ide-item-list>
+				</div>
+				<div block="tools" >
+					<div>
+						<a href="#" (click)="itemList.addItem()" title="添加元素" >
+							[添加]
+						</a>
+						<a href="#" (click)="itemList.removeItem()" title="删除元素" >
+							[删除]
+						</a>
+						<a href="#" (click)="itemList.editItem()" title="编辑元素" >
+							[编辑]
+						</a>
+						<a href="#" (click)="itemList.insertItem()" title="插入场景" >
+							[插入]
+						</a>
+					</div>
+				</div>
+			</ide-panel>
+			<ide-panel [title]="'属性'"  >
+				<div block="main" >
+					<ide-attrs></ide-attrs>
+				</div>
+			</ide-panel>
+		</ide-accordion>
+	</div>
+</ide-layout>
+
+<ide-hot-keys [targets]="{ 'timeline': timeline, 'toolsbar': toolsbar }" ></ide-hot-keys>

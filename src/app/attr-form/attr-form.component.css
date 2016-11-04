@@ -1,0 +1,78 @@
+:host {
+	font-size: 10px;
+	display: inline-block;
+	padding: 3px 5px;
+}
+label {
+	width: 70px;
+	font-weight: bold;
+}
+.attr-field {
+	display: inline-block;
+}
+
+input, select {
+	vertical-align: middle;
+}
+
+select, input[type='text'] {
+	border: 1px solid #DADADA;
+	color: #000;
+	outline: 0 none;
+	padding: 3px 3px 3px 5px;
+	font-size: 12px;
+	line-height:15px;
+	box-shadow: inset 0px 1px 4px #ECECEC;
+	-webkit-appearance:none;
+	text-indent: 0.01px;
+	text-overflow: '';
+	border-radius: 2px;
+}
+input[type='number'] {
+	width: 45px;
+	border: 0;
+	text-decoration: underline;
+}
+input[type='text'] {
+	width: 130px;
+}
+input[type='range'] {
+	display: inline-block;
+	width: 110px;
+}
+input[type='color'] {
+	border: 0;
+	background: transparent;
+	padding: 0;
+	margin: 0;
+}
+select {
+	width: 150px;
+}
+.range-value {
+	display: inline-block;
+	padding-left:3px;
+}
+
+input[type='text'].color-value {
+	border: 0;
+	width: 80px;
+	color: #000;
+	box-shadow: inset 0 0 0;
+}
+
+.single-selection-btns {
+	display: inline-block;
+}
+
+.single-selection-btns span {
+	margin-right: 15px;
+	font-size: 14px;
+	color: #999;
+	cursor: pointer;
+}
+
+.single-selection-btns span.active {
+	color: #000;
+	cursor: default;
+}

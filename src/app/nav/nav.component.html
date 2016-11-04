@@ -1,0 +1,46 @@
+<nav class="navbar navbar-light bg-faded">
+	<a class="navbar-brand" href="#">H5Studio</a>
+	<ul class="nav navbar-nav">
+		<li class="nav-item" dropdown >
+			<a dropdownToggle id="fileBtn" href="#">文件 <span class="caret"></span> </a>
+			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="fileBtn" >
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" >新建</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" >保存</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" >预览</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" >发布</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" >页面配置</a>
+				</li>
+			</ul>
+		</li>
+		<li class="nav-item" dropdown >
+			<a dropdownToggle id="bitmapBtn" class="nav-link" href="#">图片 <span class="caret"></span> </a>
+			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="pageBtn" >
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" (click)="bitmapImporter.show()" >导入</a>
+				</li>
+			</ul>
+		</li>
+		<li class="nav-item" dropdown >
+			<a dropdownToggle id="videoBtn" class="nav-link" href="#">视频 <span class="caret"></span> </a>
+			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="pageBtn" >
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" >导入</a>
+				</li>
+			</ul>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="#">扩展</a>
+		</li>
+	</ul>
+</nav>
+
+<ide-bitmap-importer #bitmapImporter ></ide-bitmap-importer>

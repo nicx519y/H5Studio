@@ -1,0 +1,23 @@
+<ide-modal [title]="'导入图片'" [width]="'800'" #modal  >
+	<form #bitmapForm="ngForm" class="modal-form" (submit)="importStart()" >
+		<div class="bitmaps" >
+			<ul>
+				<li  *ngFor="let bitmap of service.bitmaps; let i = index;" (click)="nameInput.focus()"  >
+					<ide-previewer [src]="bitmap.source" [width]="90" [height]="90"  ></ide-previewer>
+					<span class="glyphicon glyphicon-remove deleteBtn " (click)="removeBitmap(i)" ></span>
+					<input #nameInput type="text" [(ngModel)]="bitmap.name" name="name" required  onfocus="this.select()" autocomplete="off"  />
+				</li>
+				<li>
+					<button class="fileBtn" >
+						<input class="fileInput" #fileInput accept="image/*" multiple type="file" name="file" (change)="fileInputChange($event)"  />
+						<span class="glyphicon glyphicon-plus" ></span>
+					</button>
+				</li>
+			</ul>
+		</div>
+		<div class="form-row buttons" >
+			<button  type="submit" class="btn btn-primary confrim" >导&nbsp;入</button>
+			<button  type="button" class="btn btn-primary cancel" (click)="modal.hide()" >取&nbsp;消</button>
+		</div>
+	</form>
+</ide-modal>

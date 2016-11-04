@@ -1,0 +1,59 @@
+.form-row {
+	padding: 6px 0;
+}
+
+.modal-form label {
+	display: inline-block;
+	vertical-align: middle;
+	width: 87px;
+	font-size: 12px;
+	text-align: right;
+	margin: 0;
+	padding: 0;
+}
+
+.modal-form .form-input, .modal-form .form-select {
+	border: 1px solid #DADADA;
+	color: #000;
+	height: 28px;
+	outline: 0 none;
+	padding: 3px 3px 3px 5px;
+	width: 50%;
+	font-size: 12px;
+	line-height:15px;
+	box-shadow: inset 0px 1px 4px #ECECEC;
+	background: #FFF url('down-arrow.png') no-repeat right;
+	-webkit-appearance:none;
+	text-indent: 0.01px;
+	text-overflow: '';
+	border-radius: 2px;
+}
+
+.modal-form .buttons {
+	text-align: center;
+	padding-top: 10px;
+	/*padding-left: 88px;*/
+}
+
+.modal-form .buttons button {
+	font-size: 12px;
+	margin-right: 5px;
+	border-radius: 2px;
+	padding-right: 20px;
+	padding-left: 20px;
+}
+
+.modal-form .buttons button.cancel {
+	background: #ccc;
+	border-color: #ccc;
+}
+
+.modal-form .buttons button.confrim {
+	background: green;
+	border-color: green;
+}
+
+button:focus {
+	outline: 0;
+}
+

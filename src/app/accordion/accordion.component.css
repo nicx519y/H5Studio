@@ -1,0 +1,10 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+.ide-accordion {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}

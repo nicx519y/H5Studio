@@ -1,1 +1,33 @@
-/* You can add global styles to this file, and also import other style files */
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	font-size: 12px;
+	line-height: 18px;
+	height: 100%;
+	color: #333;
+}
+
+input[type="text"], select {
+	color: #333;
+	padding: 0 3px;
+}
+
+input, select {
+	outline: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:link, a:active, a:hover, a:visited{
+	text-decoration: none;
+}
+
+::-webkit-scrollbar {
+	width: 0px;/*对垂直流动条有效*/
+	height: 0px;/*对水平流动条有效*/
+}

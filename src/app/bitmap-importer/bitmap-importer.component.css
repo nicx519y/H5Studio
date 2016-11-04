@@ -1,0 +1,82 @@
+.bitmaps {
+	border: solid 1px #e5e5e5;
+	padding: 10px;
+	height: 400px;
+	overflow-y: auto;
+	box-shadow: inset 0px 1px 4px #ECECEC;
+	border-radius: 4px;
+}
+
+.bitmaps ul {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+}
+
+.bitmaps li {
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	flex-grow: 0;
+	padding: 5px;
+	width: 149px;
+	text-align: center;
+	position: relative;
+}
+
+.bitmaps li input {
+	text-align: center;
+	padding: 3px;
+	border: 0;
+	width: 100px;
+}
+
+.bitmaps .deleteBtn {
+	position: absolute;
+	top: 9px;
+	right: 34px;
+	color: green;
+	cursor: pointer;
+	display: none;
+}
+
+.bitmaps li:hover .deleteBtn {
+	display: block;
+}
+
+ide-previewer {
+	border: solid 1px #e5e5e5;
+	border-radius: 4px;
+}
+
+.fileInput {
+	cursor: pointer;
+	opacity: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 90px;
+	height: 90px;
+	
+}
+
+.fileBtn {
+	position: relative;
+	color: #fff;
+	width: 90px;
+	height: 90px;
+	background: #f5f5f5;
+	border-radius: 4px;
+	border: 0;
+	font-size: 25px;
+}
+
+.fileBtn span {
+	pointer-events: none;
+	margin-left: 5px;
+}
+
+

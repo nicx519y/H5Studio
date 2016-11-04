@@ -1,0 +1,26 @@
+<div class="ide-layout">
+	<div class="nav-wrap">
+		<ng-content select="[block=top]"></ng-content>
+	</div>
+	<div class="content-wrap">
+		<div class="left-content-wrap">
+			<ng-content select="[block=left]"></ng-content>
+		</div>
+		<div class="center-content-wrap">
+			<div class="center-top-content-wrap">
+				<div class="center-top-left-content-wrap">
+					<ng-content select="[block=centerleft]"></ng-content>
+				</div>
+				<div class="center-top-right-content-wrap">
+					<ng-content select="[block=center]"></ng-content>
+				</div>
+			</div>
+			<div class="center-bottom-content-wrap">
+				<ng-content select="[block=bottom]"></ng-content>
+			</div>
+		</div>
+		<div class="right-content-wrap">
+			<ng-content select="[block=right]"></ng-content>
+		</div>
+	</div>
+</div>

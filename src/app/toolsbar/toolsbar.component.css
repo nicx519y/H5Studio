@@ -1,0 +1,38 @@
+ul {
+	margin: 0;
+	padding: 5px;
+	list-style: none;
+}
+
+li {
+	color: #666;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	height: 33px;
+	font-size: 14px;
+	line-height: 33px;
+	text-align: center;
+	cursor: pointer;
+	border-bottom: dotted 1px #e5e5e5;
+}
+
+li:hover {
+	color: #000;
+}
+
+li:last-child {
+	border: 0;
+}
+
+li.active {
+	color: #000;
+	background: #efefef;
+	box-shadow: 0.5px 0.5px 3px #999 inset;
+	cursor: default;
+	border-bottom: 0;
+}
+
+li.active:hover {
+	color: #000;
+}
