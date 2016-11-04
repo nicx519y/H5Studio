@@ -1,25 +1,25 @@
-import { 
-	Component, 
-	ViewChild, 
-	Output, 
+import {
+	Component,
+	ViewChild,
+	Output,
 	EventEmitter,
 	QueryList,
 	ElementRef,
 	ViewChildren,
-  OnInit
+	OnInit
 } from '@angular/core';
 import { ItemsService } from '../items.service';
 import { ItemModel, ItemType } from '../models';
 import { ModalComponent } from '../modal/modal.component';
 
 @Component({
-  selector: 'ide-item-list',
-  templateUrl: './item-list.component.html',
-  styleUrls: ['./item-list.component.css', '../../assets/modal.form.css']
+	selector: 'ide-item-list',
+	templateUrl: './item-list.component.html',
+	styleUrls: ['./item-list.component.css', '../../assets/modal.form.css']
 })
 export class ItemListComponent implements OnInit {
 
-  @ViewChildren('itemContainer')
+	@ViewChildren('itemContainer')
 	itemsEle: QueryList<ElementRef>;
 
 	@ViewChild('modal')
@@ -35,7 +35,7 @@ export class ItemListComponent implements OnInit {
 		private service: ItemsService
 	) {
 		this.options = service.items;
-		
+
 	}
 
 	public addItem() {
@@ -70,7 +70,7 @@ export class ItemListComponent implements OnInit {
 		this.modal.hide();
 	}
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+	}
 
 }

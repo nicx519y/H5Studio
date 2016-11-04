@@ -4,13 +4,13 @@ import { TimelineModel, LayerModel, TweenType } from '../models';
 import { LayerComponent } from '../layer/layer.component';
 
 @Component({
-  selector: 'ide-timeline',
-  templateUrl: './timeline.component.html',
-  styleUrls: ['./timeline.component.css']
+	selector: 'ide-timeline',
+	templateUrl: './timeline.component.html',
+	styleUrls: ['./timeline.component.css']
 })
 export class TimelineComponent implements OnInit {
 
-  @ViewChildren(LayerComponent)
+	@ViewChildren(LayerComponent)
 	layers: QueryList<LayerComponent>;
 
 	private lastHoverLayer: string = null;
@@ -139,7 +139,7 @@ export class TimelineComponent implements OnInit {
 		}
 	}
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+	}
 
 }

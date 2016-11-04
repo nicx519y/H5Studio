@@ -2,13 +2,13 @@ import { Component, ViewChild, Input, Output, EventEmitter, OnInit } from '@angu
 import { ModalDirective } from 'ng2-bootstrap/components/modal/modal.component';
 
 @Component({
-  selector: 'ide-modal',
-  templateUrl: './modal.component.html',
-  styleUrls: ['./modal.component.css']
+	selector: 'ide-modal',
+	templateUrl: './modal.component.html',
+	styleUrls: ['./modal.component.css']
 })
 export class ModalComponent implements OnInit {
 
-  @ViewChild('smModal')
+  	@ViewChild('smModal')
 	public childModal:ModalDirective;
 
 	@Input()
@@ -56,7 +56,7 @@ export class ModalComponent implements OnInit {
 		});
 	}
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+	}
 
 }

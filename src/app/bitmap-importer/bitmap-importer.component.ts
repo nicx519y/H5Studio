@@ -5,13 +5,13 @@ import { BitmapImporterService } from '../bitmap-importer.service';
 
 
 @Component({
-  selector: 'ide-bitmap-importer',
-  templateUrl: './bitmap-importer.component.html',
-  styleUrls: ['./bitmap-importer.component.css', '../../assets/modal.form.css']
+	selector: 'ide-bitmap-importer',
+	templateUrl: './bitmap-importer.component.html',
+	styleUrls: ['./bitmap-importer.component.css', '../../assets/modal.form.css']
 })
 export class BitmapImporterComponent implements OnInit {
 
-  @ViewChild('modal')
+  	@ViewChild('modal')
 	public modal: ModalComponent;
 
 	@ViewChild('fileInput')

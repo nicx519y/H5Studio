@@ -4,13 +4,13 @@ import { FrameModel, LayerModel } from '../models';
 const FRAME_WIDTH: number = 9;
 
 @Component({
-  selector: 'ide-layer',
-  templateUrl: './layer.component.html',
-  styleUrls: ['./layer.component.css']
+	selector: 'ide-layer',
+	templateUrl: './layer.component.html',
+	styleUrls: ['./layer.component.css']
 })
 export class LayerComponent implements OnInit {
 
-  @Input()
+	@Input()
 	option: LayerModel;
 
 	@Output()
@@ -24,13 +24,13 @@ export class LayerComponent implements OnInit {
 
 	@Output()
 	actionChangeEvent: EventEmitter<{
-		layer: string, 
+		layer: string,
 		start: number,
-		duration: number 
+		duration: number
 	}> = new EventEmitter<{
-		layer: string, 
-		start: number, 
-		duration: number 
+		layer: string,
+		start: number,
+		duration: number
 	}>();
 
 	@Output()
@@ -88,42 +88,42 @@ export class LayerComponent implements OnInit {
 		this.action = this.actionOption;
 	}
 
-	public set hoverIndex( index: number ) {
+	public set hoverIndex(index: number) {
 		this.hoverEle.nativeElement.style.left = index * FRAME_WIDTH + 'px';
 	}
 
-	public set action( option: { start: number, duration: number } ) {
-		if( option.duration >= 0 ) {
+	public set action(option: { start: number, duration: number }) {
+		if (option.duration >= 0) {
 			this.actionEle.nativeElement.style.left = option.start * FRAME_WIDTH + 'px';
 			this.actionEle.nativeElement.style.width = FRAME_WIDTH * option.duration + 'px';
 			this.actionOption = option;
 		} else {
-			this.actionEle.nativeElement.style.left = ( option.start + option.duration ) * FRAME_WIDTH + 'px';
-			this.actionEle.nativeElement.style.width = FRAME_WIDTH * ( - option.duration + 1 ) + 'px';
+			this.actionEle.nativeElement.style.left = (option.start + option.duration) * FRAME_WIDTH + 'px';
+			this.actionEle.nativeElement.style.width = FRAME_WIDTH * (- option.duration + 1) + 'px';
 			this.actionOption = option;
 		}
 	}
 
-	public get id (): string {
+	public get id(): string {
 		return this.option.id;
 	}
 
 	@HostListener('mousemove', ['$event'])
-	private mouseMove( evt: MouseEvent ) {
+	private mouseMove(evt: MouseEvent) {
 		let mx: number = evt.offsetX;
 		let idx: number = Math.floor(mx / FRAME_WIDTH);
 		this.hoverChangeEvent.emit({
 			hoverIndex: idx,
-			layer: this.id 
+			layer: this.id
 		});
 
 		let ac = this.actionOption;
-		
+
 		//不是在移动模式
-		if( this.moveOption.handlerOffset < 0 ) {
-			if( this.mouseIsDown && ac.start >= 0 ) {
+		if (this.moveOption.handlerOffset < 0) {
+			if (this.mouseIsDown && ac.start >= 0) {
 				let duration = idx - ac.start + 1;
-				if( duration <= 0 )
+				if (duration <= 0)
 					duration -= 1;
 				this.actionChangeEvent.emit({
 					start: ac.start,
@@ -132,7 +132,7 @@ export class LayerComponent implements OnInit {
 				});
 			}
 		} else {	//移动模式
-			let newStart: number = Math.max( idx - this.moveOption.handlerOffset, 0 );
+			let newStart: number = Math.max(idx - this.moveOption.handlerOffset, 0);
 			this.actionChangeEvent.emit({
 				start: newStart,
 				duration: ac.duration,
@@ -142,22 +142,22 @@ export class LayerComponent implements OnInit {
 	}
 
 	@HostListener('mouseout', ['$event'])
-	private mouseOut( evt: MouseEvent ) {
-		this.hoverChangeEvent.emit( {
+	private mouseOut(evt: MouseEvent) {
+		this.hoverChangeEvent.emit({
 			hoverIndex: -1,
 			layer: this.id
-		} );
+		});
 		this.mouseIsDown = false;
 	}
 
 	@HostListener('mousedown', ['$event'])
-	private mouseDown( evt: MouseEvent ) {
+	private mouseDown(evt: MouseEvent) {
 		let mx: number = evt.offsetX;
 		let ac = this.actionOption;
-		
-		if( evt.shiftKey && ac.start >= 0 ) {
+
+		if (evt.shiftKey && ac.start >= 0) {
 			let duration = Math.floor(mx / FRAME_WIDTH) - ac.start + 1;
-			if( duration <= 0 )
+			if (duration <= 0)
 				duration -= 1;
 			this.actionChangeEvent.emit({
 				start: ac.start,
@@ -167,15 +167,15 @@ export class LayerComponent implements OnInit {
 		} else {
 			let idx: number = Math.floor(mx / FRAME_WIDTH);
 			//在已选择区域内
-			if(idx >= ac.start && idx < ac.start + ac.duration) {
+			if (idx >= ac.start && idx < ac.start + ac.duration) {
 				this.moveOption = {
 					start: ac.start,
-					duration: ac.duration, 
+					duration: ac.duration,
 					handlerOffset: idx - ac.start,
 					offset: 0
 				}
 			} else {	//在已选择区域外
-				this.actionChangeEvent.emit( { start: Math.floor(mx / FRAME_WIDTH), duration: 1, layer: this.id } );
+				this.actionChangeEvent.emit({ start: Math.floor(mx / FRAME_WIDTH), duration: 1, layer: this.id });
 			}
 		}
 
@@ -183,12 +183,12 @@ export class LayerComponent implements OnInit {
 	}
 
 	@HostListener('mouseup', ['$event'])
-	private mouseUp( evt: MouseEvent ) {
+	private mouseUp(evt: MouseEvent) {
 		let mc = this.moveOption;
 		let mx: number = evt.offsetX;
 		let idx: number = Math.floor(mx / FRAME_WIDTH);
-		let newStart: number = Math.max( idx - this.moveOption.handlerOffset, 0 );
-		if(mc.start >= 0) {
+		let newStart: number = Math.max(idx - this.moveOption.handlerOffset, 0);
+		if (mc.start >= 0) {
 			let nmc = {
 				start: mc.start,
 				duration: mc.duration,
@@ -196,7 +196,7 @@ export class LayerComponent implements OnInit {
 				handlerOffset: mc.handlerOffset
 			};
 
-			if( nmc.start != mc.start || nmc.duration != mc.duration || nmc.offset != mc.offset ) {
+			if (nmc.start != mc.start || nmc.duration != mc.duration || nmc.offset != mc.offset) {
 				this.actionMoveEvent.emit({
 					start: mc.start,
 					duration: mc.duration,
@@ -223,7 +223,7 @@ export class LayerComponent implements OnInit {
 		this.resetAction();
 	}
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+	}
 
 }
