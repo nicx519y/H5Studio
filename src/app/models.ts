@@ -1,8 +1,12 @@
-import { QueryList } from '@angular/core';
 
 export enum Direction {
 	vertial,		//垂直
 	horizontal		//水平
+}
+
+export enum PageType {
+	none,
+	swiper
 }
 
 export enum SwiperEffect {
@@ -650,7 +654,7 @@ export class PageModel extends BasicModel {
 }
 
 export class SwiperModel extends BasicModel {
-	initialSlide: number;							//初始页序号
+	initialSlide: number = 0;						//初始页序号
 	direction: Direction = Direction.vertial;		//动画方向
 	speed: number = 100;							//变换速度
 	autoPlay: boolean = false;						//是否自动播放
@@ -699,19 +703,6 @@ export class BitmapModel extends BasicModel {
 	}
 }
 
-export class MainModel extends BasicModel {
-	title: string = '';
-	background: BackgroundModel = new BackgroundModel();
-	swiper: SwiperModel = null;
-	pages: Array<PageModel> = [];
-	library: Array<ItemModel> = [];
-
-	constructor(options: {} = {}) {
-		super();
-		super.init(options);
-	}
-}
-
 export class HotKeyModel extends BasicModel {
 	target: string = '';
 	shift: boolean = false;
@@ -727,5 +718,27 @@ export class HotKeyModel extends BasicModel {
 	}
 }
 
+export class StageModel extends BasicModel {
 
+	background: BackgroundModel = new BackgroundModel();
+	title: string = '';
+	pageType: PageType = PageType.swiper;
+
+	constructor(options: {} = {}) {
+		super();
+		super.init(options);
+	}
+}
+
+export class MainModel extends BasicModel {
+	stage: StageModel = new StageModel();
+	swiper: SwiperModel = null;
+	pages: Array<PageModel> = [];
+	library: Array<ItemModel> = [];
+
+	constructor(options: {} = {}) {
+		super();
+		super.init(options);
+	}
+}
 

@@ -8,8 +8,8 @@ import { ModalDirective } from 'ng2-bootstrap/components/modal/modal.component';
 })
 export class ModalComponent implements OnInit {
 
-  	@ViewChild('smModal')
-	public childModal:ModalDirective;
+	@ViewChild('smModal')
+	public childModal: ModalDirective;
 
 	@Input()
 	public title: string;

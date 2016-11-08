@@ -82,6 +82,26 @@ export class HotKeysService {
 				arguments: [ EditorState.font ],
 				desc: '插入文字'
 			}),
+			new HotKeyModel({
+				target: 'navbar',
+				ctrl: true,
+				key: 's',
+				api: 'saveData',
+				desc: '保存数据'
+			}),
+			new HotKeyModel({
+				target: 'navbar',
+				ctrl: true,
+				key: 'p',
+				api: 'preview',
+				desc: '预览'
+			}),
+			new HotKeyModel({
+				target: 'navbar',
+				ctrl: true,
+				key: ',',
+				api: 'showPageConfiger'
+			}),
 		]);
 	}
 

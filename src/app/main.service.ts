@@ -40,6 +40,7 @@ export class MainService {
 		this.importBitmapService.uploadCompleteEvent.subscribe( (bitmaps: BitmapModel[]) => {
 			this.importBitmapCompleteHandler( bitmaps );
 		});
+
 	}
 
 	private activeStageChangeHandler( index: number ) {
@@ -81,5 +82,40 @@ export class MainService {
 				type: ItemType.bitmap
 			});
 		});
+	}
+
+	/**
+	 * @desc	更新数据
+	 */
+	public updateData() {
+
+	}
+
+	/**
+	 * @desc	保存数据
+	 */
+	public saveData() {
+		console.log(this.options);	
+	}
+
+	/**
+	 * @desc	预览
+	 */
+	public preview() {
+
+	}
+
+	/**
+	 * @desc	建立并打开新项目
+	 */
+	public createNewProject() {
+
+	}
+
+	/**
+	 * @desc	发布
+	 */
+	public publish() {
+
 	}
 }

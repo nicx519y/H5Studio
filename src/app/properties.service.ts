@@ -31,7 +31,8 @@ export class PropertiesService {
 		this.libItemModel = new PropertyTextboxModel({
 			label: 'item: ',
 			key: 'libItem',
-			value: '' 
+			value: '',
+			disabled: true
 		});
 		this.originalXModel = new PropertyNumberModel({
 			label: 'ori x: ',

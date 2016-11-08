@@ -1,6 +1,6 @@
 <ide-layout>
 	<div block="top" >
-		<ide-nav></ide-nav>
+		<ide-nav #navbar ></ide-nav>
 	</div>
 	<div block="left" >
 		<ide-accordion>
@@ -109,4 +109,4 @@
 	</div>
 </ide-layout>
 
-<ide-hot-keys [targets]="{ 'timeline': timeline, 'toolsbar': toolsbar }" ></ide-hot-keys>
+<ide-hot-keys [targets]="{ 'timeline': timeline, 'toolsbar': toolsbar, 'navbar' : navbar }" ></ide-hot-keys>

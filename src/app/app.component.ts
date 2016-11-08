@@ -5,6 +5,7 @@ import { ItemsService } from './items.service';
 import { PagesService } from './pages.service';
 import { AttrsService } from './attrs.service';
 import { BitmapImporterService } from './bitmap-importer.service';
+import { PageConfigerService } from './page-configer.service';
 
 
 @Component({
@@ -18,6 +19,7 @@ import { BitmapImporterService } from './bitmap-importer.service';
 		ItemsService,
 		PagesService,
 		BitmapImporterService,
+		PageConfigerService,
 	]
 })
 
@@ -25,13 +27,8 @@ export class AppComponent {
 
 
 	constructor(
-		private mainService: MainService,
-		private timelineService: TimelineService,
-		private attrsService: AttrsService,
-		private itemsService: ItemsService,
-		private pagesService: PagesService,
-		private bitmapImporterService: BitmapImporterService,
-		private viewContainerRef: ViewContainerRef // need this small hack in order to catch application root view container ref. for ng2-bootstrap
+		private viewContainerRef: ViewContainerRef, // need this small hack in order to catch application root view container ref. for ng2-bootstrap
+		private service: MainService
 	){
 
 	}

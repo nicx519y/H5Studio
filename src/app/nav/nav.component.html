@@ -5,19 +5,19 @@
 			<a dropdownToggle id="fileBtn" href="#">文件 <span class="caret"></span> </a>
 			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="fileBtn" >
 				<li role="menuitem" >
-					<a href="#" class="dropdown-item" >新建</a>
+					<a href="#" class="dropdown-item" (click)="createNewProject()" >新建</a>
 				</li>
 				<li role="menuitem" >
-					<a href="#" class="dropdown-item" >保存</a>
+					<a href="#" class="dropdown-item" (click)="saveData()" >保存</a>
 				</li>
 				<li role="menuitem" >
-					<a href="#" class="dropdown-item" >预览</a>
+					<a href="#" class="dropdown-item" (click)="preview()" >预览</a>
 				</li>
 				<li role="menuitem" >
-					<a href="#" class="dropdown-item" >发布</a>
+					<a href="#" class="dropdown-item" (click)="publish()" >发布</a>
 				</li>
 				<li role="menuitem" >
-					<a href="#" class="dropdown-item" >页面配置</a>
+					<a href="#" class="dropdown-item" (click)="showPageConfiger()" >页面配置</a>
 				</li>
 			</ul>
 		</li>
@@ -25,7 +25,7 @@
 			<a dropdownToggle id="bitmapBtn" class="nav-link" href="#">图片 <span class="caret"></span> </a>
 			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="pageBtn" >
 				<li role="menuitem" >
-					<a href="#" class="dropdown-item" (click)="bitmapImporter.show()" >导入</a>
+					<a href="#" class="dropdown-item" (click)="showBitmapImporter()" >导入</a>
 				</li>
 			</ul>
 		</li>
@@ -44,3 +44,4 @@
 </nav>
 
 <ide-bitmap-importer #bitmapImporter ></ide-bitmap-importer>
+<ide-page-configer #pageConfiger ></ide-page-configer>

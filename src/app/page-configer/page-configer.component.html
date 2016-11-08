@@ -1,0 +1,8 @@
+<ide-modal [title]="'页面设置'" [width]="600" #modal >
+	<form #configerForm="ngForm" class="modal-form" (submit)="hide()"   >
+		<ide-attr-form *ngFor="let opt of options" [options]="opt" class="modal-form"  ></ide-attr-form>
+		<div class="form-row buttons" >
+			<button  type="submit" class="btn btn-primary confrim"  >关&nbsp;闭</button>
+		</div>
+	</form>
+</ide-modal>

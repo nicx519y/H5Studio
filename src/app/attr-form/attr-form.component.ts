@@ -8,7 +8,7 @@ import {
 @Component({
 	selector: 'ide-attr-form',
 	templateUrl: './attr-form.component.html',
-	styleUrls: ['./attr-form.component.css']
+	styleUrls: ['./attr-form.component.css', '../../assets/modal.form.css']
 })
 export class AttrFormComponent implements OnInit {
 
@@ -19,7 +19,12 @@ export class AttrFormComponent implements OnInit {
 		value: any
 	};
 
-	constructor() { }
+	@Input()
+	inModal: boolean = false;
+
+	constructor() {
+		
+	}
 
 	ngOnInit() {
 	}

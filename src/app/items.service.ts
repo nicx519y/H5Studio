@@ -61,13 +61,15 @@ export class ItemsService {
 	}
 
 	editItem(index: number) {
-		if( index >= 0 && index <= this.items.length - 1 )
+		if( index >= 0 && index <= this.items.length - 1 ) {
 			this.itemEditEvent.emit( this.items[index] );
+		}
 	}
 
 	insertItem(index: number) {
-		if( index >= 0 && index <= this.items.length - 1 )
+		if( index >= 0 && index <= this.items.length - 1 ) {
 			this.itemInsertEvent.emit( this.items[index] );
+		}
 	}
 
 }

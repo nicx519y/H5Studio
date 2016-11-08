@@ -1,5 +1,10 @@
+
 .form-row {
 	padding: 6px 0;
+}
+
+ide-attr-form {
+	padding-right: 15px;
 }
 
 .modal-form label {

@@ -35,7 +35,6 @@ export class ItemListComponent implements OnInit {
 		private service: ItemsService
 	) {
 		this.options = service.items;
-
 	}
 
 	public addItem() {

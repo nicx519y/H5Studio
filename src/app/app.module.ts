@@ -21,6 +21,7 @@ import { ItemListComponent } from './item-list/item-list.component';
 import { TimelineComponent } from './timeline/timeline.component';
 import { LayerComponent } from './layer/layer.component';
 import { ToolsbarComponent } from './toolsbar/toolsbar.component';
+import { PageConfigerComponent } from './page-configer/page-configer.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ToolsbarComponent } from './toolsbar/toolsbar.component';
     ItemListComponent,
     TimelineComponent,
     LayerComponent,
-    ToolsbarComponent
+    ToolsbarComponent,
+    PageConfigerComponent
   ],
   imports: [
     BrowserModule,

@@ -42,6 +42,8 @@ export class HotKeysComponent implements OnInit {
         if (target && api != '' && typeof target[api] == 'function') {
             target[api].apply(target, model.arguments);
         }
+        evt.stopPropagation();
+        evt.preventDefault();
     }
 
     ngAfterViewInit() {

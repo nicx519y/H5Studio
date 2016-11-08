@@ -6,6 +6,8 @@ export enum ControlType {
 	Dropdown = 4,
 	StateButton = 5,
 	SingleSelectionButton = 6,
+	SingleSelectionCheckbox = 7,
+	FileSelect = 8,
 }
 
 export class PropertyBasicModel<T> {
@@ -13,17 +15,22 @@ export class PropertyBasicModel<T> {
 	key: string;
 	label: string;
 	controlType: ControlType;
+	disabled: boolean = false;
 
 	constructor(options: {
 		value?: T,
 		key?: string,
 		label?: string,
-		controlType?: ControlType
+		controlType?: ControlType,
+		disabled?: boolean,
 	}) {
 		this.value = options.value;
 		this.key = options.key || '';
 		this.label = options.label || '';
 		this.controlType = options.controlType || ControlType.Textbox;
+		if( typeof options.disabled === 'boolean' ) {
+			this.disabled = options.disabled;
+		}
 	}
 }
 
@@ -34,7 +41,7 @@ export class PropertyColorpickerModel extends PropertyBasicModel<number> {
 	}
 }
 
-export class PropertyDropdownModel extends PropertyBasicModel<string> {
+export class PropertyDropdownModel extends PropertyBasicModel<any> {
 	controlType = ControlType.Dropdown;
 	options: { key: string, value: string }[] = [];
 
@@ -93,6 +100,22 @@ export class PropertySingleSelectionModel extends PropertyBasicModel<number> {
 	controlType: ControlType = ControlType.SingleSelectionButton;
 	options: { class: string, value: string }[] = [];
 	
+	constructor(options: {} = {}) {
+		super( options );
+		Object.assign(this, options);
+	}
+}
+
+export class PropertySingleCheckboxModel extends PropertyBasicModel<boolean> {
+	controlType: ControlType = ControlType.SingleSelectionCheckbox;
+	constructor(options: {} = {}) {
+		super( options );
+		Object.assign(this, options);
+	}
+}
+
+export class PropertyFileSelectModel extends PropertyBasicModel<string> {
+	controlType: ControlType = ControlType.FileSelect;
 	constructor(options: {} = {}) {
 		super( options );
 		Object.assign(this, options);
