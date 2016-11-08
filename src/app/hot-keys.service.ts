@@ -84,24 +84,39 @@ export class HotKeysService {
 			}),
 			new HotKeyModel({
 				target: 'navbar',
-				ctrl: true,
-				key: 's',
+				alt: true,
+				key: 'ß',
 				api: 'saveData',
 				desc: '保存数据'
 			}),
 			new HotKeyModel({
 				target: 'navbar',
-				ctrl: true,
-				key: 'p',
+				alt: true,
+				key: 'π',
 				api: 'preview',
 				desc: '预览'
 			}),
 			new HotKeyModel({
 				target: 'navbar',
-				ctrl: true,
-				key: ',',
-				api: 'showPageConfiger'
+				alt: true,
+				key: '≤',
+				api: 'showPageConfiger',
+				desc: '页面配置'
 			}),
+			new HotKeyModel({
+				target: 'navbar',
+				alt: true,
+				key: '∫',
+				api: 'showBitmapImporter',
+				desc: '导入图片'
+			}),
+			new HotKeyModel({
+				target: 'itemList',
+				alt: true,
+				key: 'f8',
+				api: 'addItem',
+				desc: '新建元件'
+			})
 		]);
 	}
 
