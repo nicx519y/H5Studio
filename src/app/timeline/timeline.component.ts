@@ -1,7 +1,8 @@
-import { Component, ViewChildren, ElementRef, Input, QueryList, EventEmitter, OnInit } from '@angular/core';
+import { Component, ViewChild, ViewChildren, ElementRef, Input, Output, QueryList, OnInit, AfterViewInit } from '@angular/core';
 import { TimelineService } from '../timeline.service';
 import { TimelineModel, LayerModel, TweenType } from '../models';
 import { LayerComponent } from '../layer/layer.component';
+import { TimelineRulerComponent } from '../timeline-ruler/timeline-ruler.component';
 
 @Component({
 	selector: 'ide-timeline',
@@ -12,9 +13,19 @@ export class TimelineComponent implements OnInit {
 
 	@ViewChildren(LayerComponent)
 	layers: QueryList<LayerComponent>;
+	
+	@ViewChild('timelineContainer')
+	tlContainer: ElementRef;
+
+	@ViewChild('ruler')
+	ruler: TimelineRulerComponent;
+
+	@ViewChild('marking')
+	marking: ElementRef;
 
 	private lastHoverLayer: string = null;
 	private lastActionLayer: string = null;
+	private scaleFrame: number = 9;				//每帧的宽度
 
 	constructor(
 		private service: TimelineService
@@ -85,6 +96,8 @@ export class TimelineComponent implements OnInit {
 		}
 		this.lastHoverLayer = hoverOption.layer;
 		this.getLayerById( hoverOption.layer ).hoverIndex = hoverOption.hoverIndex;
+
+		this.marking.nativeElement.style.left = hoverOption.hoverIndex * this.scaleFrame + 'px';
 	}
 
 	public layerActionChangeHandler( actionOption: { start: number, duration: number, layer: string } ) {
@@ -99,6 +112,7 @@ export class TimelineComponent implements OnInit {
 		};
 
 		this.service.timeline.actionOption = actionOption;
+
 	}
 
 	public layerActionMoveHandler( actionMoveOption: { start: number, duration: number, offset: number, layer: string } ) {
@@ -140,6 +154,12 @@ export class TimelineComponent implements OnInit {
 	}
 
 	ngOnInit() {
+	}
+
+	ngAfterViewInit() {
+		this.tlContainer.nativeElement.addEventListener('scroll', (evt: Event) => {
+			this.ruler.render( (evt.target as Element).scrollLeft );
+		});
 	}
 
 }

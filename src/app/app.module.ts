@@ -22,6 +22,7 @@ import { TimelineComponent } from './timeline/timeline.component';
 import { LayerComponent } from './layer/layer.component';
 import { ToolsbarComponent } from './toolsbar/toolsbar.component';
 import { PageConfigerComponent } from './page-configer/page-configer.component';
+import { TimelineRulerComponent } from './timeline-ruler/timeline-ruler.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { PageConfigerComponent } from './page-configer/page-configer.component';
     TimelineComponent,
     LayerComponent,
     ToolsbarComponent,
-    PageConfigerComponent
+    PageConfigerComponent,
+    TimelineRulerComponent
   ],
   imports: [
     BrowserModule,

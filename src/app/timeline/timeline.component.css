@@ -45,6 +45,22 @@
 	overflow: auto;
 }
 
+.right.list {
+	position: relative;
+}
+
+.marking {
+	position: absolute;
+	border-left: solid 1px red;
+	width: 9px;
+	height: 100%;
+	left: -9px;
+	top: 0;
+	pointer-events: none;
+	z-index: 1000;
+	opacity: 0.5;
+}
+
 .layer-item {
 	border-bottom: dotted 1px #e5e5e5;
 	height: 23px;

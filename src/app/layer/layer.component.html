@@ -1,10 +1,9 @@
-<div class="framebase" [style.width]="option.frameCount * 9"  ></div>
-<div class="frame hover" #hover   ></div>
-<div class="frame action" #action  ></div>
+<div class="frame hover" #hover [style.width]="scaleFrame + 'px'"   ></div>
+<div class="frame action" #action [style.width]="scaleFrame + 'px'"  ></div>
 <div class="frame key" *ngFor="let frame of option.frames"
 	[ngStyle]="{
-		left: frame.index * 9 + 'px',
-		width: frame.duration * 9 + 'px'
+		left: frame.index * scaleFrame + 'px',
+		width: frame.duration * scaleFrame + 'px'
 	}"
 	[ngClass]="[
 		{true: 'empty', false: 'full'}[frame.isEmpty],

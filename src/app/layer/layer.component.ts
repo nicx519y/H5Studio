@@ -13,6 +13,9 @@ export class LayerComponent implements OnInit {
 	@Input()
 	option: LayerModel;
 
+	@Input()
+	scaleFrame: number;					//每帧刻度
+
 	@Output()
 	hoverChangeEvent: EventEmitter<{
 		layer: string,

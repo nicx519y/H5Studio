@@ -60,6 +60,7 @@ export class PreviewerComponent implements OnInit {
 		sy = ( this.height - sh ) / 2;
 
 		//抗锯齿绘制
+
 		oc.width = image.width / 2;
 		oc.height = image.height / 2;
 		ic.width = this.width;

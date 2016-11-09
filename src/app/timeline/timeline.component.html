@@ -1,7 +1,7 @@
 <div class="topnav flexbox" >
 	<div class="left" ></div>
 	<div class="right" >
-		<div class="rouler"></div>
+		<ide-timeline-ruler #ruler [scaleFrame]="scaleFrame" ></ide-timeline-ruler>
 	</div>
 </div>
 <div class="main" >
@@ -23,13 +23,14 @@
 				}[layer.visible]" ></span>
 			</div>
 		</div>
-		<div class="right list"  >
-			<div class="timeline-list" [style.minWidth]="(service.timeline.frameCount + 100) * 9 + 'px'"  >
-				<ide-layer *ngFor="let layer of service.timeline.layers" [option]="layer" 
+		<div class="right list" #timelineContainer  >
+			<div class="timeline-list" [style.minWidth]="(service.timeline.frameCount + 100) * scaleFrame + 'px'"  >
+				<ide-layer *ngFor="let layer of service.timeline.layers" [scaleFrame]="scaleFrame" [option]="layer" 
 				(hoverChangeEvent)="layerHoverChangeHandler($event)"
 				(actionChangeEvent)="layerActionChangeHandler($event)"
 				(actionMoveEvent)="layerActionMoveHandler($event)"   ></ide-layer>
 			</div>
+			<div class="marking" #marking ></div>
 		</div>
 	</div>
 </div>
