@@ -1,2 +1,2 @@
-<img *ngIf="previewData!=''" [src]="previewData" [width]="width" [height]="height" />
+<img *ngIf="previewData!=''" [src]="previewData" [width]="width * n" [height]="height * n" [style.width]="width+'px'" [style.height]="height+'px'" />
 <div *ngIf="previewData==''" [ngStyle]="{ width: width + 'px', height: height + 'px' }" ></div>

@@ -21,6 +21,8 @@ export class PreviewerComponent implements OnInit {
 
 	public previewData: string = '';
 
+	public n: number = 2;
+
 	constructor() {
 		
 	}
@@ -47,28 +49,28 @@ export class PreviewerComponent implements OnInit {
 		let icx = ic.getContext('2d');
 		let oc = document.createElement('canvas');
 		let ocx = oc.getContext('2d');
+		let n = this.n;	//用于适配retina屏幕
 
 		if( this.width / this.height >= image.width / image.height ) {
-			sh = this.height;
+			sh = this.height * n;
 			sw = d * sh;
 		} else {
-			sw = this.width;
+			sw = this.width * n;
 			sh = sw / d;
 		}
 
-		sx = ( this.width - sw ) / 2;
-		sy = ( this.height - sh ) / 2;
+		sx = ( this.width * n - sw ) / 2;
+		sy = ( this.height * n - sh ) / 2;
 
-		//抗锯齿绘制
-
+		//抗锯齿绘制 两次插值
 		oc.width = image.width / 2;
 		oc.height = image.height / 2;
-		ic.width = this.width;
-		ic.height = this.height;
+		ic.width = this.width * n;
+		ic.height = this.height * n;
 		ocx.drawImage(image, 0, 0, oc.width, oc.height);
 		ocx.drawImage(oc, 0, 0, oc.width / 2, oc.height / 2);
 		icx.drawImage( oc, 0, 0, oc.width / 2, oc.height / 2, Math.floor(sx), Math.floor(sy), Math.floor(sw), Math.floor(sh) );
-
+		
 		this.previewData = ic.toDataURL('image/png');
 
 		ic = oc = icx = ocx = null;
