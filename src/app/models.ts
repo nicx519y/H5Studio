@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 
 export enum Direction {
 	vertial,		//垂直
@@ -6,7 +7,7 @@ export enum Direction {
 
 export enum PageType {
 	none,
-	swiper
+	swiper 
 }
 
 export enum SwiperEffect {
@@ -18,7 +19,11 @@ export enum ItemType {
 	bitmap, 	//位图
 	text,		//文字
 	video,		//视频
-	shape, 		//图形
+}
+
+export enum SourceType {
+	bitmap,
+	video
 }
 
 export enum ElementType {
@@ -88,21 +93,46 @@ export enum LayerType {
 	path				//引导层
 }
 
-export class BasicModel {
 
+export class BasicModel {
 	static idrandoms: Array<string> = [];
 	idpre: string = '';
 	id: string = '';
+	
 	constructor() {
-		
 	}
-	init(options: {} = {} = {}) {
-		for(let i in options) {
-			this[i] = options[i];
-		}
+
+	public init(options: {} = {}) {
 		//如果没有指定id，则生成唯一id
-		if(typeof this['id'] == 'string' && this['id'] != '') return;
-		this['id'] = BasicModel.createNewId(this.idpre);
+		if(typeof this['id'] != 'string' || this['id'] == '') {
+			this['id'] = BasicModel.createNewId(this.idpre);
+		}
+		
+		for(let key in options) {
+			if(!Reflect.has(this, key)) {
+				continue;
+			}
+
+			let value: any = options[key];
+			let property: any = Reflect.get(this, key);
+
+			if(typeof value == 'undefined') {
+				continue;
+			}
+
+			if(typeof property == 'undefined') {
+				Reflect.set(this, key, value);
+				continue;
+			}
+
+			if(value.constructor.name == property.constructor.name) {
+				Reflect.set(this, key, value);
+			} else if(typeof value == 'Object') {
+				Reflect.set(this, key, new property.constructor(value));
+			} else {
+				continue;
+			}
+		}
 	}
 	private static createRandom(): string {
 		let str: string = Math.round(1000 * Math.random()).toString();
@@ -127,27 +157,41 @@ export class BasicModel {
 	
 }
 
+
 export class TextSourceModel extends BasicModel {
+	idpre: string = 'text';
 	width: number = 0;					//宽度
 	height: number = 0;					//高度
 	text: string = '';					//文字内容
-	font: string = '';					//字体
+	font: string = 'arial';					//字体
 	color: string = '#000000';			//颜色
-	background: BackgroundModel = null;	//背景色
+	background: BackgroundModel = new BackgroundModel();	//背景色
 	size: number = 12;					//字号
 	bold: boolean = false;				//粗体
 	italic: boolean = false;			//斜体
 	underline: boolean = false;			//下划线
-	strikethrough: boolean = false;		//删除线
 	lineheight: number = 20;			//行高
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		width?: number,
+		height?: number,
+		text?: string,
+		font?: string,
+		color?: string,
+		background?: BackgroundModel,
+		size?: number,
+		bold?: boolean,
+		italic?: boolean,
+		underline?: boolean,
+		lineheight?: number
+	} = {}) {
 		super();
 		super.init(options);
 	}
 }
 
 export class ShapeSourceModel extends BasicModel {
+	idpre: string = 'shape';
 	//to do ...
 	constructor(options: {} = {}) {
 		super();
@@ -155,26 +199,77 @@ export class ShapeSourceModel extends BasicModel {
 	}
 }
 
-export class BitmapSourceModel extends BasicModel {
-	path: string;			//图片路径
-	constructor(options: {} = {}) {
+export class SourceModel extends BasicModel {
+	idpre: string = 'source';
+	type: ItemType;
+	path: string = '';			//资源
+	width: number = 0;
+	height: number = 0;
+	fileName: string = '';
+	size: number = 0;
+	constructor(options: {
+		path?: string,
+		width?: number,
+		height?: number,
+		fileName?: string,
+		size?: number
+	} = {}) {
+		super();
+		super.init(options);
+	}
+
+	public static createSourceModel(type: ItemType, options:{}={}) {
+		let model: BasicModel;
+		switch( type ) {
+			case ItemType.bitmap:
+				model = new BitmapSourceModel( options );
+				break;
+			case ItemType.video:
+				model = new VideoSorceModel( options );
+				break;
+			case ItemType.text:
+				model = new TextSourceModel( options );
+				break;
+			case ItemType.movieclip:
+				model = new PageModel( options );
+				break;
+		}
+		return model;
+	}
+}
+
+export class BitmapSourceModel extends SourceModel {
+	idpre: string = 'bitmap';
+	type: ItemType = ItemType.bitmap;
+	constructor(options: {
+		path?: string,
+		size?: number,
+		width?: number,
+		height?: number,
+		fileName?: string
+	}={}) {
 		super();
 		super.init(options);
 	}
 }
 
-export class VideoSourceModel extends BasicModel {
-	path: string;			//视频路径
-	width: number;			//宽度
-	height: number;			//高度
-	//to do ...
-	constructor(options: {} = {}) {
+export class VideoSorceModel extends SourceModel {
+	idpre: string = 'video';
+	type: ItemType = ItemType.video;
+	constructor(options: {
+		path?: string,
+		size?: number,
+		width?: number,
+		height?: number,
+		fileName?: string
+	}={}) {
 		super();
 		super.init(options);
 	}
 }
 
 export class ElementStateModel extends BasicModel {
+	idpre: string = 'eleState';
 	originX: number = 0;	//原点X坐标
 	originY: number = 0;	//原点Y坐标
 	matrix: {				//matrix
@@ -195,44 +290,102 @@ export class ElementStateModel extends BasicModel {
 	alpha: number = 100;	//透明度 0 - 100
 	visible: boolean = true;
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		originX?: number,
+		originY?: number,
+		matrix?: {
+			a: number, b: number, c: number, d: number, e: number, f:number
+		},
+		alpha?: number,
+		visible?: boolean
+	} = {}) {
 		super();
 		super.init(options);
 	}
 }
 
 export class TweenModel extends BasicModel {
+	idpre: string = 'tween'; 
 	type: TweenType = TweenType.normal;
 	loop: boolean = false;						//是否循环
 	ease: Ease = Ease.linear;
 	duration: number = 0;						//动画帧长
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		type?: TweenType,
+		loop?: boolean,
+		ease?: Ease,
+		duration?: number
+	} = {}) {
 		super();
 		super.init(options);
 	}
 }
 
 export class ElementModel extends BasicModel {
-	instanceName: string = '';					//人为指定的标识，同样具有唯一性
-	type: ElementType = ElementType.symbol;		//标识element的类型
-	source: any = null;							//资源 对应不同资源的model类型
+	idpre: string = 'ele';
+	public instanceName: string = '';											//人为指定的标识，同样具有唯一性
+	private _type: ElementType = ElementType.symbol;					//标识element的类型
+	private _source: any = '';
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		instanceName?: string,
+		type?: ElementType,
+		source?: any
+	}={}) {
 		super();
 		super.init(options);
 	}
 
+	public set type(t: ElementType) {
+		if(t != this._type) {
+			this._type = t;
+			switch(this._type) {
+				case ElementType.symbol:
+					this._source = '';		//item id
+					break;
+				case ElementType.shape:
+					this._source = new ShapeSourceModel();
+					break;
+			}
+		}
+	}
+
+	public get type() {
+		return this._type;
+	}
+
+	public set source(src: any) {
+		switch(this._type) {
+			case ElementType.symbol:
+				if( typeof src == 'string' ) {
+					this._source = src;
+				} else {
+					throw new Error('Can not set source which not match ElementType!');
+				}
+				break;
+			case ElementType.shape:
+				this._source.init(src);
+				break;
+		}
+	}
+
+	public get source() {
+		return this._source;
+	}
+
+
 	public static fromItem( item: ItemModel ) {
 		let ele: ElementModel = new ElementModel({
 			type: ElementType.symbol,
-			source: item
+			source: item.id
 		});
 		return ele;
 	}
 }
 
 export class FilterModel extends BasicModel {
+	idpre: string = 'filter';
 	// to do ...
 
 	constructor(options: {} = {}) {
@@ -242,16 +395,34 @@ export class FilterModel extends BasicModel {
 }
 
 export class FrameModel extends BasicModel {
-	name: string = '';							//帧名，如果没有指定则为空字符串
-	index: number = 0;							//帧序号
-	isKeyFrame: boolean = true;					//是否是关键帧
-	isEmpty: boolean = false;					//是否是空帧
-	tweenType: TweenType = TweenType.none;					//区间动画类型
-	tween: TweenModel = null;					//指定到下一个关键帧之间的动画参数
-	elementState: ElementStateModel = null;		//当前状态
-	duration: number = 1;						//关键帧区域长度							
+	idpre: string = 'frame';
+	name: string = '';											//帧名，如果没有指定则为空字符串
+	index: number = 0;											//帧序号
+	isKeyFrame: boolean = true;									//是否是关键帧
+	isEmpty: boolean = false;									//是否是空帧
+	tweenType: TweenType = TweenType.none;						//区间动画类型
+	tween: TweenModel = new TweenModel();						//指定到下一个关键帧之间的动画参数
+	elementState: ElementStateModel = new ElementStateModel();	//当前状态
+	duration: number = 1;										//关键帧区域长度
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		name?: string,
+		index?: number,
+		isKeyFrame?: boolean,
+		isEmpty?: boolean,
+		tweenType?: TweenType,
+		tween?: TweenModel,
+		elementState?: ElementStateModel | {
+			originX?: number,
+			originY?: number,
+			matrix?: {
+				a: number, b: number, c: number, d: number, e: number, f:number
+			},
+			alpha?: number,
+			visible?: boolean
+		},
+		duration?: number
+	} = {}) {
 		super();
 		super.init(options);
 	}
@@ -261,6 +432,7 @@ export class FrameModel extends BasicModel {
 		if(this.tween) {
 			this.tween.duration = dur;
 		}
+		
 	}
 
 	public copy(): FrameModel {
@@ -273,10 +445,8 @@ export class FrameModel extends BasicModel {
 			duration: this.duration
 		});
 
-		if( this.elementState != null ) {
-			newFrame.elementState = new ElementStateModel();
-			Object.assign( newFrame.elementState, this.elementState );
-		}
+		newFrame.elementState = new ElementStateModel();
+		Object.assign( newFrame.elementState, this.elementState );
 
 		return newFrame;
 	}
@@ -286,19 +456,29 @@ export class FrameModel extends BasicModel {
 
 
 export class LayerModel extends BasicModel {
-	id: string = '';					//图层id
-	name: string = '';					//手动命名的name
-	zIndex: number = 0;					//层级 0在最下
-	type: LayerType = LayerType.normal;	//图层类型
-	parentLayer: string = '';			//自身的遮罩或者引导层id
-	children: Array<string> = [];		//如果自身是遮罩或者引导层，会有子图层的列表
-	startFrame: number = 0;				//开始帧
-	element: ElementModel;				//包含的element
-	frames: Array<FrameModel>;			//关键帧集合
-	frameCount: number = 0;				//总帧数
-	visible: boolean = true;			//在编辑状态是否可见，不影响实际展示
+	idpre: string = 'layer';
+	id: string = '';									//图层id
+	name: string = '';									//手动命名的name
+	type: LayerType = LayerType.normal;					//图层类型
+	parentLayer: string = '';							//自身的遮罩或者引导层id
+	children: Array<string> = [];						//如果自身是遮罩或者引导层，会有子图层的列表
+	startFrame: number = 0;								//开始帧
+	element: ElementModel = new ElementModel();			//包含的element
+	frames: Array<FrameModel> = [];						//关键帧集合
+	frameCount: number = 0;								//总帧数
+	visible: boolean = true;							//在编辑状态是否可见，不影响实际展示
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		name?: string,
+		type?: LayerType,
+		parentLayer?: string,
+		children?: string[],
+		startFrame?: number,
+		element?: ElementModel,
+		frames?: FrameModel[],
+		frameCount?: number,
+		visible?: boolean
+	} = {}) {
 		super();
 		super.init(options);
 		this.frames.forEach(frame => {
@@ -340,11 +520,10 @@ export class LayerModel extends BasicModel {
 			let keyframe: FrameModel = this.getKeyFrameByFrame( i );
 			if( !keyframe ) continue;
 			let f: FrameModel = keyframe.copy();
-			f.index = i;
-			f.tweenType = TweenType.none;
-			f.tween = null;
-			f.elementState = null;
-			f.isEmpty = true;
+			f.init({
+				index: i,
+				isEmpty: true
+			});
 			tempArr.push( f );
 		}
 
@@ -410,6 +589,7 @@ export class LayerModel extends BasicModel {
 	 * @param	{ index }		帧序号
 	 * @param	{ tweenType }	动画类型
 	 */
+	
 	public createTweens( index1: number, index2: number, tweenType: TweenType = TweenType.normal ) {
 		let frameMap: Map<number, FrameModel> = new Map<number, FrameModel>();
 		for(let i = index1; i <= index2; i ++) {
@@ -418,15 +598,12 @@ export class LayerModel extends BasicModel {
 			frameMap.set(frame.index, frame);
 		}
 		frameMap.forEach( frame => {
-			if(frame.tweenType != tweenType || frame.tween == null) {
-				frame.tweenType = tweenType;
-				frame.tween = new TweenModel({
-					type: tweenType,
-					loop: false,
-					duration: frame.duration,
-					ease: Ease.linear		
-				});
-			}
+			frame.tweenType = tweenType;
+			frame.tween.init({
+				tweenType: tweenType,
+				duration: frame.duration,
+				ease: Ease.linear
+			});
 		} );
 	}
 
@@ -442,10 +619,7 @@ export class LayerModel extends BasicModel {
 			frameMap.set(frame.index, frame);
 		}
 		frameMap.forEach( frame => {
-			if(frame.tweenType != TweenType.none || frame.tween != null) {
-				frame.tweenType = TweenType.none;
-				frame.tween = null;
-			}
+			frame.tweenType = TweenType.none;
 		} );
 	}
 
@@ -564,7 +738,6 @@ export class LayerModel extends BasicModel {
 				index: 0,
 				isKeyFrame: true,
 				isEmpty: true,
-				element: null
 			}));
 			return false;
 		}
@@ -574,7 +747,6 @@ export class LayerModel extends BasicModel {
 				index: 0,
 				isKeyFrame: true,
 				isEmpty: true,
-				element: null
 			}));
 		}
 
@@ -642,18 +814,24 @@ export class TimelineModel extends BasicModel {
 
 export class PageModel extends BasicModel {
 	idpre: string = 'page';
-	name: string = '';							//name
-	background: BackgroundModel = null;			//背景色
-	thumbnail: string = '';						//缩略图
+	name: string = '';												//name
+	background: BackgroundModel = new BackgroundModel();			//背景色
+	thumbnail: string = '';											//缩略图
 	timeline: TimelineModel = new TimelineModel();
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		name?: string,
+		background?: BackgroundModel | {},
+		thumbnail?: string,
+		timeline?: TimelineModel | {}
+	} = {}) {
 		super();
 		super.init(options);
 	}
 }
 
 export class SwiperModel extends BasicModel {
+	idpre: string = 'swiper';
 	initialSlide: number = 0;						//初始页序号
 	direction: Direction = Direction.vertial;		//动画方向
 	speed: number = 100;							//变换速度
@@ -661,7 +839,13 @@ export class SwiperModel extends BasicModel {
 	effect: SwiperEffect = SwiperEffect.slide;		//滑动特效
 	loop: boolean = false;							//是否循环播放
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		initialSlide?: number,
+		direction?: Direction,
+		speed?: number,
+		autoPlay?: boolean,
+		effect?: SwiperEffect | {}
+	} = {}) {
 		super();
 		super.init(options);
 	}
@@ -672,38 +856,57 @@ export class ItemModel extends BasicModel {
 	id: string = '';								//item id 唯一标识
 	name: string = '';								//item name
 	thumbnail: string = '';							//缩略图
-	type: ItemType = ItemType.movieclip;			//类型
-	source: any = null;								//根据不同类型包含不同source
-	constructor(options: {} = {}) {
+	private _type: ItemType = ItemType.movieclip;	//类型
+	private _source: BasicModel = new PageModel();			//存储资源数据
+	constructor(options: {
+		name?: string,
+		thumbnail?: string,
+		type?: ItemType,
+		source?: any
+	} = {}) {
 		super();
 		super.init(options);
+	}
+
+	get type(): ItemType {
+		return this._type;
+	}
+
+	set type(t: ItemType) {
+		if(this.type != t) {
+			this._type = t;
+			this._source = SourceModel.createSourceModel(t);
+		}
+	}
+
+	get source(): any {
+		return this._source;
+	}
+
+	set source( src: any ) {
+		this.source.init(src);
 	}
 }
 
 export class BackgroundModel extends BasicModel {
-	color: string = '#ffffff';
+	idpre: string = 'bg';
+	color: string = 'rgba(0, 0, 0, 0)';
 	image: string = '';
 	repeat: boolean = false;
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		color?: string,
+		image?: string,
+		repeat?: boolean
+	} = {}) {
 		super();
 		super.init(options);
 	}
 }
 
-export class BitmapModel extends BasicModel {
-	source: string = '';
-	fileName: string = '';
-	name: string = '';
-	size: number = 0;
-
-	constructor( options: {} ={} ) {
-		super();
-		super.init( options );
-	}
-}
 
 export class HotKeyModel extends BasicModel {
+	idpre: string = 'hotkey';
 	target: string = '';
 	shift: boolean = false;
 	ctrl: boolean = false;
@@ -715,11 +918,12 @@ export class HotKeyModel extends BasicModel {
 	constructor(options: {} = {}) {
 		super();
 		super.init(options);
+		
 	}
 }
 
 export class StageModel extends BasicModel {
-
+	idpre: string = 'stage';
 	background: BackgroundModel = new BackgroundModel();
 	title: string = '';
 	pageType: PageType = PageType.swiper;
@@ -731,8 +935,9 @@ export class StageModel extends BasicModel {
 }
 
 export class MainModel extends BasicModel {
+	idpre: string = 'main';
 	stage: StageModel = new StageModel();
-	swiper: SwiperModel = null;
+	swiper: SwiperModel = new SwiperModel();
 	pages: Array<PageModel> = [];
 	library: Array<ItemModel> = [];
 
@@ -741,4 +946,5 @@ export class MainModel extends BasicModel {
 		super.init(options);
 	}
 }
+
 

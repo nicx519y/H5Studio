@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef, EventEmitter, OnInit } from '@angular/core';
 import { ModalComponent } from '../modal/modal.component';
-import { BitmapModel } from '../models';
+import { BitmapSourceModel } from '../models';
 import { BitmapImporterService } from '../bitmap-importer.service';
 
 
@@ -58,9 +58,8 @@ export class BitmapImporterComponent implements OnInit {
 			let reader: FileReader = new FileReader();
 			reader.onload = ( evt: ProgressEvent ) => {
 				this.service.createNewBitmap({
-					source: reader.result,
+					path: String(reader.result),
 					fileName: file.name,
-					name: file.name,
 					size: file.size
 				});
 			};
@@ -70,7 +69,7 @@ export class BitmapImporterComponent implements OnInit {
 	}
 
 	private hasFile( file: File ): boolean {
-		let bitmap: BitmapModel = this.service.bitmaps.find((value: BitmapModel, index: number) => {
+		let bitmap: BitmapSourceModel = this.service.bitmaps.find((value: BitmapSourceModel, index: number) => {
 			return value.fileName === file.name;
 		});
 		return !!bitmap;

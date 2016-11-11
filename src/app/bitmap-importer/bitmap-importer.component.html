@@ -3,9 +3,9 @@
 		<div class="bitmaps" >
 			<ul>
 				<li  *ngFor="let bitmap of service.bitmaps; let i = index;" (click)="nameInput.focus()"  >
-					<ide-previewer [src]="bitmap.source" [width]="90" [height]="90"  ></ide-previewer>
+					<ide-previewer [src]="bitmap.path" [width]="90" [height]="90"  ></ide-previewer>
 					<span class="glyphicon glyphicon-remove deleteBtn " (click)="removeBitmap(i)" ></span>
-					<input #nameInput type="text" [(ngModel)]="bitmap.name" name="name" required  onfocus="this.select()" autocomplete="off"  />
+					<input #nameInput type="text" [(ngModel)]="bitmap.fileName" name="name" required  onfocus="this.select()" autocomplete="off"  />
 				</li>
 				<li>
 					<button class="fileBtn" >

@@ -4,7 +4,7 @@ import { PagesService } from './pages.service';
 import { AttrsService } from './attrs.service';
 import { TimelineService } from './timeline.service';
 import { BitmapImporterService } from './bitmap-importer.service';
-import { MainModel, BitmapModel, ElementModel, ItemModel, ItemType } from './models';
+import { MainModel, BitmapSourceModel, ElementModel, ItemModel, ItemType } from './models';
 
 @Injectable()
 export class MainService {
@@ -37,7 +37,7 @@ export class MainService {
 			this.itemDeleteHandler( item );
 		});
 
-		this.importBitmapService.uploadCompleteEvent.subscribe( (bitmaps: BitmapModel[]) => {
+		this.importBitmapService.uploadCompleteEvent.subscribe( (bitmaps: BitmapSourceModel[]) => {
 			this.importBitmapCompleteHandler( bitmaps );
 		});
 
@@ -73,12 +73,12 @@ export class MainService {
 		});
 	}
 
-	private importBitmapCompleteHandler( bitmaps: BitmapModel[] ) {
+	private importBitmapCompleteHandler( bitmaps: BitmapSourceModel[] ) {
 		bitmaps.map( bitmap => {
 			this.itemsService.addItem({
-				name: bitmap.name,
-				source: bitmap.source,
-				thumbnail: bitmap.source,
+				name: bitmap.fileName,
+				source: bitmap.path,
+				thumbnail: bitmap.path,
 				type: ItemType.bitmap
 			});
 		});

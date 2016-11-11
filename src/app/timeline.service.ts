@@ -32,7 +32,7 @@ export class TimelineService {
 		});
 
 		let newLayer: LayerModel = new LayerModel({
-			name: element.source.name,
+			name: 'New Element',
 			type: LayerType.normal,
 			element: element,
 			frames: [

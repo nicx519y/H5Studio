@@ -70,7 +70,6 @@ export class TimelineRulerComponent implements OnInit {
 		let interval = setInterval(() => {
 			if(this.container.nativeElement.offsetWidth != 0) {
 				clearInterval(interval);
-				console.log('clear');
 				this.render();
 			}
 		}, 10);

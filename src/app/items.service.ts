@@ -1,9 +1,9 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { ItemModel, ItemType } from './models';
 
+
 @Injectable()
 export class ItemsService {
-
 	private itemsList: Array<ItemModel>=[];
 	private _active: number = -1;
 
@@ -17,7 +17,6 @@ export class ItemsService {
 	itemDeleteEvent: EventEmitter<ItemModel> = new EventEmitter();
 
 	constructor() {
-	
 	}
 
 	get active(): number {
