@@ -23,14 +23,14 @@ export class PageListComponent implements OnInit {
 	 * 新增空白场景
 	 */
 	addEmptyPageAfterActive() {
-		this.services.addEmptyStage( this.services.active + 1, 'new page' );
+		this.services.addEmptyStage( this.services.active + 1, 'New Page' );
 	}
 
 	/**
 	 * 在最后新增空白页
 	 */
 	addEmptyPageAtLast() {
-		this.services.addEmptyStage( this.services.pages.length, 'new page' );
+		this.services.addEmptyStage( this.services.pages.length, 'New Page' );
 	}
 
 	/**

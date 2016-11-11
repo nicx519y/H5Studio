@@ -70,7 +70,7 @@ export class HotKeysService {
 			}),
 			new HotKeyModel({
 				target: 'toolsbar',
-				key: 'p',
+				key: 'b',
 				api: 'changeState',
 				arguments: [ EditorState.draw ],
 				desc: '绘制'
@@ -84,38 +84,45 @@ export class HotKeysService {
 			}),
 			new HotKeyModel({
 				target: 'navbar',
-				alt: true,
-				key: 'ß',
+				ctrl: true,
+				key: 's',
 				api: 'saveData',
 				desc: '保存数据'
 			}),
 			new HotKeyModel({
 				target: 'navbar',
-				alt: true,
-				key: 'π',
+				ctrl: true,
+				key: 'v',
 				api: 'preview',
 				desc: '预览'
 			}),
 			new HotKeyModel({
 				target: 'navbar',
-				alt: true,
-				key: '≤',
+				ctrl: true,
+				key: ',',
 				api: 'showPageConfiger',
 				desc: '页面配置'
 			}),
 			new HotKeyModel({
 				target: 'navbar',
-				alt: true,
-				key: '∫',
+				ctrl: true,
+				key: 'b',
 				api: 'showBitmapImporter',
 				desc: '导入图片'
 			}),
 			new HotKeyModel({
 				target: 'itemList',
-				alt: true,
-				key: 'f8',
+				ctrl: true,
+				key: 'i',
 				api: 'addItem',
 				desc: '新建元件'
+			}),
+			new HotKeyModel({
+				target: 'pageList',
+				ctrl: true,
+				key: 'p',
+				api: 'addEmptyPageAtLast',
+				desc: '新增页面'
 			})
 		]);
 	}
