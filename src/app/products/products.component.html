@@ -1,0 +1,7 @@
+<div class="list-group">
+	<a href="/ide/{{opt.prodId}}" *ngFor="let opt of service.options" class="list-group-item" >
+		<h3>{{opt.title}}</h3>
+		项目作者：<span class="user" >{{opt.user}}</span> <br />
+		修改时间：<span class="last-modify" >{{opt.lastModify}}</span>
+	</a>
+</div>

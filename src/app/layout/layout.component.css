@@ -1,7 +1,4 @@
-:host /deep/ [block=left], 
-:host /deep/ [block=right], 
-:host /deep/ [block=bottom], 
-:host /deep/ [block=center], 
+:host /deep/ [block=content], 
 :host /deep/ [block=top] {
 	width:100%;
 	display: flex;
@@ -24,45 +21,5 @@
 	display: flex;
 	flex-direction: row;
 }
-.left-content-wrap {
-	width: 170px;
-	flex-basis: auto;
-	display: flex;
-	flex-direction: row;
-}
 
-.center-content-wrap {
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-}
-.right-content-wrap {
-	width: 280px;
-	flex-basis: auto;
-	display: flex;
-	flex-direction: row;
-}
-.center-top-content-wrap {
-	flex-grow: 1;
-	padding: 0 2px 2px 2px;
-	display: flex;
-	flex-direction: row;
-}
-.center-bottom-content-wrap {
-	display: flex;
-	height: 200px;
-	flex-basis: auto;
-	display: flex;
-	padding: 0 2px;
-}
-
-.center-top-left-content-wrap {
-	flex-grow: 0;
-	width: 45px;
-	border: solid 1px #eee;
-}
-
-.center-top-right-content-wrap {
-	flex-grow: 1;
-}
 

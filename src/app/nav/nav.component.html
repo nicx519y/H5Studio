@@ -1,27 +1,35 @@
 <nav class="navbar navbar-light bg-faded">
 	<a class="navbar-brand" href="#">H5Studio</a>
 	<ul class="nav navbar-nav">
-		<li class="nav-item" dropdown >
-			<a dropdownToggle id="fileBtn" href="#">文件 <span class="caret"></span> </a>
-			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="fileBtn" >
-				<li role="menuitem" >
-					<a href="#" class="dropdown-item" (click)="createNewProject()" >新建</a>
-				</li>
-				<li role="menuitem" >
-					<a href="#" class="dropdown-item" (click)="saveData()" >保存</a>
-				</li>
-				<li role="menuitem" >
-					<a href="#" class="dropdown-item" (click)="preview()" >预览</a>
-				</li>
-				<li role="menuitem" >
-					<a href="#" class="dropdown-item" (click)="publish()" >发布</a>
-				</li>
-				<li role="menuitem" >
-					<a href="#" class="dropdown-item" (click)="showPageConfiger()" >页面配置</a>
+		<li class="nav-item" dropdown *ngFor="let item of options" >
+			<a dropdownToggle [id]="item.navId" href="#">{{item.title}} <span class="caret"></span> </a>
+			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="{item.navId}" >
+				<li role="menuitem" *ngFor="let l of item.list" >
+					<a href="#" class="dropdown-item" (click)="l.clickHandler()" >{{l.label}}</a>
 				</li>
 			</ul>
 		</li>
-		<li class="nav-item" dropdown >
+		<!--<li class="nav-item" dropdown >
+			<a dropdownToggle id="fileBtn" href="#">文件 <span class="caret"></span> </a>
+			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="fileBtn" >
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" (click)="mainService.createNewProject()" >新建</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" (click)="mainService.saveData()" >保存</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" (click)="mainService.preview()" >预览</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" (click)="mainService.publish()" >发布</a>
+				</li>
+				<li role="menuitem" >
+					<a href="#" class="dropdown-item" (click)="mainService.showPageConfiger()" >页面配置</a>
+				</li>
+			</ul>
+		</li>-->
+		<!--<li class="nav-item" dropdown >
 			<a dropdownToggle id="bitmapBtn" class="nav-link" href="#">图片 <span class="caret"></span> </a>
 			<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="pageBtn" >
 				<li role="menuitem" >
@@ -39,9 +47,9 @@
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" href="#">扩展</a>
-		</li>
+		</li>-->
 	</ul>
 </nav>
 
-<ide-bitmap-importer #bitmapImporter ></ide-bitmap-importer>
-<ide-page-configer #pageConfiger ></ide-page-configer>
+<!--<ide-bitmap-importer #bitmapImporter ></ide-bitmap-importer>
+<ide-page-configer #pageConfiger ></ide-page-configer>-->

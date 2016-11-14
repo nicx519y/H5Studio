@@ -1,52 +1,25 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, ViewContainerRef } from '@angular/core';
 import { MainService } from '../main.service';
-import { PageConfigerComponent } from '../page-configer/page-configer.component';
-import { BitmapImporterComponent } from '../bitmap-importer/bitmap-importer.component';
+import { NavDropdownMenuModel } from '../models';
 
 @Component({
-	selector: 'ide-nav',
+	selector: 'app-nav',
 	templateUrl: './nav.component.html',
 	styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit {
 
-	@ViewChild('pageConfiger')
-	pageConfiger: PageConfigerComponent;
-
-	@ViewChild('bitmapImporter')
-	bitmapImporter: BitmapImporterComponent;
+	@Input()
+	options: NavDropdownMenuModel[];
 
 	constructor(
-		private mainService: MainService
+		private viewContainerRef: ViewContainerRef, // need this small hack in order to catch application root view container ref. for ng2-bootstrap
 	) { 
 
 	}
 
-	public saveData() {
-		this.mainService.saveData();
-	}
-
-	public preview() {
-		this.mainService.preview();
-	}
-
-	public publish() {
-		this.mainService.publish();
-	}
-
-	public createNewProject() {
-		this.mainService.createNewProject();
-	}
-
-	public showPageConfiger() {
-		this.pageConfiger.show();
-	}
-
-	public showBitmapImporter() {
-		this.bitmapImporter.show();
-	}
-
 	ngOnInit() {
+		
 	}
 
 }

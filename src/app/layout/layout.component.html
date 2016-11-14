@@ -3,7 +3,8 @@
 		<ng-content select="[block=top]"></ng-content>
 	</div>
 	<div class="content-wrap">
-		<div class="left-content-wrap">
+		<ng-content select="[block=content]" ></ng-content>
+		<!--<div class="left-content-wrap">
 			<ng-content select="[block=left]"></ng-content>
 		</div>
 		<div class="center-content-wrap">
@@ -21,6 +22,6 @@
 		</div>
 		<div class="right-content-wrap">
 			<ng-content select="[block=right]"></ng-content>
-		</div>
+		</div>-->
 	</div>
 </div>

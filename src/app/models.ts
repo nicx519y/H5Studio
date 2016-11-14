@@ -96,7 +96,7 @@ export enum LayerType {
 
 export class BasicModel {
 	static idrandoms: Array<string> = [];
-	idpre: string = '';
+	protected idpre: string = '';
 	id: string = '';
 	
 	constructor() {
@@ -159,7 +159,7 @@ export class BasicModel {
 
 
 export class TextSourceModel extends BasicModel {
-	idpre: string = 'text';
+	protected idpre: string = 'text';
 	width: number = 0;					//宽度
 	height: number = 0;					//高度
 	text: string = '';					//文字内容
@@ -191,7 +191,7 @@ export class TextSourceModel extends BasicModel {
 }
 
 export class ShapeSourceModel extends BasicModel {
-	idpre: string = 'shape';
+	protected idpre: string = 'shape';
 	//to do ...
 	constructor(options: {} = {}) {
 		super();
@@ -200,7 +200,7 @@ export class ShapeSourceModel extends BasicModel {
 }
 
 export class SourceModel extends BasicModel {
-	idpre: string = 'source';
+	protected idpre: string = 'source';
 	type: ItemType;
 	path: string = '';			//资源
 	width: number = 0;
@@ -239,7 +239,7 @@ export class SourceModel extends BasicModel {
 }
 
 export class BitmapSourceModel extends SourceModel {
-	idpre: string = 'bitmap';
+	protected idpre: string = 'bitmap';
 	type: ItemType = ItemType.bitmap;
 	constructor(options: {
 		path?: string,
@@ -254,7 +254,7 @@ export class BitmapSourceModel extends SourceModel {
 }
 
 export class VideoSorceModel extends SourceModel {
-	idpre: string = 'video';
+	protected idpre: string = 'video';
 	type: ItemType = ItemType.video;
 	constructor(options: {
 		path?: string,
@@ -269,7 +269,7 @@ export class VideoSorceModel extends SourceModel {
 }
 
 export class ElementStateModel extends BasicModel {
-	idpre: string = 'eleState';
+	protected idpre: string = 'eleState';
 	originX: number = 0;	//原点X坐标
 	originY: number = 0;	//原点Y坐标
 	matrix: {				//matrix
@@ -305,7 +305,7 @@ export class ElementStateModel extends BasicModel {
 }
 
 export class TweenModel extends BasicModel {
-	idpre: string = 'tween'; 
+	protected idpre: string = 'tween'; 
 	type: TweenType = TweenType.normal;
 	loop: boolean = false;						//是否循环
 	ease: Ease = Ease.linear;
@@ -323,7 +323,7 @@ export class TweenModel extends BasicModel {
 }
 
 export class ElementModel extends BasicModel {
-	idpre: string = 'ele';
+	protected idpre: string = 'ele';
 	public instanceName: string = '';											//人为指定的标识，同样具有唯一性
 	private _type: ElementType = ElementType.symbol;					//标识element的类型
 	private _source: any = '';
@@ -385,7 +385,7 @@ export class ElementModel extends BasicModel {
 }
 
 export class FilterModel extends BasicModel {
-	idpre: string = 'filter';
+	protected idpre: string = 'filter';
 	// to do ...
 
 	constructor(options: {} = {}) {
@@ -395,7 +395,7 @@ export class FilterModel extends BasicModel {
 }
 
 export class FrameModel extends BasicModel {
-	idpre: string = 'frame';
+	protected idpre: string = 'frame';
 	name: string = '';											//帧名，如果没有指定则为空字符串
 	index: number = 0;											//帧序号
 	isKeyFrame: boolean = true;									//是否是关键帧
@@ -456,7 +456,7 @@ export class FrameModel extends BasicModel {
 
 
 export class LayerModel extends BasicModel {
-	idpre: string = 'layer';
+	protected idpre: string = 'layer';
 	id: string = '';									//图层id
 	name: string = '';									//手动命名的name
 	type: LayerType = LayerType.normal;					//图层类型
@@ -755,7 +755,7 @@ export class LayerModel extends BasicModel {
 }
 
 export class TimelineModel extends BasicModel {
-	idpre: string = 'timeline';
+	protected idpre: string = 'timeline';
 	name: string = '';
 	actionOption: {
 		layer: string,
@@ -813,7 +813,7 @@ export class TimelineModel extends BasicModel {
 }
 
 export class PageModel extends BasicModel {
-	idpre: string = 'page';
+	protected idpre: string = 'page';
 	name: string = '';												//name
 	background: BackgroundModel = new BackgroundModel();			//背景色
 	thumbnail: string = '';											//缩略图
@@ -831,7 +831,7 @@ export class PageModel extends BasicModel {
 }
 
 export class SwiperModel extends BasicModel {
-	idpre: string = 'swiper';
+	protected idpre: string = 'swiper';
 	initialSlide: number = 0;						//初始页序号
 	direction: Direction = Direction.vertial;		//动画方向
 	speed: number = 100;							//变换速度
@@ -852,7 +852,7 @@ export class SwiperModel extends BasicModel {
 }
 
 export class ItemModel extends BasicModel {
-	idpre: string = 'item'; 						//id 前缀
+	protected idpre: string = 'item'; 						//id 前缀
 	id: string = '';								//item id 唯一标识
 	name: string = '';								//item name
 	thumbnail: string = '';							//缩略图
@@ -889,8 +889,8 @@ export class ItemModel extends BasicModel {
 }
 
 export class BackgroundModel extends BasicModel {
-	idpre: string = 'bg';
-	color: string = 'rgba(0, 0, 0, 0)';
+	protected idpre: string = 'bg';
+	color: string = '#ffffff';
 	image: string = '';
 	repeat: boolean = false;
 
@@ -906,7 +906,7 @@ export class BackgroundModel extends BasicModel {
 
 
 export class HotKeyModel extends BasicModel {
-	idpre: string = 'hotkey';
+	protected idpre: string = 'hotkey';
 	target: string = '';
 	shift: boolean = false;
 	ctrl: boolean = false;
@@ -914,8 +914,18 @@ export class HotKeyModel extends BasicModel {
 	key: string = '';
 	api: string = '';
 	arguments: Array<any> = [];
+	desc: string = '';
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		target?: string,
+		shift?: boolean,
+		ctrl?: boolean,
+		alt?: boolean,
+		key?: string,
+		api?: string,
+		arguments?: any[],
+		desc?: string
+	} = {}) {
 		super();
 		super.init(options);
 		
@@ -923,28 +933,75 @@ export class HotKeyModel extends BasicModel {
 }
 
 export class StageModel extends BasicModel {
-	idpre: string = 'stage';
+	protected idpre: string = 'stage';
 	background: BackgroundModel = new BackgroundModel();
 	title: string = '';
 	pageType: PageType = PageType.swiper;
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		background?: BackgroundModel,
+		title?: string,
+		pageType?: PageType 
+	} = {}) {
 		super();
 		super.init(options);
 	}
 }
 
 export class MainModel extends BasicModel {
-	idpre: string = 'main';
+	protected idpre: string = 'main';
 	stage: StageModel = new StageModel();
 	swiper: SwiperModel = new SwiperModel();
 	pages: Array<PageModel> = [];
 	library: Array<ItemModel> = [];
 
-	constructor(options: {} = {}) {
+	constructor(options: {
+		stage?: StageModel,
+		swiper?: SwiperModel,
+		pages?: PageModel[],
+		library?: ItemModel[]
+	} = {}) {
 		super();
 		super.init(options);
 	}
 }
 
+export class ProductModel extends BasicModel {
+	protected idpre: string = 'product';
+	title: string = '';
+	user: string = '';
+	lastModify: number = 0;
+	prodId: string = '';
 
+	constructor(options: {
+		title?: string,
+		user?: string,
+		lastModify?: number,
+		prodId?: string
+	} = {}) {
+		super();
+		super.init(options);
+	}
+}
+
+export class NavDropdownMenuModel extends BasicModel {
+	protected idpre: string = 'nav';
+	navId: string = '';
+	title: string = '';
+	list: {
+		label: string,
+		clickHandler: Function
+	}[] = [];
+	
+	constructor(options: {
+		navId?: string,
+		title?: string,
+		list?: {
+			label?: string,
+			clickHandler?: Function
+		}[]
+	} = {}) {
+		super();
+		super.init(options);
+	}
+}

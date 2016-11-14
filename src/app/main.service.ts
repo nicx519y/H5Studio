@@ -88,14 +88,16 @@ export class MainService {
 	 * @desc	更新数据
 	 */
 	public updateData() {
-
+		
 	}
 
 	/**
 	 * @desc	保存数据
 	 */
 	public saveData() {
-		console.log(this.options);	
+		let myStroge: Storage = localStorage;
+		let mainId: string = this.options.id;
+		myStroge.setItem(mainId, JSON.stringify(this.options));
 	}
 
 	/**

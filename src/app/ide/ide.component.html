@@ -1,7 +1,4 @@
-<ide-layout>
-	<div block="top" >
-		<ide-nav #navbar ></ide-nav>
-	</div>
+<app-ide-layout>
 	<div block="left" >
 		<ide-accordion>
 			<ide-panel [title]="'页面'" [isOpen]="true" [closeAble]="false" [hasTools]="true" >
@@ -10,16 +7,16 @@
 				</div>
 				<div block="tools" >
 					<div>
-						<a href="#" (click)="pageList.addEmptyPageAfterActive()" [tooltip]="'新增页面'" >
+						<a href="javascript:void(0)" (click)="pageList.addEmptyPageAfterActive()" [tooltip]="'新增页面'" >
 							[新增]
 						</a>
-						<a href="#" (click)="pageList.removeActivePage()" [tooltip]="'删除页面'" >
+						<a href="javascript:void(0)" (click)="pageList.removeActivePage()" [tooltip]="'删除页面'" >
 							[删除]
 						</a>
-						<a href="#" (click)="pageList.upActivePage()" [tooltip]="'上移页面'" >
+						<a href="javascript:void(0)" (click)="pageList.upActivePage()" [tooltip]="'上移页面'" >
 							[上移]
 						</a>
-						<a href="#" (click)="pageList.downActivePage()" [tooltip]="'下移页面'" >
+						<a href="javascript:void(0)" (click)="pageList.downActivePage()" [tooltip]="'下移页面'" >
 							[下移]
 						</a>
 					</div>
@@ -40,36 +37,36 @@
 				</div>
 				<div block="tools" >
 					<div class="tools-left" style="width: 180px;" >
-						<a href="#" [tooltip]="'删除图层'" (click)="timeline.removeLayer()" >
+						<a href="javascript:void(0)" [tooltip]="'删除图层'" (click)="timeline.removeLayer()" >
 							[删除]
 						</a>
-						<a href="#" [tooltip]="'上移图层'" (click)="timeline.upLayer()" >
+						<a href="javascript:void(0)" [tooltip]="'上移图层'" (click)="timeline.upLayer()" >
 							[上移]
 						</a>
-						<a href="#" [tooltip]="'下移图层'" (click)="timeline.downLayer()" >
+						<a href="javascript:void(0)" [tooltip]="'下移图层'" (click)="timeline.downLayer()" >
 							[下移]
 						</a>
 					</div>
 					<div class="tools-right" >
-						<a href="#" (click)="timeline.changeToKeyFrames()"  >
+						<a href="javascript:void(0)" (click)="timeline.changeToKeyFrames()"  >
 							[转换关键帧]
 						</a>
-						<a href="#" (click)="timeline.changeToEmptyKeyFrames()"  >
+						<a href="javascript:void(0)" (click)="timeline.changeToEmptyKeyFrames()"  >
 							[转换空白关键帧]
 						</a>
-						<a href="#" (click)="timeline.removeKeyFrames()"  >
+						<a href="javascript:void(0)" (click)="timeline.removeKeyFrames()"  >
 							[删除关键帧]
 						</a>
-						<a href="#" (click)="timeline.changeToFrames()"  >
+						<a href="javascript:void(0)" (click)="timeline.changeToFrames()"  >
 							[转换帧]
 						</a>
-						<a href="#" (click)="timeline.removeFrames()"  >
+						<a href="javascript:void(0)" (click)="timeline.removeFrames()"  >
 							[删除帧]
 						</a>
-						<a href="#" (click)="timeline.createTweens()"  >
+						<a href="javascript:void(0)" (click)="timeline.createTweens()"  >
 							[新建动画]
 						</a>
-						<a href="#" (click)="timeline.removeTweens()"  >
+						<a href="javascript:void(0)" (click)="timeline.removeTweens()"  >
 							[删除动画]
 						</a>
 					</div>
@@ -85,16 +82,16 @@
 				</div>
 				<div block="tools" >
 					<div>
-						<a href="#" (click)="itemList.addItem()" [tooltip]="'添加元素'" >
+						<a href="javascript:void(0)" (click)="itemList.addItem()" [tooltip]="'添加元素'" >
 							[添加]
 						</a>
-						<a href="#" (click)="itemList.removeItem()" [tooltip]="'删除元素'" >
+						<a href="javascript:void(0)" (click)="itemList.removeItem()" [tooltip]="'删除元素'" >
 							[删除]
 						</a>
-						<a href="#" (click)="itemList.editItem()" [tooltip]="'编辑元素'" >
+						<a href="javascript:void(0)" (click)="itemList.editItem()" [tooltip]="'编辑元素'" >
 							[编辑]
 						</a>
-						<a href="#" (click)="itemList.insertItem()" [tooltip]="'插入场景'" >
+						<a href="javascript:void(0)" (click)="itemList.insertItem()" [tooltip]="'插入场景'" >
 							[插入]
 						</a>
 					</div>
@@ -107,6 +104,6 @@
 			</ide-panel>
 		</ide-accordion>
 	</div>
-</ide-layout>
+</app-ide-layout>
 
-<ide-hot-keys [targets]="{ 'timeline': timeline, 'toolsbar': toolsbar, 'navbar' : navbar, 'itemList': itemList, 'pageList': pageList }" ></ide-hot-keys>
+<!--<ide-hot-keys [targets]="{ 'timeline': timeline, 'toolsbar': toolsbar, 'navbar' : navbar, 'itemList': itemList, 'pageList': pageList }" ></ide-hot-keys>-->
