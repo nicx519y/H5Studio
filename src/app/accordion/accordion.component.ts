@@ -7,6 +7,7 @@ import {
     AfterViewInit,
     QueryList,
     OnInit,
+    HostListener,
 } from '@angular/core';
 
 import { PanelComponent } from '../panel/panel.component';
@@ -31,6 +32,7 @@ export class AccordionComponent implements OnInit {
     /**
      * @desc 重新计算每个panel的高度
      */
+    @HostListener('window:resize')
     updateSize() {
         let containerHeight = this.container.nativeElement.clientHeight;
         let tempHeight = 0;

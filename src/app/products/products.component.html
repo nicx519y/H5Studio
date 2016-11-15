@@ -1,7 +1,19 @@
 <div class="list-group">
-	<a href="/ide/{{opt.prodId}}" *ngFor="let opt of service.options" class="list-group-item" >
+	<a href="javascript:void(0)" [routerLink]="['/ide', opt.prodId]" *ngFor="let opt of service.options" class="list-group-item">
 		<h3>{{opt.title}}</h3>
-		项目作者：<span class="user" >{{opt.user}}</span> <br />
-		修改时间：<span class="last-modify" >{{opt.lastModify}}</span>
+		项目作者：<span class="user">{{opt.user}}</span> <br /> 修改时间：
+		<span class="last-modify">{{opt.lastModify | date: 'yyyy/mm/dd hh:mm:ss' }}</span>
 	</a>
 </div>
+
+<nav>
+	<ul class="pagination">
+		<li><a href="#">&laquo;</a></li>
+		<li><a href="#">1</a></li>
+		<li><a href="#">2</a></li>
+		<li><a href="#">3</a></li>
+		<li><a href="#">4</a></li>
+		<li><a href="#">5</a></li>
+		<li><a href="#">&raquo;</a></li>
+	</ul>
+</nav>

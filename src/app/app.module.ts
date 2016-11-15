@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, RouterLink ,RouterLinkActive } from '@angular/router';
 import { ProductsModule } from './products/products.module';
 import { IdeModule } from './ide/ide.module';
 import { AppComponent } from './app/app.component';
@@ -11,22 +11,22 @@ import { LayoutComponent } from './layout/layout.component';
 import { NavComponent } from './nav/nav.component';
 
 const ROUTERS: Routes = [
-	{ path: '', redirectTo: '/products', pathMatch: 'full' },
+	{ path: '', redirectTo: 'products', pathMatch: 'full' },
 	{ path: 'products', component: ProductsComponent },
 	{ path: 'ide/:id', component: IdeComponent },
 ];
 
 @NgModule({
 	imports: [
-		BrowserModule,
 		RouterModule.forRoot(ROUTERS),
+		BrowserModule,
 		ProductsModule,
 		IdeModule,
 	],
 	declarations: [
 		AppComponent,
 		NavComponent,
-		LayoutComponent
+		LayoutComponent,
 	],
 	providers: [
 		MainService
