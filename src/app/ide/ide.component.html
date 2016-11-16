@@ -5,19 +5,30 @@
 				<a dropdownToggle id="fileBtn" href="javascript:void(0)">文件 <span class="caret"></span> </a>
 				<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="fileBtn" >
 					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="service.createNewProject()" >新建</a>
+						<a href="javascript:void(0)" class="dropdown-item" (click)="createNewProject()" >新建</a>
 					</li>
 					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="service.saveData()" >保存</a>
+						<a href="javascript:void(0)" class="dropdown-item" (click)="saveData()" >保存</a>
 					</li>
 					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="service.preview()" >预览</a>
+						<a href="javascript:void(0)" class="dropdown-item" (click)="preview()" >预览</a>
 					</li>
 					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="service.publish()" >发布</a>
+						<a href="javascript:void(0)" class="dropdown-item" (click)="publish()" >发布</a>
 					</li>
 					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="service.showPageConfiger()" >页面配置</a>
+						<a href="javascript:void(0)" class="dropdown-item" (click)="pageConfiger.show()" >页面配置</a>
+					</li>
+				</ul>
+			</li>
+			<li class="nav-item" dropdown >
+				<a dropdownToggle id="sourceBtn" href="javascript:void(0)">资源 <span class="caret"></span> </a>
+				<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="sourceBtn" >
+					<li role="menuitem" >
+						<a href="javascript:void(0)" class="dropdown-item" (click)="bitmapImporter.show()" >导入图片</a>
+					</li>
+					<li role="menuitem" >
+						<a href="javascript:void(0)" class="dropdown-item"  >导入视频</a>
 					</li>
 				</ul>
 			</li>
@@ -134,4 +145,15 @@
 	</div>
 </app-layout>
 
-<!--<ide-hot-keys [targets]="{ 'timeline': timeline, 'toolsbar': toolsbar, 'navbar' : navbar, 'itemList': itemList, 'pageList': pageList }" ></ide-hot-keys>-->
+<ide-hot-keys [targets]="{ 
+	'timeline': timeline, 
+	'toolsbar': toolsbar, 
+	'ide' : this, 
+	'bitmapImporter': bitmapImporter,
+	'pageConfiger': pageConfiger,
+	'itemList': 
+	itemList, 
+	'pageList': pageList 
+	}" ></ide-hot-keys>
+<ide-bitmap-importer #bitmapImporter ></ide-bitmap-importer>
+<ide-page-configer #pageConfiger ></ide-page-configer>

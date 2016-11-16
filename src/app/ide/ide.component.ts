@@ -16,4 +16,20 @@ export class IdeComponent {
 		
 	}
 
+	public saveData() {
+		console.log('save');
+		this.service.saveData();
+	}
+
+	public preview() {
+		console.log('preview');
+	}
+
+	public publish() {
+		console.log('publish');
+	}
+
+	public createNewProject() {
+		this.service.createNewProject();
+	}
 }

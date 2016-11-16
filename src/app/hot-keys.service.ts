@@ -83,31 +83,31 @@ export class HotKeysService {
 				desc: '插入文字'
 			}),
 			new HotKeyModel({
-				target: 'navbar',
+				target: 'ide',
 				ctrl: true,
 				key: 's',
 				api: 'saveData',
 				desc: '保存数据'
 			}),
 			new HotKeyModel({
-				target: 'navbar',
+				target: 'ide',
 				ctrl: true,
 				key: 'v',
 				api: 'preview',
 				desc: '预览'
 			}),
 			new HotKeyModel({
-				target: 'navbar',
+				target: 'pageConfiger',
 				ctrl: true,
 				key: ',',
-				api: 'showPageConfiger',
+				api: 'show',
 				desc: '页面配置'
 			}),
 			new HotKeyModel({
-				target: 'navbar',
+				target: 'bitmapImporter',
 				ctrl: true,
 				key: 'b',
-				api: 'showBitmapImporter',
+				api: 'show',
 				desc: '导入图片'
 			}),
 			new HotKeyModel({
