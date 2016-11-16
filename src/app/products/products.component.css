@@ -1,11 +1,25 @@
 :host {
-	padding: 20px;
 	font-size: 10px;
 }
 
-a:link, a:active, a:hover, a:visited {
+.list-group-item {
+	position: relative;
 	line-height: 20px;
 	color: #999;
+}
+
+.list-group-item .btn-group {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+.list-group-item .btn-group button:focus {
+	outline: none;
+}
+
+.btn-group button span{
+	font-size: 12px;
 }
 
 h3 {
@@ -15,10 +29,21 @@ h3 {
 	color: #333;
 }
 
-nav {
-	text-align: center;
+
+.nav-item {
+	font-size: 13px;
+	height: 40px;
 }
 
-.pagination {
-	margin: 0;
+.nav-item > a {
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+.dropdown-menu a {
+	font-size: 12px;
+}
+
+div[block="content"] {
+	overflow-y: scroll;
 }

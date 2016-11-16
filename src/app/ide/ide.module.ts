@@ -1,8 +1,9 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { Ng2BootstrapModule } from 'ng2-bootstrap/ng2-bootstrap';
+import { AppCommonModule } from '../app-common/app-common.module';
 
 import { IdeComponent } from './ide.component';
 import { AccordionComponent } from '../accordion/accordion.component';
@@ -31,7 +32,17 @@ import { AttrsService } from '../attrs.service';
 import { BitmapImporterService } from '../bitmap-importer.service';
 import { PageConfigerService } from '../page-configer.service';
 
+import { IdeRoutingModule } from './ide.routing.module';
+
 @NgModule({
+	imports: [
+		IdeRoutingModule,
+		CommonModule,
+		FormsModule,
+		HttpModule,
+		Ng2BootstrapModule,
+		AppCommonModule,
+	],
 	declarations: [
 		IdeComponent,
 		AccordionComponent,
@@ -51,12 +62,6 @@ import { PageConfigerService } from '../page-configer.service';
 		ToolsbarComponent,
 		PageConfigerComponent,
 		TimelineRulerComponent,
-	],
-	imports: [
-		BrowserModule,
-		FormsModule,
-		HttpModule,
-		Ng2BootstrapModule
 	],
 	providers: [
 		MainService,

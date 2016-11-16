@@ -1,19 +1,33 @@
-<div class="list-group">
-	<a href="javascript:void(0)" [routerLink]="['/ide', opt.prodId]" *ngFor="let opt of service.options" class="list-group-item">
-		<h3>{{opt.title}}</h3>
-		项目作者：<span class="user">{{opt.user}}</span> <br /> 修改时间：
-		<span class="last-modify">{{opt.lastModify | date: 'yyyy/mm/dd hh:mm:ss' }}</span>
-	</a>
-</div>
-
-<nav>
-	<ul class="pagination">
-		<li><a href="#">&laquo;</a></li>
-		<li><a href="#">1</a></li>
-		<li><a href="#">2</a></li>
-		<li><a href="#">3</a></li>
-		<li><a href="#">4</a></li>
-		<li><a href="#">5</a></li>
-		<li><a href="#">&raquo;</a></li>
-	</ul>
-</nav>
+<app-layout>
+	<div block="top" >
+		<app-nav>
+			<li class="nav-item" dropdown >
+				<a dropdownToggle id="projectBtn" href="javascript:void(0)">项目 <span class="caret"></span> </a>
+				<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="projectBtn" >
+					<li role="menuitem" >
+						<a href="javascript:void(0)" class="dropdown-item" (click)="service.createNewProject()" >新建</a>
+					</li>
+				</ul>
+			</li>
+		</app-nav>
+	</div>
+	<div block="content" >
+		<ul class="list-group">
+			<li *ngFor="let opt of service.options" class="list-group-item">
+				<h3>
+					<a href="javascript:void(0)" [routerLink]="['/studio']" [queryParams]="{pid: opt.prodId}"  >{{opt.title}}</a>
+				</h3>
+				项目作者：<span class="user">{{opt.user}}</span> <br /> 修改时间：
+				<span class="last-modify">{{opt.lastModify | date: 'yyyy/mm/dd hh:mm:ss' }}</span>
+				<div class="btn-group">
+					<button type="button" class="btn btn-default" [routerLink]="['/studio']" [queryParams]="{pid: opt.prodId}" >
+						<span class="glyphicon glyphicon-edit" ></span>
+					</button> 
+					<button type="button" class="btn btn-default" (click)="service.removeProject(opt.prodId)" >
+						<span class="glyphicon glyphicon-trash" ></span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+</app-layout>

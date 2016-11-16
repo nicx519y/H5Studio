@@ -18,7 +18,7 @@ export class ProductsComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		
+		this.service.fetch();
 	}
 
 }

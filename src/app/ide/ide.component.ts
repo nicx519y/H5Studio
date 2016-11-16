@@ -10,20 +10,10 @@ import { NavDropdownMenuModel } from '../models';
 
 export class IdeComponent {
 
-	private navOptions:  NavDropdownMenuModel[];
-
 	constructor(
 		private service: MainService
 	){
-		this.navOptions = [
-			new NavDropdownMenuModel({
-				navId: 'file',
-				title: '文件',
-				list: [{
-					
-				}]
-			})
-		];
+		
 	}
 
 }

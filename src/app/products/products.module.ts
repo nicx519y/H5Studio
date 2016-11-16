@@ -1,22 +1,30 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { ProductsService } from '../products.service';
+import { RouterModule, Routes } from '@angular/router';
 import { ProductsComponent } from './products.component';
-import { RouterModule } from '@angular/router';
+import { AppCommonModule } from '../app-common/app-common.module';
+import { Ng2BootstrapModule } from 'ng2-bootstrap/ng2-bootstrap';
+import { ProductsService } from '../products.service';
+import { ProductsRoutingModule } from './products.routing.module';
 
 @NgModule({
 	imports: [
-		BrowserModule,
+		ProductsRoutingModule,
+		CommonModule,
 		FormsModule,
 		HttpModule,
 		RouterModule,
+		AppCommonModule,
+		Ng2BootstrapModule,
 	],
 	declarations: [
 		ProductsComponent,
 	],
-	providers: [ProductsService],
+	providers: [
+		ProductsService
+	],
 	exports: [
 		ProductsComponent
 	]

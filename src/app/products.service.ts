@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ProductModel } from './models';
+import { ProductModel, MainModel } from './models';
 
 @Injectable()
 export class ProductsService {
@@ -7,6 +7,10 @@ export class ProductsService {
 	options: ProductModel[] = [];
 
 	constructor() { 
+		
+	}
+
+	fetch() {
 		this.options = [
 			new ProductModel({
 				title: 'One Product',
@@ -41,11 +45,14 @@ export class ProductsService {
 		];
 	}
 
-	fetch() {
-
-	}
-
-	update() {
+	createNewProject() {
 		
 	}
+
+	removeProject(id: string) {
+		
+	}
+	
+	
+
 }

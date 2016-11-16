@@ -9,3 +9,19 @@ a {
 a:link, a:active, a:hover, a:visited{
 	text-decoration: none;
 }
+
+
+
+.nav-item {
+	font-size: 13px;
+	height: 40px;
+}
+
+.nav-item > a {
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+.dropdown-menu a {
+	font-size: 12px;
+}
