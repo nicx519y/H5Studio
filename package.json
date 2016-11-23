@@ -12,6 +12,8 @@
   },
   "private": true,
   "dependencies": {
+    "@JDB/janvas": ">=0.0.6",
+    "@JDB/janvas-developer": ">=0.0.6",
     "@angular/common": "~2.1.0",
     "@angular/compiler": "~2.1.0",
     "@angular/core": "~2.1.0",
