@@ -1,15 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Output, EventEmitter } from '@angular/core';
 import { ItemsService } from './items.service';
 import { PagesService } from './pages.service';
 import { AttrsService } from './attrs.service';
 import { TimelineService } from './timeline.service';
 import { BitmapImporterService } from './bitmap-importer.service';
-import { MainModel, BitmapSourceModel, ElementModel, ItemModel, ItemType } from './models';
+import { MainModel, BitmapSourceModel, ElementModel, ItemModel, ItemType, TimelineModel, PageModel } from './models';
 
 @Injectable()
 export class MainService {
 	
 	private options: MainModel = new MainModel();
+	private _outputData: MainModel;
+
+	@Output()
+	public dataUpdateEvent: EventEmitter<MainModel|boolean> = new EventEmitter();
 
 	constructor(
 		private itemsService: ItemsService,
@@ -40,15 +44,15 @@ export class MainService {
 		this.importBitmapService.uploadCompleteEvent.subscribe( (bitmaps: BitmapSourceModel[]) => {
 			this.importBitmapCompleteHandler( bitmaps );
 		});
-
 	}
 
 	private activeStageChangeHandler( index: number ) {
 		this.timelineService.timeline = this.options.pages[index].timeline;
+		this.createOuputData();
 	}
 
 	private itemEditHandler( item: ItemModel ) {
-
+		this.createOuputData();
 	}
 
 	private itemInsertHandler( item: ItemModel ) {
@@ -56,6 +60,7 @@ export class MainService {
 			this.timelineService.addElement(
 				ElementModel.fromItem( item )
 			);
+			this.createOuputData();
 		} else {
 			alert( '请选择要插入的页面' );
 		}
@@ -68,20 +73,49 @@ export class MainService {
 	private itemDeleteHandler( item: ItemModel ) {
 		this.options.pages.forEach( page => {
 			page.timeline.removeLayerWithElement( ( ele: ElementModel ) => {
-				return ele.source === item;
+				return ele.item === item.id;
 			});
 		});
+		this.createOuputData();
 	}
 
 	private importBitmapCompleteHandler( bitmaps: BitmapSourceModel[] ) {
 		bitmaps.map( bitmap => {
 			this.itemsService.addItem({
 				name: bitmap.fileName,
-				source: bitmap.path,
-				thumbnail: bitmap.path,
+				source: bitmap,
+				thumbnail: bitmap.url,
 				type: ItemType.bitmap
 			});
 		});
+		this.createOuputData();
+	}
+
+	/**
+	 * @desc	生成输出数据，可能是一个item或者是整个应用的数据
+	 */
+	private createOuputData(itemId: string = '') {
+		if(!itemId || itemId == '') {
+			this._outputData = this.options.value;
+			return;
+		}
+		let lib: ItemModel[] = this.options.library;
+		let item: ItemModel = lib.find(item => {
+			return item.id == itemId;
+		});
+
+		if(item) {
+			if(item.type != ItemType.movieclip) {
+				this._outputData = new MainModel().value;	//不是影片剪辑
+			} else {
+				let output: MainModel = new MainModel();
+				output.pages = [item.source as PageModel];
+				output.library = lib;
+				this._outputData = output.value;
+			}
+		} else {
+			this._outputData = new MainModel().value;
+		}
 	}
 
 	/**
@@ -110,5 +144,14 @@ export class MainService {
 	 */
 	public publish() {
 
+	}
+
+	public get data(): MainModel {
+		return this.options;
+	}
+
+
+	public get outputData(): MainModel {
+		return this._outputData;
 	}
 }

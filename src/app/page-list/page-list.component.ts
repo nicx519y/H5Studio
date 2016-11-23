@@ -2,13 +2,13 @@ import { Component, ViewChildren, QueryList, ElementRef, OnInit } from '@angular
 import { PagesService } from '../pages.service';
 
 @Component({
-  selector: 'ide-page-list',
-  templateUrl: './page-list.component.html',
-  styleUrls: ['./page-list.component.css']
+	selector: 'ide-page-list',
+	templateUrl: './page-list.component.html',
+	styleUrls: ['./page-list.component.css']
 })
 export class PageListComponent implements OnInit {
 
-  private model;
+	private model;
 
 	@ViewChildren('nameInput')
 	nameInputList: QueryList<ElementRef>;
@@ -23,14 +23,14 @@ export class PageListComponent implements OnInit {
 	 * 新增空白场景
 	 */
 	addEmptyPageAfterActive() {
-		this.services.addEmptyStage( this.services.active + 1, 'New Page' );
+		this.services.addEmptyStage(this.services.active + 1, 'New Page');
 	}
 
 	/**
 	 * 在最后新增空白页
 	 */
 	addEmptyPageAtLast() {
-		this.services.addEmptyStage( this.services.pages.length, 'New Page' );
+		this.services.addEmptyStage(this.services.pages.length, 'New Page');
 	}
 
 	/**
@@ -53,20 +53,20 @@ export class PageListComponent implements OnInit {
 		this.services.downStage(this.services.active);
 	}
 
-	pageActive( index: number ) {
+	pageActive(index: number) {
 		this.services.active = index;
 		this.nameInputList.toArray()[index].nativeElement.focus();
 	}
 
 	ngAfterViewInit() {
-		this.nameInputList.changes.subscribe( (list: QueryList<ElementRef>) => {
-			setTimeout( () => {
+		this.nameInputList.changes.subscribe((list: QueryList<ElementRef>) => {
+			setTimeout(() => {
 				this.nameInputList.toArray()[this.services.active].nativeElement.focus();
 			}, 100);
 		});
 	}
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+	}
 
 }

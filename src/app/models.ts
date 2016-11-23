@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 export enum Direction {
 	vertial,		//垂直
 	horizontal		//水平
@@ -109,6 +107,8 @@ export class BasicModel {
 		}
 		
 		for(let key in options) {
+			if( key == 'value' ) continue;
+
 			if(!Reflect.has(this, key)) {
 				continue;
 			}
@@ -124,7 +124,6 @@ export class BasicModel {
 				Reflect.set(this, key, value);
 				continue;
 			}
-
 			if(value.constructor.name == property.constructor.name) {
 				Reflect.set(this, key, value);
 			} else if(typeof value == 'Object') {
@@ -153,6 +152,43 @@ export class BasicModel {
 	 */
 	private static createNewId(pre:string): string {
 		return pre + new Date().getTime() + this.createRandom();
+	}
+
+	private deepValue(obj): any {
+		// return obj;
+		if(typeof obj == 'undefined' || obj === null) return obj;
+		let keys: string[] = Object.getOwnPropertyNames(obj);
+		let value: any;
+		if(Reflect.has(obj, 'length')) {
+			value = [];
+		} else {
+			value = {};
+		}
+		keys.forEach(key => {
+			if(key != 'idpre') {
+				let realKey: string = key.replace(/^_/, '');
+				let o: any = obj[realKey];
+				let val: any;
+				if(typeof o == 'function' || typeof o == 'undefined' || o == null) {
+					//do nothing..
+				} else if (val instanceof BasicModel) {
+					val = val.value;
+					Reflect.set(value, realKey, val);
+				} else if (typeof o == 'object') {
+					val = this.deepValue(o);
+					Reflect.set(value, realKey, val);
+				} else {
+					val = o;
+					Reflect.set(value, realKey, val);
+				}
+			}
+		});
+		return value;
+	}
+
+	public get value(): any {
+		let value: any = this.deepValue(this);
+		return value;
 	}
 	
 }
@@ -188,6 +224,8 @@ export class TextSourceModel extends BasicModel {
 		super();
 		super.init(options);
 	}
+
+	
 }
 
 export class ShapeSourceModel extends BasicModel {
@@ -202,13 +240,13 @@ export class ShapeSourceModel extends BasicModel {
 export class SourceModel extends BasicModel {
 	protected idpre: string = 'source';
 	type: ItemType;
-	path: string = '';			//资源
+	url: string = '';			//资源
 	width: number = 0;
 	height: number = 0;
 	fileName: string = '';
 	size: number = 0;
 	constructor(options: {
-		path?: string,
+		url?: string,
 		width?: number,
 		height?: number,
 		fileName?: string,
@@ -242,7 +280,7 @@ export class BitmapSourceModel extends SourceModel {
 	protected idpre: string = 'bitmap';
 	type: ItemType = ItemType.bitmap;
 	constructor(options: {
-		path?: string,
+		url?: string,
 		size?: number,
 		width?: number,
 		height?: number,
@@ -257,7 +295,7 @@ export class VideoSorceModel extends SourceModel {
 	protected idpre: string = 'video';
 	type: ItemType = ItemType.video;
 	constructor(options: {
-		path?: string,
+		url?: string,
 		size?: number,
 		width?: number,
 		height?: number,
@@ -326,12 +364,12 @@ export class ElementModel extends BasicModel {
 	protected idpre: string = 'ele';
 	public instanceName: string = '';											//人为指定的标识，同样具有唯一性
 	private _type: ElementType = ElementType.symbol;					//标识element的类型
-	private _source: any = '';
+	private _item: any = '';
 
 	constructor(options: {
 		instanceName?: string,
 		type?: ElementType,
-		source?: any
+		item?: any
 	}={}) {
 		super();
 		super.init(options);
@@ -342,10 +380,10 @@ export class ElementModel extends BasicModel {
 			this._type = t;
 			switch(this._type) {
 				case ElementType.symbol:
-					this._source = '';		//item id
+					this._item = '';		//item id
 					break;
 				case ElementType.shape:
-					this._source = new ShapeSourceModel();
+					this._item = new ShapeSourceModel();
 					break;
 			}
 		}
@@ -355,30 +393,30 @@ export class ElementModel extends BasicModel {
 		return this._type;
 	}
 
-	public set source(src: any) {
+	public set item(src: any) {
 		switch(this._type) {
 			case ElementType.symbol:
 				if( typeof src == 'string' ) {
-					this._source = src;
+					this._item = src;
 				} else {
 					throw new Error('Can not set source which not match ElementType!');
 				}
 				break;
 			case ElementType.shape:
-				this._source.init(src);
+				this._item.init(src);
 				break;
 		}
 	}
 
-	public get source() {
-		return this._source;
+	public get item() {
+		return this._item;
 	}
 
 
 	public static fromItem( item: ItemModel ) {
 		let ele: ElementModel = new ElementModel({
 			type: ElementType.symbol,
-			source: item.id
+			item: item.id
 		});
 		return ele;
 	}
@@ -818,6 +856,7 @@ export class PageModel extends BasicModel {
 	background: BackgroundModel = new BackgroundModel();			//背景色
 	thumbnail: string = '';											//缩略图
 	timeline: TimelineModel = new TimelineModel();
+	layers: LayerModel[];
 
 	constructor(options: {
 		name?: string,
@@ -827,12 +866,13 @@ export class PageModel extends BasicModel {
 	} = {}) {
 		super();
 		super.init(options);
+		this.layers = this.timeline.layers;
 	}
 }
 
 export class SwiperModel extends BasicModel {
 	protected idpre: string = 'swiper';
-	initialSlide: number = 0;						//初始页序号
+	initialSlide: number = 1;						//初始页序号
 	direction: Direction = Direction.vertial;		//动画方向
 	speed: number = 100;							//变换速度
 	autoPlay: boolean = false;						//是否自动播放
@@ -866,6 +906,8 @@ export class ItemModel extends BasicModel {
 	} = {}) {
 		super();
 		super.init(options);
+		this.type = options.type;
+		this.source = options.source;
 	}
 
 	get type(): ItemType {
@@ -886,6 +928,7 @@ export class ItemModel extends BasicModel {
 	set source( src: any ) {
 		this.source.init(src);
 	}
+
 }
 
 export class BackgroundModel extends BasicModel {
@@ -978,28 +1021,6 @@ export class ProductModel extends BasicModel {
 		user?: string,
 		lastModify?: number,
 		prodId?: string
-	} = {}) {
-		super();
-		super.init(options);
-	}
-}
-
-export class NavDropdownMenuModel extends BasicModel {
-	protected idpre: string = 'nav';
-	navId: string = '';
-	title: string = '';
-	list: {
-		label: string,
-		clickHandler: Function
-	}[] = [];
-	
-	constructor(options: {
-		navId?: string,
-		title?: string,
-		list?: {
-			label?: string,
-			clickHandler?: Function
-		}[]
 	} = {}) {
 		super();
 		super.init(options);

@@ -71,6 +71,10 @@ input[type='color'] {
 	height: 26px;
 }
 
+select[disabled], input[disabled] {
+	background: #f5f5f5;
+}
+
 :host.modal-form .file-select-btn input[type='text'] {
 	width: 48%;
 }
@@ -107,6 +111,7 @@ input[type='color'] {
 	text-overflow: '';
 	border-radius: 2px;
 }
+
 
 select {
 	width: 150px;

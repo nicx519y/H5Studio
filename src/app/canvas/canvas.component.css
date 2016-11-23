@@ -1,0 +1,14 @@
+:host {
+	/*width: 0;*/
+	/*height: 0;*/
+	display: flex;
+	flex-grow: 1;
+	position: relative;
+}
+.box {
+	left: 0;
+	top: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: 1;
+}

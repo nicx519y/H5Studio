@@ -52,4 +52,5 @@
 
 .center-top-right-content-wrap {
 	flex-grow: 1;
+	display: flex;
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { RouterModule, Routes } from '@angular/router';
 import { Ng2BootstrapModule } from 'ng2-bootstrap/ng2-bootstrap';
 import { AppCommonModule } from '../app-common/app-common.module';
 
@@ -32,16 +33,18 @@ import { AttrsService } from '../attrs.service';
 import { BitmapImporterService } from '../bitmap-importer.service';
 import { PageConfigerService } from '../page-configer.service';
 
-import { IdeRoutingModule } from './ide.routing.module';
+const ROUTES: Routes = [
+	{path: 'studio', component: IdeComponent}
+];
 
 @NgModule({
 	imports: [
-		IdeRoutingModule,
+		RouterModule.forChild(ROUTES),
 		CommonModule,
 		FormsModule,
 		HttpModule,
-		Ng2BootstrapModule,
 		AppCommonModule,
+		Ng2BootstrapModule,
 	],
 	declarations: [
 		IdeComponent,

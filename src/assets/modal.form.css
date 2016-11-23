@@ -34,6 +34,10 @@ ide-attr-form {
 	border-radius: 2px;
 }
 
+.modal-form .form-input[disabled], .modal-form .form-select[disabled] {
+	background: #f5f5f5;
+}
+
 .modal-form .buttons {
 	text-align: center;
 	padding-top: 10px;

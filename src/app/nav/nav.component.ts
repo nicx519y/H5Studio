@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, Input, ViewContainerRef } from '@angular/core';
 import { MainService } from '../main.service';
-import { NavDropdownMenuModel } from '../models';
 import { ActivatedRoute, Router, RouterState } from '@angular/router';
 
 @Component({

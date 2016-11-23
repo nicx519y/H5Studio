@@ -1,16 +1,24 @@
 import { Injectable } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import 'rxjs/add/operator/toPromise'
 import { ProductModel, MainModel } from './models';
 
 @Injectable()
 export class ProductsService {
 
+	private fetchURL: string = '/api/fetch';
+	private createURL: string = '/api/create';
+	private removeURL: string = '/api/remove';
+
 	options: ProductModel[] = [];
 
-	constructor() { 
+	constructor(
+		private http: Http
+	) { 
 		
 	}
 
-	fetch() {
+	public fetch() {
 		this.options = [
 			new ProductModel({
 				title: 'One Product',
@@ -45,14 +53,16 @@ export class ProductsService {
 		];
 	}
 
-	createNewProject() {
-		
+	public createNewProject() {
+		return this.http.post(this.createURL, {});
 	}
 
-	removeProject(id: string) {
-		
+	public removeProject(id: string) {
+		return this.http.post(this.removeURL, {});
 	}
 	
-	
+	private errorHandler(error: Response | any): Promise<any> {
+		return Promise.reject(error.message || error);
+	}
 
 }

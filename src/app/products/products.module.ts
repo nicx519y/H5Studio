@@ -1,21 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { RouterModule, Routes, RouterLink } from '@angular/router';
 import { HttpModule } from '@angular/http';
-import { RouterModule } from '@angular/router';
-import { ProductsComponent } from './products.component';
-import { AppCommonModule } from '../app-common/app-common.module';
 import { Ng2BootstrapModule } from 'ng2-bootstrap/ng2-bootstrap';
+import { AppCommonModule } from '../app-common/app-common.module';
 import { ProductsService } from '../products.service';
-import { ProductsRoutingModule } from './products.routing.module';
+import { ProductsComponent } from './products.component';
+
+const ROUTES: Routes = [
+	{path: 'products', component: ProductsComponent}
+];
 
 @NgModule({
 	imports: [
-		ProductsRoutingModule,
+		RouterModule.forChild(ROUTES),
 		CommonModule,
-		FormsModule,
 		HttpModule,
-		RouterModule,
 		AppCommonModule,
 		Ng2BootstrapModule,
 	],

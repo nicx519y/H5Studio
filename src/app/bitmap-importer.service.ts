@@ -18,7 +18,7 @@ export class BitmapImporterService {
 	}
 
 	public createNewBitmap( options: {
-		path: string,
+		url: string,
 		fileName: string,
 		size: number
 	} ) {

@@ -58,7 +58,7 @@ export class BitmapImporterComponent implements OnInit {
 			let reader: FileReader = new FileReader();
 			reader.onload = ( evt: ProgressEvent ) => {
 				this.service.createNewBitmap({
-					path: String(reader.result),
+					url: String(reader.result),
 					fileName: file.name,
 					size: file.size
 				});
