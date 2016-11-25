@@ -58,7 +58,7 @@ export class HotKeysService {
 				target: 'toolsbar',
 				key: 'v',
 				api: 'changeState',
-				arguments: [ EditorState.choise ],
+				arguments: [ EditorState.choose ],
 				desc: '选择舞台元素'
 			}),
 			new HotKeyModel({
@@ -79,7 +79,7 @@ export class HotKeysService {
 				target: 'toolsbar',
 				key: 't',
 				api: 'changeState',
-				arguments: [ EditorState.font ],
+				arguments: [ EditorState.text ],
 				desc: '插入文字'
 			}),
 			new HotKeyModel({

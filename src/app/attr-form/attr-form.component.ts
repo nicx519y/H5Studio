@@ -16,7 +16,7 @@ export class AttrFormComponent implements OnInit {
 	options: {
 		key: string,
 		controlType: string,
-		value: any
+		value: any,
 	};
 
 	@Input()

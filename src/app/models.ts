@@ -37,8 +37,8 @@ export enum TweenType {
 
 export enum EditorState {
 	none,
-	choise,				//选择
-	font,				//文字
+	choose,				//选择
+	text,				//文字
 	zoom,				//放大缩小
 	draw				//绘制
 }
@@ -172,7 +172,7 @@ export class BasicModel {
 				if(typeof o == 'function' || typeof o == 'undefined' || o == null) {
 					//do nothing..
 				} else if (val instanceof BasicModel) {
-					val = val.value;
+					val = val.getValue();
 					Reflect.set(value, realKey, val);
 				} else if (typeof o == 'object') {
 					val = this.deepValue(o);
@@ -186,7 +186,7 @@ export class BasicModel {
 		return value;
 	}
 
-	public get value(): any {
+	public getValue(): any {
 		let value: any = this.deepValue(this);
 		return value;
 	}
@@ -308,37 +308,60 @@ export class VideoSorceModel extends SourceModel {
 
 export class ElementStateModel extends BasicModel {
 	protected idpre: string = 'eleState';
+	x: number = 0;			//父级坐标
+	y: number = 0;
 	originX: number = 0;	//原点X坐标
 	originY: number = 0;	//原点Y坐标
-	matrix: {				//matrix
-		a: number,
-		b: number,
-		c: number,
-		d: number,
-		e: number,
-		f: number
-	} = {
-		a: 1,
-		b: 0,
-		c: 0,
-		d: 1,
-		e: 0,
-		f: 0
-	};
+	rotation: number = 0;
+	scaleX: number = 1;
+	scaleY: number = 1;
+	skewX: number = 0;
+	skewY: number = 0;
 	alpha: number = 100;	//透明度 0 - 100
 	visible: boolean = true;
 
 	constructor(options: {
+		x?: number,
+		y?: number,
 		originX?: number,
 		originY?: number,
-		matrix?: {
-			a: number, b: number, c: number, d: number, e: number, f:number
-		},
+		rotation?: number,
+		scaleX?: number,
+		scaleY?: number,
+		skewX?: number,
+		skewY?: number
 		alpha?: number,
 		visible?: boolean
 	} = {}) {
 		super();
 		super.init(options);
+	}
+
+	public get matrix(): {
+		a: number, b: number, c: number, d: number, e: number, f: number
+	} {
+		let m: {a: number, b: number, c: number, d: number, e: number, f: number } = {
+			a: 1, b: 0, c: 0, d: 1, e: this.x, f: this.y
+		};
+		let rn: number = Math.PI * this.rotation / 180;		//旋转弧度
+		let skx: number = Math.PI * this.skewX / 180;		//skew弧度
+		let sky: number = Math.PI * this.skewY / 180;		//
+		m.e -= this.originX;
+		m.f -= this.originY;
+		m.a = Math.cos(rn) * this.scaleX;
+		m.b = Math.sin(rn) * Math.tan(sky);
+		m.c = -Math.sin(rn) * Math.tan(skx);
+		m.d = Math.cos(rn) * this.scaleY;
+		m.e += this.originX;
+		m.f += this.originY;
+
+		return m;
+	}
+
+	public getValue(): any {
+		let value: any = super.getValue();
+		value.matrix = this.matrix;
+		return value;
 	}
 }
 
@@ -848,6 +871,35 @@ export class TimelineModel extends BasicModel {
 		});
 	}
 
+	/**
+	 * @desc	根据element id获取当前活动帧下的某一个element及其状态
+	 */
+	public getElementStateInActionFrameById(elementId: string): {
+		element: ElementModel,
+		state: ElementStateModel
+	} {
+		let element: ElementModel;
+		let elementState: ElementStateModel;
+		let result: {
+			element: ElementModel,
+			state: ElementStateModel
+		};
+		let layer: LayerModel = this.layers.find(l => {
+			return l.element.id == elementId;
+		});
+		if(layer) {
+			element = layer.element;
+			let frame: FrameModel = layer.getKeyFrameByFrame(Math.max(this.actionOption.start, 0));
+			frame && (elementState = frame.elementState);
+		}
+		result = {
+			element: element,
+			state: elementState
+		};
+
+		return result;
+	}
+
 }
 
 export class PageModel extends BasicModel {
@@ -1026,3 +1078,4 @@ export class ProductModel extends BasicModel {
 		super.init(options);
 	}
 }
+

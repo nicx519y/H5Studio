@@ -12,12 +12,12 @@ export class ToolsbarComponent implements OnInit {
 	public states = [
 		{
 			name: '选择元素',
-			state: EditorState.choise,
+			state: EditorState.choose,
 			class: 'glyphicon-screenshot'
 		},
 		{
 			name: '插入文本',
-			state: EditorState.font,
+			state: EditorState.text,
 			class: 'glyphicon-font'
 		},
 		{

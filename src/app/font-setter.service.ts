@@ -9,6 +9,7 @@ import {
 	PropertyBooleanModel,
 	PropertySingleSelectionModel,
 } from './properties';
+import { ElementModel, ElementStateModel } from './models';
 
 @Injectable()
 export class FontSetterService {
@@ -151,5 +152,16 @@ export class FontSetterService {
 		});
 
 		return values;
+	}
+
+	public setElement(options: {
+		element: ElementModel,
+		state: ElementStateModel
+	}) {
+		
+	}
+
+	public clear() {
+
 	}
 }

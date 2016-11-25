@@ -65,7 +65,7 @@
 				<ide-toolsbar #toolsbar></ide-toolsbar>
 			</div>
 			<div block="center">
-				<app-canvas [data]="service.outputData" ></app-canvas>
+				<app-canvas #canvas [data]="service.outputData" [mode]="toolsbar.state" (elementSelected)="attrSetter.setElement($event)" ></app-canvas>
 			</div>
 			<div block="bottom">
 				<ide-accordion>
@@ -137,7 +137,7 @@
 					</ide-panel>
 					<ide-panel [title]="'属性'">
 						<div block="main">
-							<ide-attrs></ide-attrs>
+							<ide-attrs #attrSetter [state]="toolsbar.state" ></ide-attrs>
 						</div>
 					</ide-panel>
 				</ide-accordion>

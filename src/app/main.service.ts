@@ -4,7 +4,7 @@ import { PagesService } from './pages.service';
 import { AttrsService } from './attrs.service';
 import { TimelineService } from './timeline.service';
 import { BitmapImporterService } from './bitmap-importer.service';
-import { MainModel, BitmapSourceModel, ElementModel, ItemModel, ItemType, TimelineModel, PageModel } from './models';
+import { MainModel, BitmapSourceModel, ElementModel, ElementStateModel, ItemModel, ItemType, TimelineModel, PageModel, LayerModel } from './models';
 
 @Injectable()
 export class MainService {
@@ -96,7 +96,7 @@ export class MainService {
 	 */
 	private createOuputData(itemId: string = '') {
 		if(!itemId || itemId == '') {
-			this._outputData = this.options.value;
+			this._outputData = this.options.getValue();
 			return;
 		}
 		let lib: ItemModel[] = this.options.library;
@@ -106,15 +106,15 @@ export class MainService {
 
 		if(item) {
 			if(item.type != ItemType.movieclip) {
-				this._outputData = new MainModel().value;	//不是影片剪辑
+				this._outputData = new MainModel().getValue();	//不是影片剪辑
 			} else {
 				let output: MainModel = new MainModel();
 				output.pages = [item.source as PageModel];
 				output.library = lib;
-				this._outputData = output.value;
+				this._outputData = output.getValue();
 			}
 		} else {
-			this._outputData = new MainModel().value;
+			this._outputData = new MainModel().getValue();
 		}
 	}
 
@@ -144,6 +144,15 @@ export class MainService {
 	 */
 	public publish() {
 
+	}
+	/**
+	 * @desc	根据id获取element
+	 */
+	public getElementStateInActionFrameById(id: string): {
+		element: ElementModel,
+		state: ElementStateModel
+	} {
+		return this.timelineService.timeline.getElementStateInActionFrameById(id);
 	}
 
 	public get data(): MainModel {
