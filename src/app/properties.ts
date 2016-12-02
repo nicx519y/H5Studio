@@ -16,6 +16,7 @@ export class PropertyBasicModel<T> {
 	label: string;
 	controlType: ControlType;
 	disabled: boolean = false;
+	model: any;
 
 	constructor(options: {
 		value?: T,
@@ -23,6 +24,7 @@ export class PropertyBasicModel<T> {
 		label?: string,
 		controlType?: ControlType,
 		disabled?: boolean,
+		model?: any,
 	}) {
 		this.value = options.value;
 		this.key = options.key || '';
@@ -31,6 +33,12 @@ export class PropertyBasicModel<T> {
 		if( typeof options.disabled === 'boolean' ) {
 			this.disabled = options.disabled;
 		}
+		this.model = options.model;
+	}
+
+	public setModel() {
+		if(typeof this.model == 'object')
+			Reflect.set(this.model, this.key, this.value);
 	}
 }
 

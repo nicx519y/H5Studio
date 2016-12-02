@@ -313,55 +313,33 @@ export class ElementStateModel extends BasicModel {
 	originX: number = 0;	//原点X坐标
 	originY: number = 0;	//原点Y坐标
 	rotation: number = 0;
-	scaleX: number = 1;
-	scaleY: number = 1;
+	scaleX: number = 0;
+	scaleY: number = 0;
 	skewX: number = 0;
 	skewY: number = 0;
 	alpha: number = 100;	//透明度 0 - 100
-	visible: boolean = true;
+	
+	matrix: {
+		a: number, b: number, c: number, d: number, e: number, f: number
+	} = {
+		a: 1, b: 0, c: 0, d: 1, e: 0, f: 0
+	};
 
 	constructor(options: {
 		x?: number,
 		y?: number,
+		rotation?: number;
+		scaleX?: number;
+		scaleY?: number;
+		skewX?: number;
+		skewY?: number;
 		originX?: number,
 		originY?: number,
-		rotation?: number,
-		scaleX?: number,
-		scaleY?: number,
-		skewX?: number,
-		skewY?: number
 		alpha?: number,
-		visible?: boolean
+		matrix?: { a: number, b: number, c: number, d: number, e: number, f: number },
 	} = {}) {
 		super();
 		super.init(options);
-	}
-
-	public get matrix(): {
-		a: number, b: number, c: number, d: number, e: number, f: number
-	} {
-		let m: {a: number, b: number, c: number, d: number, e: number, f: number } = {
-			a: 1, b: 0, c: 0, d: 1, e: this.x, f: this.y
-		};
-		let rn: number = Math.PI * this.rotation / 180;		//旋转弧度
-		let skx: number = Math.PI * this.skewX / 180;		//skew弧度
-		let sky: number = Math.PI * this.skewY / 180;		//
-		m.e -= this.originX;
-		m.f -= this.originY;
-		m.a = Math.cos(rn) * this.scaleX;
-		m.b = Math.sin(rn) * Math.tan(sky);
-		m.c = -Math.sin(rn) * Math.tan(skx);
-		m.d = Math.cos(rn) * this.scaleY;
-		m.e += this.originX;
-		m.f += this.originY;
-
-		return m;
-	}
-
-	public getValue(): any {
-		let value: any = super.getValue();
-		value.matrix = this.matrix;
-		return value;
 	}
 }
 
@@ -386,13 +364,15 @@ export class TweenModel extends BasicModel {
 export class ElementModel extends BasicModel {
 	protected idpre: string = 'ele';
 	public instanceName: string = '';											//人为指定的标识，同样具有唯一性
+	public visible: boolean = true;
 	private _type: ElementType = ElementType.symbol;					//标识element的类型
 	private _item: any = '';
 
 	constructor(options: {
 		instanceName?: string,
 		type?: ElementType,
-		item?: any
+		item?: any,
+		visible?: boolean,
 	}={}) {
 		super();
 		super.init(options);
@@ -847,19 +827,36 @@ export class TimelineModel extends BasicModel {
 	 * @desc	删除一个图层
 	 */
 	public removeLayer( layer: Function | LayerModel ) {
-		let tempLayer: Array<LayerModel> = [];
-		this.layers.forEach( l => {
+		// let tempLayer: Array<LayerModel> = [];
+		// this.layers.forEach( l => {
+		// 	if( typeof layer === 'function' ) {
+		// 		if( !layer( l ) ) {
+		// 			tempLayer.push( l );
+		// 		}
+		// 	} else if( layer instanceof LayerModel ) {
+		// 		if( layer !== l ) {
+		// 			tempLayer.push( l );
+		// 		}
+		// 	}
+		// });
+
+		let idx: number = 0;
+		while(idx < this.layers.length) {
+			let l: LayerModel = this.layers[idx];
 			if( typeof layer === 'function' ) {
-				if( !layer( l ) ) {
-					tempLayer.push( l );
+				if( layer( l ) ) {
+					this.layers.splice(idx, 1);
+				} else {
+					idx ++;
 				}
 			} else if( layer instanceof LayerModel ) {
-				if( layer !== l ) {
-					tempLayer.push( l );
+				if( layer == l ) {
+					this.layers.splice(idx, 1);
+				} else {
+					idx ++;
 				}
 			}
-		});
-		this.layers = tempLayer;
+		}
 	}
 
 	/**
@@ -876,13 +873,13 @@ export class TimelineModel extends BasicModel {
 	 */
 	public getElementStateInActionFrameById(elementId: string): {
 		element: ElementModel,
-		state: ElementStateModel
+		state: ElementStateModel,
 	} {
 		let element: ElementModel;
 		let elementState: ElementStateModel;
 		let result: {
 			element: ElementModel,
-			state: ElementStateModel
+			state: ElementStateModel,
 		};
 		let layer: LayerModel = this.layers.find(l => {
 			return l.element.id == elementId;
@@ -894,12 +891,11 @@ export class TimelineModel extends BasicModel {
 		}
 		result = {
 			element: element,
-			state: elementState
+			state: elementState,
 		};
 
 		return result;
 	}
-
 }
 
 export class PageModel extends BasicModel {

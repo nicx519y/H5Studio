@@ -11,8 +11,10 @@ import {
     ChangeDetectionStrategy,
     SimpleChange,
     EventEmitter,
+    ChangeDetectorRef,
 } from '@angular/core';
 import { MainService } from '../main.service';
+import { TimelineService } from '../timeline.service';
 import { MainModel, EditorState, ElementModel, ElementStateModel } from '../models';
 import Developer from '@JDB/janvas-developer/app/main/developer';
 
@@ -25,35 +27,36 @@ import Developer from '@JDB/janvas-developer/app/main/developer';
 export class CanvasComponent implements OnInit {
 
     @ViewChild('dev')
-    devCanvas: ElementRef;
+    private devCanvas: ElementRef;
 
     @ViewChild('box')
-    box: ElementRef;
+    private box: ElementRef;
 
     @Input()
-    data: MainModel;
-
-    @Input()
-    mode: EditorState;
+    private mode: EditorState;
 
     @Output()
-    elementSelected: EventEmitter<{element: ElementModel, state: ElementStateModel}> = new EventEmitter();
+    public elementSelected: EventEmitter<{element: ElementModel, state: ElementStateModel}> = new EventEmitter();
 
+    private data: any;
     private janvas: any;
 
     constructor(
         private service: MainService,
-        private container: ViewContainerRef
+        private tlService: TimelineService,
+        private container: ViewContainerRef,
+        private cdRef: ChangeDetectorRef
     ) {
+        
     }
 
     @HostListener('window:resize')
-    private janvasResize() {
+    private janvasResize(target=null) {
         let w: number = this.container.element.nativeElement.offsetWidth;
         let h: number = this.container.element.nativeElement.offsetHeight;
         this.box.nativeElement.style.width = w + 'px';
         this.box.nativeElement.style.height = h + 'px';
-        this.janvas.resizeJanvasDev(w, h);
+        (target || this.janvas).resizeJanvasDev(w, h);
     }
 
     private initJanvas() {
@@ -65,55 +68,69 @@ export class CanvasComponent implements OnInit {
                 data: new MainModel() //janvas data
             },
             (target) => {
-                console.log(Developer.EVENTS.ELEMENT_SELECTED);
                 target.changeMode(Developer.MODE.READ_MODE);
                 target.addEventHandler(Developer.EVENTS.ELEMENT_SELECTED, ele => this.janvasSelectedHandler(ele));
                 target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGE, ele => this.janvasChangeHandler(ele));
+                this.service.timelineChange.subscribe((tlService: TimelineService) => this.timelineDateChange(tlService));
+                this.janvasResize(target);
             }
         );
     }
 
-    private janvasSelectedHandler(ele) {
-        let id: string = ele.id;
-        let obj: { element: ElementModel, state: ElementStateModel } = this.service.getElementStateInActionFrameById(id);
-        obj && this.elementSelected.emit(obj);
+    private janvasSelectedHandler(obj) {
+        let id: string = obj.elementId;
+        let result: { 
+            element: ElementModel, 
+            state: ElementStateModel,
+        };
+        result = this.service.getElementStateInActionFrameById(id);
+        result && this.elementSelected.emit(result);
     }
 
     private janvasChangeHandler(ele) {
-        console.log(ele);
+        let id: string = ele.id;
+        let obj: { element: ElementModel, state: ElementStateModel } = this.service.getElementStateInActionFrameById(id);
+        Object.assign(obj.state, ele.state);
+        this.janvasUpdate(()=>this.elementSelected.emit(obj));
+    }
+
+    private janvasUpdate(callback: Function=null) {
+        this.data = this.service.data.getValue();
+        console.log(this.data);
+        this.data && this.janvas.updateJanvasData(this.data, () => {
+            this.janvas.gotoPage(this.tlService.stageId);
+            this.janvas.gotoFrame(Math.max(this.tlService.timeline.actionOption.start, 0));
+            callback && callback();
+        });
+    }
+
+    public timelineDateChange(tlService: TimelineService) {
+        this.janvasUpdate();
     }
 
     ngOnInit() {
-        setTimeout(() => {
-            this.initJanvas();
-            this.janvasResize();
-        }, 100);
+        setTimeout(this.initJanvas.bind(this), 100);
     }
 
     ngOnChanges(change) {
-        if(change.data && change.data.currentValue) {
-            console.log(change.data.currentValue);
-            this.janvas && this.janvas.updateJanvasData(change.data.currentValue);
-        }
-        if(change.mode) {
+        if(change.mode && this.janvas) {
             switch(change.mode.currentValue) {
                 case EditorState.none:
-                    this.janvas && this.janvas.changeMode(Developer.MODE.READ_MODE);
+                    this.janvas.changeMode(Developer.MODE.READ_MODE);
                     break;
                 case EditorState.choose:
-                    this.janvas && this.janvas.changeMode(Developer.MODE.EDIT_MODE);
+                    this.janvas.changeMode(Developer.MODE.EDIT_MODE);
                     break;
                 case EditorState.text:
-                    this.janvas && this.janvas.changeMode(Developer.MODE.TEXT_MODE);
+                    this.janvas.changeMode(Developer.MODE.TEXT_MODE);
                     break;
                 case EditorState.zoom: 
                     
                     break;
                 case EditorState.draw:
-                    this.janvas && this.janvas.changeMode(Developer.MODE.DRAW_MODE);
+                    this.janvas.changeMode(Developer.MODE.DRAW_MODE);
                     break;
             }
         }
     }
-
 }

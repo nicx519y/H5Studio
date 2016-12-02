@@ -65,30 +65,30 @@
 				<ide-toolsbar #toolsbar></ide-toolsbar>
 			</div>
 			<div block="center">
-				<app-canvas #canvas [data]="service.outputData" [mode]="toolsbar.state" (elementSelected)="attrSetter.setElement($event)" ></app-canvas>
+				<app-canvas #canvas  [mode]="toolsbar.state" (elementSelected)="attrSetter.setElement($event);" ></app-canvas>
 			</div>
 			<div block="bottom">
 				<ide-accordion>
 					<ide-panel [title]="'时间轴'" [hasTitle]="false" [isOpen]="true" [hasTools]="true" [closeAble]="false" [autoHeight]="300" #timelinepanel>
 						<div block="main">
-							<ide-timeline #timeline></ide-timeline>
+							<ide-timeline #timeline ></ide-timeline>
 						</div>
 						<div block="tools">
 							<div class="tools-left" style="width: 180px;">
 								<a href="javascript:void(0)" [tooltip]="'删除图层'" (click)="timeline.removeLayer()">
 								[删除]
-							</a>
+								</a>
 								<a href="javascript:void(0)" [tooltip]="'上移图层'" (click)="timeline.upLayer()">
 								[上移]
-							</a>
+								</a>
 								<a href="javascript:void(0)" [tooltip]="'下移图层'" (click)="timeline.downLayer()">
 								[下移]
-							</a>
+								</a>
 							</div>
 							<div class="tools-right">
 								<a href="javascript:void(0)" (click)="timeline.changeToKeyFrames()">
 								[转换关键帧]
-							</a>
+								</a>
 								<a href="javascript:void(0)" (click)="timeline.changeToEmptyKeyFrames()">
 								[转换空白关键帧]
 							</a>

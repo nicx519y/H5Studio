@@ -41,10 +41,13 @@ export class AttrsComponent implements OnInit {
 		}
 	}
 
+	private onSubmit() {
+		this.service.submit();
+	}
+
 	ngOnInit() {
 		// this.service.mode = AttrMode.fontSetter;
 		this.options = this.service.attrs;
-		
 	}
 
 }

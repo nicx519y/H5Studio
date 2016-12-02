@@ -34,22 +34,26 @@ export class PageConfigerComponent implements OnInit {
 		let title = new PropertyTextboxModel({
 			label: '标题：',
 			key: 'title',
-			value: service.config.stage.title
+			value: service.config.stage.title,
+			model: service.config.stage,
 		});
 		let backgroundColor = new PropertyColorpickerModel({
 			label: '背景色：',
-			key: 'backgroundColor',
-			value: service.config.stage.background.color
+			key: 'color',
+			value: service.config.stage.background.color,
+			model: service.config.stage.background,
 		});
 		let backgroundImage = new PropertyFileSelectModel({
 			label: '背景图片：',
-			key: 'backgroundImage',
-			value: service.config.stage.background.image
+			key: 'image',
+			value: service.config.stage.background.image,
+			model: service.config.stage.background,
 		});
 		let backgroundRepeat = new PropertySingleCheckboxModel({
 			label: '背景重复：',
-			key: 'backgroundRepeat',
-			value: service.config.stage.background.repeat
+			key: 'repeat',
+			value: service.config.stage.background.repeat,
+			model: service.config.stage.background,
 		});
 		let pageType = new PropertyDropdownModel({
 			label: '变换模式：',
@@ -61,16 +65,18 @@ export class PageConfigerComponent implements OnInit {
 				key: 'swiper',
 				value: PageType.swiper
 			}],
-			value: service.config.stage.pageType
+			value: service.config.stage.pageType,
+			model: service.config.stage,
 		});
 		let initialSlide = new PropertyNumberModel({
 			label: '起始页：',
-			key: 'swiperInitialSlide',
-			value: service.config.swiper.initialSlide
+			key: 'initialSlide',
+			value: service.config.swiper.initialSlide,
+			model: service.config.swiper,
 		});
 		let direction = new PropertyDropdownModel({
 			label: '页面变换方向：',
-			key: 'swiperDirection',
+			key: 'direction',
 			options: [{
 				key: '纵向',
 				value: Direction.vertial
@@ -79,31 +85,35 @@ export class PageConfigerComponent implements OnInit {
 				value: Direction.horizontal
 			}],
 			value: service.config.swiper.direction,
-			visible: (pageType.value == PageType.swiper)
+			model: service.config.swiper,
 		});
 		let speed = new PropertyNumberModel({
 			label: '变换动画速度：',
-			key: 'swiperSpeed',
-			value: service.config.swiper.speed
+			key: 'speed',
+			value: service.config.swiper.speed,
+			model: service.config.swiper,
 		});
 		let effect = new PropertyDropdownModel({
 			label: '变换动画特效：',
-			key: 'swiperEffect',
+			key: 'effect',
 			options: [{
 				key: 'Slide',
 				value: SwiperEffect.slide
 			}],
-			value: service.config.swiper.effect
+			value: service.config.swiper.effect,
+			model: service.config.swiper,
 		});
 		let loop = new PropertySingleCheckboxModel({
 			label: '循环播放：',
-			key: 'swiperLoop',
-			value: service.config.swiper.loop
+			key: 'loop',
+			value: service.config.swiper.loop,
+			model: service.config.swiper,
 		});
 		let autoPlay = new PropertySingleCheckboxModel({
 			label: '自动播放：',
-			key: 'swiperAutoPlay',
-			value: service.config.swiper.autoPlay
+			key: 'autoPlay',
+			value: service.config.swiper.autoPlay,
+			model: service.config.swiper,
 		});
 
 		this.options = [
@@ -126,6 +136,7 @@ export class PageConfigerComponent implements OnInit {
 	}
 
 	public hide() {
+		this.options.forEach(option => option.setModel());
 		this.modal.hide();
 	}
 

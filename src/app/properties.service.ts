@@ -67,30 +67,12 @@ export class PropertiesService {
 			new PropertyNumberModel({
 				label: 'x: ',
 				key: 'x',
-				value: state.x
+				value: state.matrix.e
 			}),
 			new PropertyNumberModel({
 				label: 'y: ',
 				key: 'y',
-				value: state.y
-			}),
-			new PropertyNumberModel({
-				label: 'scale x: ',
-				key: 'scaleX',
-				value: state.scaleX
-			}),
-			new PropertyNumberModel({
-				label: 'scale y: ',
-				key: 'scaleY',
-				value: state.scaleY
-			}),
-			new PropertyRangeModel({
-				label: 'rotation: ',
-				key: 'rotation',
-				value: state.rotation,
-				min: 0,
-				max: 360,
-				step: 0.1
+				value: state.matrix.f
 			}),
 			new PropertyRangeModel({
 				label: 'alpha: ',

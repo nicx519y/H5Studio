@@ -1,4 +1,4 @@
-import { Injectable, QueryList } from '@angular/core';
+import { Injectable, QueryList, Output, EventEmitter } from '@angular/core';
 import { 
 	LayerModel,
 	FrameModel,
@@ -13,7 +13,12 @@ import {
 
 @Injectable()
 export class TimelineService {
-	timeline: TimelineModel = new TimelineModel();
+	private _timeline: TimelineModel = new TimelineModel();
+	private _stateId: string = '';
+
+	@Output()
+	dataChange: EventEmitter<TimelineService> = new EventEmitter();
+
 	constructor() {
 		
 	}
@@ -41,6 +46,8 @@ export class TimelineService {
 		});
 
 		this.timeline.layers.push(newLayer);
+
+		this.dataChange.emit(this);
 	}
 	/**
 	 * @desc	删除一个element
@@ -50,6 +57,8 @@ export class TimelineService {
 		this.timeline.removeLayerWithElement( ( ele: ElementModel ) => {
 			return ele.id === elementId;
 		});
+
+		this.dataChange.emit(this);
 	}
 
 	/**
@@ -60,6 +69,7 @@ export class TimelineService {
 		this.timeline.removeLayer( ( layer: LayerModel ) => {
 			return layer.id === layerId;
 		});
+		this.dataChange.emit(this);
 	}
 
 	/**
@@ -75,6 +85,7 @@ export class TimelineService {
 			let temp: LayerModel = this.timeline.layers[layerIndex];
 			this.timeline.layers[layerIndex] = this.timeline.layers[layerIndex - 1];
 			this.timeline.layers[layerIndex - 1] = temp;
+			this.dataChange.emit(this);
 		}
 	}
 
@@ -91,6 +102,7 @@ export class TimelineService {
 			let temp: LayerModel = this.timeline.layers[layerIndex];
 			this.timeline.layers[layerIndex] = this.timeline.layers[layerIndex + 1];
 			this.timeline.layers[layerIndex + 1] = temp;
+			this.dataChange.emit(this);
 		}
 	}
 
@@ -111,7 +123,7 @@ export class TimelineService {
 			let temp: LayerModel = this.timeline.layers[idx2];
 			this.timeline.layers[idx2] = this.timeline.layers[idx1];
 			this.timeline.layers[idx1] = temp;
-
+			this.dataChange.emit(this);
 			return true;
 		}
 
@@ -126,10 +138,12 @@ export class TimelineService {
 	 */
 	public changeToKeyFrames( index1: number, index2: number, layerId: string ) {
 		this.getLayerById(layerId).changeToKeyFrames(index1, index2);
+		this.dataChange.emit(this);
 	}
 
 	public changeToEmptyKeyFrames( index1: number, index2: number, layerId: string ) {
 		this.getLayerById(layerId).changeToEmptyKeyFrames(index1, index2);
+		this.dataChange.emit(this);
 	}
 
 	/**
@@ -140,6 +154,7 @@ export class TimelineService {
 	 */
 	public changeToFrames( index1: number, index2: number, layerId: string ) {
 		this.getLayerById(layerId).changeToFrames(index1, index2);
+		this.dataChange.emit(this);
 	}
 
 	/**
@@ -150,6 +165,7 @@ export class TimelineService {
 	 */
 	public removeKeyFrames( index1: number, index2: number, layerId: string ) {
 		this.getLayerById(layerId).removeKeyFrames(index1, index2);
+		this.dataChange.emit(this);
 	}
 
 	/**
@@ -160,6 +176,7 @@ export class TimelineService {
 	 */
 	public removeFrames( index1: number, index2: number, layerId: string ) {
 		this.getLayerById(layerId).removeFrames(index1, index2);
+		this.dataChange.emit(this);
 	}
 	
 	/**
@@ -169,6 +186,7 @@ export class TimelineService {
 	 */
 	public createTweens( index1: number, index2: number, layerId: string, tweenType: TweenType = TweenType.normal ) {
 		this.getLayerById( layerId ).createTweens( index1, index2, tweenType );
+		this.dataChange.emit(this);
 	}
 
 	/**
@@ -178,6 +196,7 @@ export class TimelineService {
 	 */
 	public removeTweens( index1: number, index2: number, layerId: string ) {
 		this.getLayerById( layerId ).removeTweens( index1, index2 );
+		this.dataChange.emit(this);
 	}
 
 	/**
@@ -185,11 +204,33 @@ export class TimelineService {
 	 */
 	public moveFrames( index1: number, index2: number, offset: number, layerId: string ) {
 		this.getLayerById( layerId ).moveFrames( index1, index2, offset );
+		this.dataChange.emit(this);
 	}
 
 	public getLayerById( id: string ): LayerModel {
 		return this.timeline.layers.find((layer: LayerModel) => {
 			return ( layer.id === id );
 		});
+	}
+
+	// public set timeline(tl: TimelineModel) {
+	// 	this._timeline = tl;
+	// 	this.dataChange.emit(this.timeline);
+	// }
+
+	public get timeline(): TimelineModel {
+		return this._timeline;
+	}
+
+	public get stageId(): string {
+		return this._stateId;
+	}
+
+	public setTimeline(stageId: string, tl: TimelineModel) {
+		if(this._stateId != stageId) {
+			this._stateId = stageId;
+			this._timeline = tl;
+			this.dataChange.emit(this);
+		}
 	}
 }

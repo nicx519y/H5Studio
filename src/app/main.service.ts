@@ -10,10 +10,9 @@ import { MainModel, BitmapSourceModel, ElementModel, ElementStateModel, ItemMode
 export class MainService {
 	
 	private options: MainModel = new MainModel();
-	private _outputData: MainModel;
 
 	@Output()
-	public dataUpdateEvent: EventEmitter<MainModel|boolean> = new EventEmitter();
+	timelineChange: EventEmitter<any> = new EventEmitter();
 
 	constructor(
 		private itemsService: ItemsService,
@@ -24,35 +23,26 @@ export class MainService {
 	) {
 		this.pagesService.stages = this.options.pages;
 		this.itemsService.items = this.options.library;
-
-		this.pagesService.pageActiveChangeEvent.subscribe( index => {
-			this.activeStageChangeHandler( index );
-		});
-
-		this.itemsService.itemEditEvent.subscribe( item => {
-			this.itemEditHandler( item );
-		});
-
-		this.itemsService.itemInsertEvent.subscribe( item => {
-			this.itemInsertHandler( item );
-		});
-
-		this.itemsService.itemDeleteEvent.subscribe( item => {
-			this.itemDeleteHandler( item );
-		});
-
-		this.importBitmapService.uploadCompleteEvent.subscribe( (bitmaps: BitmapSourceModel[]) => {
-			this.importBitmapCompleteHandler( bitmaps );
-		});
+		this.pagesService.pageActiveChangeEvent.subscribe(index => this.activeStageChangeHandler( index ));
+		this.itemsService.itemEditEvent.subscribe(item => this.itemEditHandler( item ));
+		this.itemsService.itemInsertEvent.subscribe(item => this.itemInsertHandler( item ));
+		this.itemsService.itemDeleteEvent.subscribe(item => this.itemDeleteHandler( item ));
+		this.importBitmapService.uploadCompleteEvent.subscribe((bitmaps: BitmapSourceModel[]) => this.importBitmapCompleteHandler( bitmaps ));
+		this.timelineService.dataChange.subscribe(timelineService => this.timelineDataChangeHandler(timelineService));
+		this.attrsService.attrsSubmit.subscribe(() => this.attrsSubmitHandler());
 	}
 
 	private activeStageChangeHandler( index: number ) {
-		this.timelineService.timeline = this.options.pages[index].timeline;
-		this.createOuputData();
+		let page: PageModel = this.options.pages[index];
+		this.timelineService.setTimeline(page.id, page.timeline);
 	}
 
 	private itemEditHandler( item: ItemModel ) {
-		this.createOuputData();
+		if(item.type == ItemType.movieclip)
+			this.timelineService.setTimeline(item.id, item.source.timeline);
+		else {
+			alert('只能编辑 Movie Clip 类型的元件！');
+		}
 	}
 
 	private itemInsertHandler( item: ItemModel ) {
@@ -60,7 +50,6 @@ export class MainService {
 			this.timelineService.addElement(
 				ElementModel.fromItem( item )
 			);
-			this.createOuputData();
 		} else {
 			alert( '请选择要插入的页面' );
 		}
@@ -76,46 +65,24 @@ export class MainService {
 				return ele.item === item.id;
 			});
 		});
-		this.createOuputData();
 	}
 
 	private importBitmapCompleteHandler( bitmaps: BitmapSourceModel[] ) {
-		bitmaps.map( bitmap => {
-			this.itemsService.addItem({
+		bitmaps.map( bitmap => this.itemsService.addItem({
 				name: bitmap.fileName,
 				source: bitmap,
 				thumbnail: bitmap.url,
 				type: ItemType.bitmap
-			});
-		});
-		this.createOuputData();
+			})
+		);
 	}
 
-	/**
-	 * @desc	生成输出数据，可能是一个item或者是整个应用的数据
-	 */
-	private createOuputData(itemId: string = '') {
-		if(!itemId || itemId == '') {
-			this._outputData = this.options.getValue();
-			return;
-		}
-		let lib: ItemModel[] = this.options.library;
-		let item: ItemModel = lib.find(item => {
-			return item.id == itemId;
-		});
+	private timelineDataChangeHandler(tlService: TimelineService) {
+		this.timelineChange.emit(tlService);
+	}
 
-		if(item) {
-			if(item.type != ItemType.movieclip) {
-				this._outputData = new MainModel().getValue();	//不是影片剪辑
-			} else {
-				let output: MainModel = new MainModel();
-				output.pages = [item.source as PageModel];
-				output.library = lib;
-				this._outputData = output.getValue();
-			}
-		} else {
-			this._outputData = new MainModel().getValue();
-		}
+	private attrsSubmitHandler() {
+		this.timelineChange.emit(this.timelineService);
 	}
 
 	/**
@@ -145,22 +112,15 @@ export class MainService {
 	public publish() {
 
 	}
-	/**
-	 * @desc	根据id获取element
-	 */
-	public getElementStateInActionFrameById(id: string): {
-		element: ElementModel,
-		state: ElementStateModel
-	} {
-		return this.timelineService.timeline.getElementStateInActionFrameById(id);
-	}
 
 	public get data(): MainModel {
 		return this.options;
 	}
 
-
-	public get outputData(): MainModel {
-		return this._outputData;
+	public getElementStateInActionFrameById(id: string): {
+		element: ElementModel,
+		state: ElementStateModel,
+	} {
+		return this.timelineService.timeline.getElementStateInActionFrameById(id);
 	}
 }

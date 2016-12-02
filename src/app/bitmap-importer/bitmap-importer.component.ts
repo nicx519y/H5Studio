@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, OnInit } from '@angular/core';
 import { ModalComponent } from '../modal/modal.component';
 import { BitmapSourceModel } from '../models';
 import { BitmapImporterService } from '../bitmap-importer.service';
@@ -7,7 +7,8 @@ import { BitmapImporterService } from '../bitmap-importer.service';
 @Component({
 	selector: 'ide-bitmap-importer',
 	templateUrl: './bitmap-importer.component.html',
-	styleUrls: ['./bitmap-importer.component.css', '../../assets/modal.form.css']
+	styleUrls: ['./bitmap-importer.component.css', '../../assets/modal.form.css'],
+	changeDetection: ChangeDetectionStrategy.Default,
 })
 export class BitmapImporterComponent implements OnInit {
 
@@ -17,8 +18,11 @@ export class BitmapImporterComponent implements OnInit {
 	@ViewChild('fileInput')
 	public fileInput: ElementRef;
 
+	public bitmaps: BitmapSourceModel[];
+
 	constructor(
-		private service: BitmapImporterService
+		private service: BitmapImporterService,
+		private cd: ChangeDetectorRef,
 	) {
 		this.service.uploadCompleteEvent.subscribe( bitmaps => {
 			this.hide();
@@ -36,7 +40,6 @@ export class BitmapImporterComponent implements OnInit {
 	public importStart() {
 		//....
 		this.service.upload();
-
 	}
 
 	public removeBitmap( index: number ) {
@@ -46,6 +49,7 @@ export class BitmapImporterComponent implements OnInit {
 	private fileInputChange( evt ) {
 		if( evt.target.value == '' ) return;
 		let files: FileList = evt.target.files;
+		console.log(files);
 		for( let i = 0, file: File; file = files[i]; i ++ ) {
 			if( !this.fileFilter( file.type ) ) {  
 				continue;
@@ -69,7 +73,7 @@ export class BitmapImporterComponent implements OnInit {
 	}
 
 	private hasFile( file: File ): boolean {
-		let bitmap: BitmapSourceModel = this.service.bitmaps.find((value: BitmapSourceModel, index: number) => {
+		let bitmap: BitmapSourceModel = this.bitmaps.find((value: BitmapSourceModel, index: number) => {
 			return value.fileName === file.name;
 		});
 		return !!bitmap;
@@ -86,7 +90,12 @@ export class BitmapImporterComponent implements OnInit {
 		});
 	}
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+		this.bitmaps = this.service.bitmaps;
+	}
+
+	ngOnChanges(change) {
+		
+	}
 
 }

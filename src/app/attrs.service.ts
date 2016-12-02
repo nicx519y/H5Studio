@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Output, EventEmitter } from '@angular/core';
 import { 
 	PropertyBasicModel,
 	PropertyTextboxModel,
@@ -18,6 +18,9 @@ export class AttrsService {
 
 	private _mode: AttrMode = AttrMode.property;
 	public attrs: PropertyBasicModel<any>[] = [];
+
+	@Output()
+	attrsSubmit: EventEmitter<any> = new EventEmitter();
 
 	constructor() {
 		this.mode = AttrMode.none;
@@ -57,59 +60,48 @@ export class AttrsService {
 			new PropertyTextboxModel({
 				label: 'id: ',
 				key: 'instanceName',
-				value: ele.instanceName
+				value: ele.instanceName,
+				model: ele
 			}),
 			new PropertyTextboxModel({
 				label: 'item: ',
 				key: 'item',
 				value: ele.item,
-				disabled: true
+				disabled: true,
+				model: ele
 			}),
 			new PropertyNumberModel({
 				label: 'center x: ',
 				key: 'originX',
-				value: state.originX
+				value: Math.round(state.originX),
+				model: state
 			}),
 			new PropertyNumberModel({
 				label: 'center y: ',
 				key: 'originY',
-				value: state.originY
+				value: Math.round(state.originY),
+				model: state
 			}),
 			new PropertyNumberModel({
 				label: 'x: ',
-				key: 'x',
-				value: state.x
+				key: 'e',
+				value: Math.round(state.matrix.e),
+				model: state.matrix
 			}),
 			new PropertyNumberModel({
 				label: 'y: ',
-				key: 'y',
-				value: state.y
-			}),
-			new PropertyNumberModel({
-				label: 'scale x: ',
-				key: 'scaleX',
-				value: state.scaleX
-			}),
-			new PropertyNumberModel({
-				label: 'scale y: ',
-				key: 'scaleY',
-				value: state.scaleY
-			}),
-			new PropertyRangeModel({
-				label: 'rotation: ',
-				key: 'rotation',
-				value: state.rotation,
-				min: 0,
-				max: 360,
-				step: 0.1
+				key: 'f',
+				value: Math.round(state.matrix.f),
+				model: state.matrix
 			}),
 			new PropertyRangeModel({
 				label: 'alpha: ',
 				key: 'alpha',
-				value: state.alpha,
+				value: Math.round(state.alpha),
 				min: 0,
 				max: 100,
-				step: 1
+				step: 1,
+				model: state
 			}),
 		);
 		return models;
@@ -118,5 +110,10 @@ export class AttrsService {
 	private getFontSettingModels({element: ElementModel, state: ElementStateModel}): PropertyBasicModel<any>[] {
 		let models: PropertyBasicModel<any>[] = [];
 		return models;
+	}
+
+	public submit() {
+		this.attrs.forEach(attr => attr.setModel());
+		this.attrsSubmit.emit();
 	}
 }

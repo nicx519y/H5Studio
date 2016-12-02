@@ -1,13 +1,14 @@
-import { Component, Input, ElementRef, AfterViewInit, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, ElementRef, AfterViewInit, ViewChild, OnInit, ChangeDetectionStrategy, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'ide-previewer',
   templateUrl: './previewer.component.html',
-  styleUrls: ['./previewer.component.css']
+  styleUrls: ['./previewer.component.css'],
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class PreviewerComponent implements OnInit {
 
-  @Input()
+  	@Input()
 	public src: string;
 
 	@Input()
@@ -80,8 +81,12 @@ export class PreviewerComponent implements OnInit {
 	ngAfterViewInit() {
 		this.loadImage();
 	}
+	ngOnInit() {
 
-  ngOnInit() {
-  }
+	}
+	ngOnChanges(change) {
+		
+	}
 
+	
 }

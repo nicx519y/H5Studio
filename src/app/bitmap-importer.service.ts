@@ -1,20 +1,20 @@
-import { Injectable, Output, EventEmitter } from '@angular/core';
+import { Injectable, Output, EventEmitter,  } from '@angular/core';
 import { BitmapSourceModel } from './models';
 
 @Injectable()
 export class BitmapImporterService {
 
-	public bitmaps: BitmapSourceModel[] = [];
+	public _bitmaps: BitmapSourceModel[] = [];
 
 	@Output()
 	public uploadCompleteEvent: EventEmitter<BitmapSourceModel[]> = new EventEmitter();
 
-	constructor() {
-
+	constructor(
+	) {
 	}
 
 	public removeBitmap( index: number ) {
-		this.bitmaps.splice( index, 1 );
+		this._bitmaps.splice( index, 1 );
 	}
 
 	public createNewBitmap( options: {
@@ -23,16 +23,19 @@ export class BitmapImporterService {
 		size: number
 	} ) {
 		let newBitmap: BitmapSourceModel = new BitmapSourceModel( options );
-		this.bitmaps.push( newBitmap );
+		this._bitmaps.push( newBitmap );
 	}
 
 	public clearData() {
-		this.bitmaps = [];
-		this.bitmaps.length = 0;
+		this._bitmaps.length = 0;
 	}
 
 	public upload() {
-		this.uploadCompleteEvent.emit( this.bitmaps );
+		this.uploadCompleteEvent.emit( this._bitmaps );
+	}
+
+	public get bitmaps() {
+		return this._bitmaps;
 	}
 
 }
