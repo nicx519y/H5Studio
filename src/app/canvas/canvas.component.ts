@@ -90,13 +90,11 @@ export class CanvasComponent implements OnInit {
     private janvasChangeHandler(ele) {
         let id: string = ele.id;
         let obj: { element: ElementModel, state: ElementStateModel } = this.service.getElementStateInActionFrameById(id);
-        Object.assign(obj.state, ele.state);
         this.janvasUpdate(()=>this.elementSelected.emit(obj));
     }
 
     private janvasUpdate(callback: Function=null) {
         this.data = this.service.data.getValue();
-        console.log(this.data);
         this.data && this.janvas.updateJanvasData(this.data, () => {
             this.janvas.gotoPage(this.tlService.stageId);
             this.janvas.gotoFrame(Math.max(this.tlService.timeline.actionOption.start, 0));

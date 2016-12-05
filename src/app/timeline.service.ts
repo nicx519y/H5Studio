@@ -73,14 +73,19 @@ export class TimelineService {
 	}
 
 	public upLayers(layerIds: string[]) {
+		if(layerIds.length <= 0) return;
 		let ids: string[] = layerIds.concat();
+		let layers: LayerModel[] = this.timeline.layers;
 		ids.sort((a, b) => {
-			let idx1: number = this.timeline.layers.findIndex(layer => {return layer.id == a});
-			let idx2: number = this.timeline.layers.findIndex(layer => {return layer.id == b});
-			if(idx2 > idx1) return 1;
-			else if(idx2 < idx1) return -1;
+			let idx1: number = layers.findIndex(layer => {return layer.id == a});
+			let idx2: number = layers.findIndex(layer => {return layer.id == b});
+			if(idx2 > idx1) return -1;
+			else if(idx2 < idx1) return 1;
 			else return 0;
-		}).forEach(id => this.upLayer(id));
+		});
+
+		if(layers[0].id == ids[0]) return;
+		ids.forEach(id => this.upLayer(id));
 		this.dataChange.emit(this);
 	}
 
@@ -101,14 +106,18 @@ export class TimelineService {
 	}
 
 	public downLayers(layerIds: string[]) {
+		if(layerIds.length <= 0) return;
 		let ids: string[] = layerIds.concat();
+		let layers: LayerModel[] = this.timeline.layers;
 		ids.sort((a, b) => {
-			let idx1: number = this.timeline.layers.findIndex(layer => {return layer.id == a});
-			let idx2: number = this.timeline.layers.findIndex(layer => {return layer.id == b});
-			if(idx2 > idx1) return -1;
-			else if(idx2 < idx1) return 1;
+			let idx1: number = layers.findIndex(layer => {return layer.id == a});
+			let idx2: number = layers.findIndex(layer => {return layer.id == b});
+			if(idx2 > idx1) return 1;
+			else if(idx2 < idx1) return -1;
 			else return 0;
-		}).forEach(id => this.downLayer(id));
+		});
+		if(layers[layers.length - 1].id == ids[0]) return;
+		ids.forEach(id => this.downLayer(id));
 		this.dataChange.emit(this);
 	}
 
@@ -119,7 +128,7 @@ export class TimelineService {
 		let layerIndex: number = this.timeline.layers.findIndex( layer => {
 			return (layer.id === layerId);
 		});
-		if( layerIndex < 0 || layerIndex > this.timeline.layers.length - 1 ){
+		if( layerIndex < 0 || layerIndex >= this.timeline.layers.length - 1 ){
 			return;
 		} else {
 			let temp: LayerModel = this.timeline.layers[layerIndex];
