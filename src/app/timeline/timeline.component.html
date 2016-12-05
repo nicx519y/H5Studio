@@ -8,7 +8,7 @@
 	<div class="flexbox" >
 		<div class="left list" >
 			<div *ngFor="let layer of service.timeline.layers" class="layer-item" 
-			[ngClass]="{true: 'active'}[service.timeline.actionOption.layer==layer.id]"  >
+			[ngClass]="{true: 'active'}[service.timeline.actionOption.layers.indexOf(layer.id)>=0]"  >
 				<span [ngClass]="{
 					'0' : 'glyphicon glyphicon-file',
 					'1' : 'glyphicon glyphicon-adjust',
@@ -25,10 +25,10 @@
 		</div>
 		<div class="right list" #timelineContainer  >
 			<div class="timeline-list" [style.minWidth]="(service.timeline.frameCount + 100) * scaleFrame + 'px'"  >
-				<ide-layer *ngFor="let layer of service.timeline.layers" [scaleFrame]="scaleFrame" [option]="layer" 
-				(hoverChangeEvent)="layerHoverChangeHandler($event)"
-				(actionChangeEvent)="layerActionChangeHandler($event)"
-				(actionMoveEvent)="layerActionMoveHandler($event)"   ></ide-layer>
+				<ide-layer *ngFor="let layer of service.timeline.layers" [scaleFrame]="scaleFrame" [option]="layer"
+					(mouseActionEvent)="layerMouseEventHandler($event)" 
+					[action]="getLayerAction(layer.id)"
+				></ide-layer>
 			</div>
 			<div class="marking" #marking ></div>
 		</div>

@@ -17,24 +17,11 @@ export class LayerComponent implements OnInit {
 	scaleFrame: number;					//每帧刻度
 
 	@Output()
-	hoverChangeEvent: EventEmitter<{
-		layer: string,
-		hoverIndex: number
-	}> = new EventEmitter<{
-		layer: string,
-		hoverIndex: number
-	}>();
-
-	@Output()
-	actionChangeEvent: EventEmitter<{
-		layer: string,
-		start: number,
-		duration: number
-	}> = new EventEmitter<{
-		layer: string,
-		start: number,
-		duration: number
-	}>();
+	mouseActionEvent: EventEmitter<{
+		event: MouseEvent,
+		frameIdx: number,
+		layerId: string
+	}> = new EventEmitter();
 
 	@Output()
 	actionMoveEvent: EventEmitter<{
@@ -65,18 +52,6 @@ export class LayerComponent implements OnInit {
 		duration: 0
 	};
 
-	private moveOption: {
-		start: number,
-		duration: number,
-		handlerOffset: number,
-		offset: number
-	} = {
-		start: -1,
-		duration: 0,
-		handlerOffset: -1,
-		offset: 0
-	};
-
 	constructor(
 		private container: ElementRef
 	) {
@@ -95,6 +70,7 @@ export class LayerComponent implements OnInit {
 		this.hoverEle.nativeElement.style.left = index * FRAME_WIDTH + 'px';
 	}
 
+	@Input()
 	public set action(option: { start: number, duration: number }) {
 		if (option.duration >= 0) {
 			this.actionEle.nativeElement.style.left = option.start * FRAME_WIDTH + 'px';
@@ -115,109 +91,44 @@ export class LayerComponent implements OnInit {
 	private mouseMove(evt: MouseEvent) {
 		let mx: number = evt.offsetX;
 		let idx: number = Math.floor(mx / FRAME_WIDTH);
-		this.hoverChangeEvent.emit({
-			hoverIndex: idx,
-			layer: this.id
+		this.mouseActionEvent.emit({
+			event: evt,
+			frameIdx: idx,
+			layerId: this.id
 		});
-
-		let ac = this.actionOption;
-
-		//不是在移动模式
-		if (this.moveOption.handlerOffset < 0) {
-			if (this.mouseIsDown && ac.start >= 0) {
-				let duration = idx - ac.start + 1;
-				if (duration <= 0)
-					duration -= 1;
-				this.actionChangeEvent.emit({
-					start: ac.start,
-					duration: duration,
-					layer: this.id
-				});
-			}
-		} else {	//移动模式
-			let newStart: number = Math.max(idx - this.moveOption.handlerOffset, 0);
-			this.actionChangeEvent.emit({
-				start: newStart,
-				duration: ac.duration,
-				layer: this.id
-			});
-		}
 	}
 
 	@HostListener('mouseout', ['$event'])
 	private mouseOut(evt: MouseEvent) {
-		this.hoverChangeEvent.emit({
-			hoverIndex: -1,
-			layer: this.id
+		let mx: number = evt.offsetX;
+		let idx: number = Math.floor(mx / FRAME_WIDTH);
+		this.mouseActionEvent.emit({
+			event: evt,
+			frameIdx: idx,
+			layerId: this.id
 		});
-		this.mouseIsDown = false;
 	}
 
 	@HostListener('mousedown', ['$event'])
 	private mouseDown(evt: MouseEvent) {
 		let mx: number = evt.offsetX;
-		let ac = this.actionOption;
-
-		if (evt.shiftKey && ac.start >= 0) {
-			let duration = Math.floor(mx / FRAME_WIDTH) - ac.start + 1;
-			if (duration <= 0)
-				duration -= 1;
-			this.actionChangeEvent.emit({
-				start: ac.start,
-				duration: duration,
-				layer: this.id
-			});
-		} else {
-			let idx: number = Math.floor(mx / FRAME_WIDTH);
-			//在已选择区域内
-			if (idx >= ac.start && idx < ac.start + ac.duration) {
-				this.moveOption = {
-					start: ac.start,
-					duration: ac.duration,
-					handlerOffset: idx - ac.start,
-					offset: 0
-				}
-			} else {	//在已选择区域外
-				this.actionChangeEvent.emit({ start: Math.floor(mx / FRAME_WIDTH), duration: 1, layer: this.id });
-			}
-		}
-
-		this.mouseIsDown = true;
+		let idx: number = Math.floor(mx / FRAME_WIDTH);
+		this.mouseActionEvent.emit({
+			event: evt,
+			frameIdx: idx,
+			layerId: this.id
+		});
 	}
 
 	@HostListener('mouseup', ['$event'])
 	private mouseUp(evt: MouseEvent) {
-		let mc = this.moveOption;
 		let mx: number = evt.offsetX;
 		let idx: number = Math.floor(mx / FRAME_WIDTH);
-		let newStart: number = Math.max(idx - this.moveOption.handlerOffset, 0);
-		if (mc.start >= 0) {
-			let nmc = {
-				start: mc.start,
-				duration: mc.duration,
-				offset: newStart - mc.start,
-				handlerOffset: mc.handlerOffset
-			};
-
-			if (nmc.start != mc.start || nmc.duration != mc.duration || nmc.offset != mc.offset) {
-				this.actionMoveEvent.emit({
-					start: mc.start,
-					duration: mc.duration,
-					offset: newStart - mc.start,
-					layer: this.id
-				});
-				this.moveOption = nmc;
-			}
-		}
-
-		this.mouseIsDown = false;
-
-		this.moveOption = {	//reset
-			start: -1,
-			handlerOffset: -1,
-			duration: 0,
-			offset: 0
-		};
+		this.mouseActionEvent.emit({
+			event: evt,
+			frameIdx: idx,
+			layerId: this.id
+		});
 	}
 
 	ngAfterViewInit() {

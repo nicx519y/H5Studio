@@ -61,7 +61,7 @@ export class MainService {
 	 */
 	private itemDeleteHandler( item: ItemModel ) {
 		this.options.pages.forEach( page => {
-			page.timeline.removeLayerWithElement( ( ele: ElementModel ) => {
+			page.timeline.removeLayersWithElement( ( ele: ElementModel ) => {
 				return ele.item === item.id;
 			});
 		});

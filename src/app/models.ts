@@ -313,8 +313,8 @@ export class ElementStateModel extends BasicModel {
 	originX: number = 0;	//原点X坐标
 	originY: number = 0;	//原点Y坐标
 	rotation: number = 0;
-	scaleX: number = 0;
-	scaleY: number = 0;
+	scaleX: number = 1;
+	scaleY: number = 1;
 	skewX: number = 0;
 	skewY: number = 0;
 	alpha: number = 100;	//透明度 0 - 100
@@ -507,7 +507,6 @@ export class LayerModel extends BasicModel {
 	element: ElementModel = new ElementModel();			//包含的element
 	frames: Array<FrameModel> = [];						//关键帧集合
 	frameCount: number = 0;								//总帧数
-	visible: boolean = true;							//在编辑状态是否可见，不影响实际展示
 
 	constructor(options: {
 		name?: string,
@@ -518,7 +517,6 @@ export class LayerModel extends BasicModel {
 		element?: ElementModel,
 		frames?: FrameModel[],
 		frameCount?: number,
-		visible?: boolean
 	} = {}) {
 		super();
 		super.init(options);
@@ -799,11 +797,11 @@ export class TimelineModel extends BasicModel {
 	protected idpre: string = 'timeline';
 	name: string = '';
 	actionOption: {
-		layer: string,
+		layers: string[],
 		start: number,
 		duration: number
 	}={
-		layer: null,
+		layers: [],
 		start: -1,
 		duration: 0
 	};
@@ -824,33 +822,20 @@ export class TimelineModel extends BasicModel {
 	}
 
 	/**
-	 * @desc	删除一个图层
+	 * @desc	删除图层
 	 */
-	public removeLayer( layer: Function | LayerModel ) {
-		// let tempLayer: Array<LayerModel> = [];
-		// this.layers.forEach( l => {
-		// 	if( typeof layer === 'function' ) {
-		// 		if( !layer( l ) ) {
-		// 			tempLayer.push( l );
-		// 		}
-		// 	} else if( layer instanceof LayerModel ) {
-		// 		if( layer !== l ) {
-		// 			tempLayer.push( l );
-		// 		}
-		// 	}
-		// });
-
+	public removeLayers( layers: Function | LayerModel[] ) {
 		let idx: number = 0;
 		while(idx < this.layers.length) {
 			let l: LayerModel = this.layers[idx];
-			if( typeof layer === 'function' ) {
-				if( layer( l ) ) {
+			if( typeof layers === 'function' ) {
+				if( layers( l ) ) {
 					this.layers.splice(idx, 1);
 				} else {
 					idx ++;
 				}
-			} else if( layer instanceof LayerModel ) {
-				if( layer == l ) {
+			} else {
+				if( layers.indexOf(l) >= 0 ) {
 					this.layers.splice(idx, 1);
 				} else {
 					idx ++;
@@ -862,9 +847,13 @@ export class TimelineModel extends BasicModel {
 	/**
 	 * @desc	删除包含有指定element的图层
 	 */
-	public removeLayerWithElement( element: Function | ElementModel ) {
-		this.removeLayer( ( layer: LayerModel ) => {
-			return layer.hasElement( element );
+	public removeLayersWithElement( element: Function | ElementModel[] ) {
+		this.removeLayers( ( layer: LayerModel ) => {
+			if(typeof element == 'function') {
+				return layer.hasElement(element);
+			} else {
+				return (element.map(ele => { return layer.hasElement(ele) }).length > 0);
+			}
 		});
 	}
 
@@ -896,6 +885,17 @@ export class TimelineModel extends BasicModel {
 
 		return result;
 	}
+
+	public isInAction(frameIdx: number, layerId: string): boolean {
+		if(this.actionOption.layers.indexOf(layerId) < 0) return false;
+		let start = this.actionOption.start;
+		let duration = this.actionOption.duration;
+		let n = Math.min(start, start + duration);
+		let m = Math.max(start, start + duration);
+		if(frameIdx < n || frameIdx > m) return false;
+		return true;
+	}
+
 }
 
 export class PageModel extends BasicModel {

@@ -54,7 +54,7 @@ export class TimelineService {
 	 * @param	{ elementId }	需要删除的elementModel id
 	 */
 	public removeElement(elementId: string) {
-		this.timeline.removeLayerWithElement( ( ele: ElementModel ) => {
+		this.timeline.removeLayersWithElement( ( ele: ElementModel ) => {
 			return ele.id === elementId;
 		});
 
@@ -65,17 +65,29 @@ export class TimelineService {
 	 * @desc	删除一个图层
 	 * @param	{ layerId }		需要删除的图层id
 	 */
-	public removeLayer(layerId: string) {
-		this.timeline.removeLayer( ( layer: LayerModel ) => {
-			return layer.id === layerId;
+	public removeLayers(layerIds: string[]) {
+		this.timeline.removeLayers( ( layer: LayerModel ) => {
+			return (layerIds.indexOf(layer.id) >= 0);
 		});
+		this.dataChange.emit(this);
+	}
+
+	public upLayers(layerIds: string[]) {
+		let ids: string[] = layerIds.concat();
+		ids.sort((a, b) => {
+			let idx1: number = this.timeline.layers.findIndex(layer => {return layer.id == a});
+			let idx2: number = this.timeline.layers.findIndex(layer => {return layer.id == b});
+			if(idx2 > idx1) return 1;
+			else if(idx2 < idx1) return -1;
+			else return 0;
+		}).forEach(id => this.upLayer(id));
 		this.dataChange.emit(this);
 	}
 
 	/**
 	 * @desc	上移图层
 	 */
-	public upLayer( layerId: string ){
+	private upLayer( layerId: string ){
 		let layerIndex: number = this.timeline.layers.findIndex( layer => {
 			return (layer.id === layerId);
 		});
@@ -85,14 +97,25 @@ export class TimelineService {
 			let temp: LayerModel = this.timeline.layers[layerIndex];
 			this.timeline.layers[layerIndex] = this.timeline.layers[layerIndex - 1];
 			this.timeline.layers[layerIndex - 1] = temp;
-			this.dataChange.emit(this);
 		}
+	}
+
+	public downLayers(layerIds: string[]) {
+		let ids: string[] = layerIds.concat();
+		ids.sort((a, b) => {
+			let idx1: number = this.timeline.layers.findIndex(layer => {return layer.id == a});
+			let idx2: number = this.timeline.layers.findIndex(layer => {return layer.id == b});
+			if(idx2 > idx1) return -1;
+			else if(idx2 < idx1) return 1;
+			else return 0;
+		}).forEach(id => this.downLayer(id));
+		this.dataChange.emit(this);
 	}
 
 	/**
 	 * @desc	下移图层
 	 */
-	public downLayer( layerId: string ){
+	private downLayer( layerId: string ){
 		let layerIndex: number = this.timeline.layers.findIndex( layer => {
 			return (layer.id === layerId);
 		});
@@ -102,7 +125,6 @@ export class TimelineService {
 			let temp: LayerModel = this.timeline.layers[layerIndex];
 			this.timeline.layers[layerIndex] = this.timeline.layers[layerIndex + 1];
 			this.timeline.layers[layerIndex + 1] = temp;
-			this.dataChange.emit(this);
 		}
 	}
 
@@ -134,15 +156,19 @@ export class TimelineService {
 	 * @desc	转换成关键帧
 	 * @param	{ index1 }	起始帧序号
 	 * @param	{ index2 }	结束帧序号
-	 * @param	{ layerId }	要操作的图层ID
+	 * @param	{ layerIds }	要操作的图层ID
 	 */
-	public changeToKeyFrames( index1: number, index2: number, layerId: string ) {
-		this.getLayerById(layerId).changeToKeyFrames(index1, index2);
+	public changeToKeyFrames( index1: number, index2: number, layerIds: string[] ) {
+		layerIds.forEach(id => {
+			this.getLayerById(id).changeToKeyFrames(index1, index2);
+		});
 		this.dataChange.emit(this);
 	}
 
-	public changeToEmptyKeyFrames( index1: number, index2: number, layerId: string ) {
-		this.getLayerById(layerId).changeToEmptyKeyFrames(index1, index2);
+	public changeToEmptyKeyFrames( index1: number, index2: number, layerIds: string[] ) {
+		layerIds.forEach(id => {
+			this.getLayerById(id).changeToEmptyKeyFrames(index1, index2);
+		});
 		this.dataChange.emit(this);
 	}
 
@@ -150,10 +176,12 @@ export class TimelineService {
 	 * @desc	增加新的普通帧
 	 * @param	{ index1 }	起始帧序号
 	 * @param	{ index2 }	结束帧序号
-	 * @param	{ layerId }	要操作的图层ID
+	 * @param	{ layerIds }	要操作的图层ID
 	 */
-	public changeToFrames( index1: number, index2: number, layerId: string ) {
-		this.getLayerById(layerId).changeToFrames(index1, index2);
+	public changeToFrames( index1: number, index2: number, layerIds: string[] ) {
+		layerIds.forEach(id => {
+			this.getLayerById(id).changeToFrames(index1, index2);
+		});
 		this.dataChange.emit(this);
 	}
 
@@ -163,8 +191,10 @@ export class TimelineService {
 	 * @param	{ index2 }	结束帧序号
 	 * @param	{ layerId }	要操作的图层ID
 	 */
-	public removeKeyFrames( index1: number, index2: number, layerId: string ) {
-		this.getLayerById(layerId).removeKeyFrames(index1, index2);
+	public removeKeyFrames( index1: number, index2: number, layerIds: string[] ) {
+		layerIds.forEach(id => {
+			this.getLayerById(id).removeKeyFrames(index1, index2);
+		});
 		this.dataChange.emit(this);
 	}
 
@@ -174,8 +204,10 @@ export class TimelineService {
 	 * @param	{ index2 }	结束帧序号
 	 * @param	{ layerId }	要操作的图层ID
 	 */
-	public removeFrames( index1: number, index2: number, layerId: string ) {
-		this.getLayerById(layerId).removeFrames(index1, index2);
+	public removeFrames( index1: number, index2: number, layerIds: string[] ) {
+		layerIds.forEach(id => {
+			this.getLayerById(id).removeFrames(index1, index2);
+		});
 		this.dataChange.emit(this);
 	}
 	
@@ -184,9 +216,11 @@ export class TimelineService {
 	 * @param	{ index }	创建帧序号
 	 * @param	{ layerId }	要操作的图层ID
 	 */
-	public createTweens( index1: number, index2: number, layerId: string, tweenType: TweenType = TweenType.normal ) {
-		this.getLayerById( layerId ).createTweens( index1, index2, tweenType );
-		this.dataChange.emit(this);
+	public createTweens( index1: number, index2: number, layerIds: string[], tweenType: TweenType = TweenType.normal ) {
+		layerIds.forEach(id => {
+			this.getLayerById( id ).createTweens( index1, index2, tweenType );
+			this.dataChange.emit(this);
+		});
 	}
 
 	/**
@@ -194,17 +228,21 @@ export class TimelineService {
 	 * @param	{ index }	删除帧序号
 	 * @param	{ layerId }	作用图层ID
 	 */
-	public removeTweens( index1: number, index2: number, layerId: string ) {
-		this.getLayerById( layerId ).removeTweens( index1, index2 );
-		this.dataChange.emit(this);
+	public removeTweens( index1: number, index2: number, layerIds: string[] ) {
+		layerIds.forEach(id => {
+			this.getLayerById( id ).removeTweens( index1, index2 );
+			this.dataChange.emit(this);
+		});
 	}
 
 	/**
 	 * @desc	移动一些帧
 	 */
-	public moveFrames( index1: number, index2: number, offset: number, layerId: string ) {
-		this.getLayerById( layerId ).moveFrames( index1, index2, offset );
-		this.dataChange.emit(this);
+	public moveFrames( index1: number, index2: number, offset: number, layerIds: string[] ) {
+		layerIds.forEach(id => {
+			this.getLayerById( id ).moveFrames( index1, index2, offset );
+			this.dataChange.emit(this);
+		});
 	}
 
 	public getLayerById( id: string ): LayerModel {
@@ -212,11 +250,6 @@ export class TimelineService {
 			return ( layer.id === id );
 		});
 	}
-
-	// public set timeline(tl: TimelineModel) {
-	// 	this._timeline = tl;
-	// 	this.dataChange.emit(this.timeline);
-	// }
 
 	public get timeline(): TimelineModel {
 		return this._timeline;
