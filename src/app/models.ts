@@ -105,7 +105,6 @@ export class BasicModel {
 		if(typeof this['id'] != 'string' || this['id'] == '') {
 			this['id'] = BasicModel.createNewId(this.idpre);
 		}
-		
 		for(let key in options) {
 			if( key == 'value' ) continue;
 
@@ -124,14 +123,16 @@ export class BasicModel {
 				Reflect.set(this, key, value);
 				continue;
 			}
+
 			if(value.constructor.name == property.constructor.name) {
 				Reflect.set(this, key, value);
-			} else if(typeof value == 'Object') {
+			} else if(typeof value == 'object') {
 				Reflect.set(this, key, new property.constructor(value));
 			} else {
 				continue;
 			}
 		}
+		return this;
 	}
 	private static createRandom(): string {
 		let str: string = Math.round(1000 * Math.random()).toString();
@@ -890,8 +891,8 @@ export class TimelineModel extends BasicModel {
 		if(this.actionOption.layers.indexOf(layerId) < 0) return false;
 		let start = this.actionOption.start;
 		let duration = this.actionOption.duration;
-		let n = Math.min(start, start + duration);
-		let m = Math.max(start, start + duration);
+		let n = Math.min(start, start + duration - 1);
+		let m = Math.max(start, start + duration - 1);
 		if(frameIdx < n || frameIdx > m) return false;
 		return true;
 	}

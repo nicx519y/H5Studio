@@ -28,6 +28,7 @@ export class TimelineComponent implements OnInit {
 	private scaleFrame: number = 9;				//每帧的宽度
 	private actionIsChanging: boolean = false;
 	private moveDistance: number = -1;
+	private mouseEventTimer: any;
 	private actionStart: {
 		layerId: string,
 		frameIdx: number
@@ -134,6 +135,7 @@ export class TimelineComponent implements OnInit {
 		frameIdx: number,
 		layerId: string,
 	}) {
+		let event = evt.event;
 		if(event.type == 'mousemove') {
 			this.hoverChange(evt.frameIdx, evt.layerId);
 			if(this.actionIsChanging)
@@ -142,8 +144,9 @@ export class TimelineComponent implements OnInit {
 				this.moveingFrames(evt.frameIdx);
 		}else if(event.type == 'mouseout') {
 			this.hoverChange();
+			this.actionIsChanging && (this.mouseEventTimer = setTimeout(() => this.actionChangeEnd(evt.frameIdx, evt.layerId), 500));
 		}else if(event.type == 'mousedown') {
-			if(event['shiftKey']) {
+			if(event.shiftKey) {
 				if(this.actionStart.frameIdx >= 0) {
 					this.actionIsChanging = true;
 					this.actionChangeEnd(evt.frameIdx, evt.layerId);
@@ -179,6 +182,7 @@ export class TimelineComponent implements OnInit {
 	}
 
 	private actionChangeStart(frameIdx: number, layerId: string) {
+		clearTimeout(this.mouseEventTimer);
 		this.actionIsChanging = true;
 		this.actionStart.layerId = layerId;
 		this.actionStart.frameIdx = frameIdx;
@@ -193,6 +197,7 @@ export class TimelineComponent implements OnInit {
 
 	private actionChange(frameIdx: number, layerId: string) {
 		if(!this.actionIsChanging) return;
+		clearTimeout(this.mouseEventTimer);
 		let layers: LayerModel[] = this.service.timeline.layers;
 		let ao = this.service.timeline.actionOption;
 		let layerStartIdx: number = layers.findIndex(layer => {return layer.id == this.actionStart.layerId});
@@ -210,6 +215,7 @@ export class TimelineComponent implements OnInit {
 	}
 
 	private actionChangeEnd(frameIdx: number, layerId: string) {
+		clearTimeout(this.mouseEventTimer);
 		this.actionChange(frameIdx, layerId);
 		this.actionIsChanging = false;
 	}
@@ -262,6 +268,20 @@ export class TimelineComponent implements OnInit {
 				duration: 0
 			}
 		}
+	}
+
+	/**
+	 * @desc	用户在画板中选择了元素，时间轴做出相应的改变
+	 */
+	public elementSelected() {
+
+	}
+
+	/**
+	 * @desc	画板中的元素进行了改变，时间轴做出响应的改变
+	 */
+	public elementsChanged() {
+
 	}
 
 	ngOnInit() {

@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { MainService } from '../main.service';
 import { TimelineService } from '../timeline.service';
-import { MainModel, EditorState, ElementModel, ElementStateModel } from '../models';
+import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel } from '../models';
 import Developer from '@JDB/janvas-developer/app/main/developer';
 
 @Component({
@@ -32,11 +32,21 @@ export class CanvasComponent implements OnInit {
     @ViewChild('box')
     private box: ElementRef;
 
-    @Input()
-    private mode: EditorState;
+    private _mode: EditorState;
 
     @Output()
-    public elementSelected: EventEmitter<{element: ElementModel, state: ElementStateModel}> = new EventEmitter();
+    public elementsSelected: EventEmitter<{
+        frameIndex: number, 
+        elements: {
+            elementId: string,
+            layerId: string,
+            elementState: any,
+            bounds: any
+        }[]
+    }> = new EventEmitter();
+
+    @Output()
+    public elementsChanged: EventEmitter<any> = new EventEmitter();
 
     private data: any;
     private janvas: any;
@@ -73,28 +83,69 @@ export class CanvasComponent implements OnInit {
                 target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGE, ele => this.janvasChangeHandler(ele));
                 this.service.timelineChange.subscribe((tlService: TimelineService) => this.timelineDateChange(tlService));
                 this.janvasResize(target);
+                this.mode = this._mode;
             }
         );
     }
 
-    private janvasSelectedHandler(obj) {
-        let id: string = obj.elementId;
-        let result: { 
-            element: ElementModel, 
-            state: ElementStateModel,
+    private janvasSelectedHandler(eleArr: any[]) {
+        // console.log('selected: ', eleArr);
+        this.elementsSelected.emit(this.filterJanvasData(eleArr));
+    }
+
+    private janvasChangeHandler(eleArr: any[]) {
+        // console.log('change: ', eleArr);
+        let data = this.filterJanvasData(eleArr);
+        this.elementsChanged.emit(data);
+        let layerIds: string[] = data.elements.map(ele => { return ele.layerId });
+        this.tlService.changeToKeyFrames(data.frameIndex, data.frameIndex, layerIds);
+        let changes = data.elements.map(ele => {
+            return {
+                layerId: ele.layerId,
+                frame: {
+                    elementState: ele.elementState
+                },
+            };
+        });
+        this.tlService.changeKeyFramesState(data.frameIndex, changes);
+    }
+
+    private filterJanvasData(eleArr: any[]): {
+        frameIndex: number, 
+        elements: {
+            elementId: string,
+            layerId: string,
+            elementState: any,
+            bounds: any
+        }[]
+    } {
+        if(!eleArr || eleArr.length <= 0)
+            return null;
+
+        let elements: {
+            elementId: string,
+            layerId: string,
+            elementState: any,
+            bounds: any,
+        }[] = eleArr.map(ele => {
+            let result = {
+                elementId: ele.elementId,
+                layerId: ele.layerId,
+                elementState: ele.state,
+                bounds: ele.transformedBounds
+            };
+            return result;
+        });
+        let result = {
+            frameIndex: eleArr[0].frameIndex,
+            elements: elements
         };
-        result = this.service.getElementStateInActionFrameById(id);
-        result && this.elementSelected.emit(result);
+        return result;
     }
-
-    private janvasChangeHandler(ele) {
-        let id: string = ele.id;
-        let obj: { element: ElementModel, state: ElementStateModel } = this.service.getElementStateInActionFrameById(id);
-        this.janvasUpdate(()=>this.elementSelected.emit(obj));
-    }
-
+ 
     private janvasUpdate(callback: Function=null) {
         this.data = this.service.data.getValue();
+        console.log(this.data);
         this.data && this.janvas.updateJanvasData(this.data, () => {
             this.janvas.gotoPage(this.tlService.stageId);
             this.janvas.gotoFrame(Math.max(this.tlService.timeline.actionOption.start, 0));
@@ -106,13 +157,12 @@ export class CanvasComponent implements OnInit {
         this.janvasUpdate();
     }
 
-    ngOnInit() {
-        setTimeout(this.initJanvas.bind(this), 100);
-    }
+    @Input()
+    public set mode(mode: EditorState) {
+        this._mode = mode;
 
-    ngOnChanges(change) {
-        if(change.mode && this.janvas) {
-            switch(change.mode.currentValue) {
+        if(this.janvas) {
+            switch(mode) {
                 case EditorState.none:
                     this.janvas.changeMode(Developer.MODE.READ_MODE);
                     break;
@@ -131,4 +181,15 @@ export class CanvasComponent implements OnInit {
             }
         }
     }
+
+    public get mode(): EditorState {
+        return this._mode;
+    }
+
+    ngOnInit() {
+        setTimeout(this.initJanvas.bind(this), 100);
+    }
+
+    // ngOnChanges(change) {
+    // }
 }

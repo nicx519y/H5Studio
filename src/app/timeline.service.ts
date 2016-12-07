@@ -74,8 +74,9 @@ export class TimelineService {
 
 	public upLayers(layerIds: string[]) {
 		if(layerIds.length <= 0) return;
-		let ids: string[] = layerIds.concat();
 		let layers: LayerModel[] = this.timeline.layers;
+		if(layerIds.indexOf(layers[0].id) >= 0) return;
+		let ids: string[] = layerIds.concat();
 		ids.sort((a, b) => {
 			let idx1: number = layers.findIndex(layer => {return layer.id == a});
 			let idx2: number = layers.findIndex(layer => {return layer.id == b});
@@ -84,7 +85,6 @@ export class TimelineService {
 			else return 0;
 		});
 
-		if(layers[0].id == ids[0]) return;
 		ids.forEach(id => this.upLayer(id));
 		this.dataChange.emit(this);
 	}
@@ -107,8 +107,9 @@ export class TimelineService {
 
 	public downLayers(layerIds: string[]) {
 		if(layerIds.length <= 0) return;
-		let ids: string[] = layerIds.concat();
 		let layers: LayerModel[] = this.timeline.layers;
+		if(layerIds.indexOf(layers[layers.length - 1].id) >= 0) return;
+		let ids: string[] = layerIds.concat();
 		ids.sort((a, b) => {
 			let idx1: number = layers.findIndex(layer => {return layer.id == a});
 			let idx2: number = layers.findIndex(layer => {return layer.id == b});
@@ -116,7 +117,6 @@ export class TimelineService {
 			else if(idx2 < idx1) return -1;
 			else return 0;
 		});
-		if(layers[layers.length - 1].id == ids[0]) return;
 		ids.forEach(id => this.downLayer(id));
 		this.dataChange.emit(this);
 	}
@@ -169,7 +169,8 @@ export class TimelineService {
 	 */
 	public changeToKeyFrames( index1: number, index2: number, layerIds: string[] ) {
 		layerIds.forEach(id => {
-			this.getLayerById(id).changeToKeyFrames(index1, index2);
+			let layer: LayerModel = this.getLayerById(id);
+			layer && layer.changeToKeyFrames(index1, index2);
 		});
 		this.dataChange.emit(this);
 	}
@@ -274,5 +275,19 @@ export class TimelineService {
 			this._timeline = tl;
 			this.dataChange.emit(this);
 		}
+	}
+
+	/**
+	 * @desc	改变一个关键帧的状态
+	 * @returns	FrameModel[]
+	 */
+	public changeKeyFramesState(frameIdx: number, changes: {layerId: string, frame: any}[] = []): FrameModel[] {
+		let frameArr: FrameModel[] = changes.map(change => {
+			return this.timeline.layers.find(l => { return l.id == change.layerId })
+				.frames.find(f => { return f.index == frameIdx })
+					.init(change.frame);
+		});
+		this.dataChange.emit(this);
+		return frameArr;
 	}
 }
