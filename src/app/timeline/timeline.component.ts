@@ -50,56 +50,56 @@ export class TimelineComponent implements OnInit {
 	}
 
 	public removeLayers() {
-		let actionLayers: string[] = this.service.timeline.actionOption.layers;
+		let actionLayers: string[] = this.service.actionOption.layers;
 		if( !actionLayers || actionLayers.length <= 0 ) return;
 		this.service.removeLayers( actionLayers );
 	}
 
 	public upLayers() {
-		let actionLayers: string[] = this.service.timeline.actionOption.layers;
+		let actionLayers: string[] = this.service.actionOption.layers;
 		if( !actionLayers || actionLayers.length <= 0 ) return;
 		this.service.upLayers( actionLayers );
 	}
 
 	public downLayers() {
-		let actionLayers: string[] = this.service.timeline.actionOption.layers;
+		let actionLayers: string[] = this.service.actionOption.layers;
 		if( !actionLayers || actionLayers.length <= 0 ) return;
 		this.service.downLayers( actionLayers );
 	}
 
 	public changeToKeyFrames() {
 		let op = this.getActionIndexs();
-		this.service.changeToKeyFrames( op.index1, op.index2, this.service.timeline.actionOption.layers );
+		this.service.changeToKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
 	}
 
 	public changeToEmptyKeyFrames() {
 		let op = this.getActionIndexs();
-		this.service.changeToEmptyKeyFrames( op.index1, op.index2, this.service.timeline.actionOption.layers );
+		this.service.changeToEmptyKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
 	}
 
 	public changeToFrames() {
 		let op = this.getActionIndexs();
-		this.service.changeToFrames( op.index1, op.index2, this.service.timeline.actionOption.layers );
+		this.service.changeToFrames( op.index1, op.index2, this.service.actionOption.layers );
 	}
 
 	public removeKeyFrames() {
 		let op = this.getActionIndexs();
-		this.service.removeKeyFrames( op.index1, op.index2, this.service.timeline.actionOption.layers );
+		this.service.removeKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
 	}
 
 	public removeFrames() {
 		let op = this.getActionIndexs();
-		this.service.removeFrames( op.index1, op.index2, this.service.timeline.actionOption.layers );
+		this.service.removeFrames( op.index1, op.index2, this.service.actionOption.layers );
 	}
 	
 	public createTweens() {
 		let op = this.getActionIndexs();
-		this.service.createTweens( op.index1, op.index2, this.service.timeline.actionOption.layers );
+		this.service.createTweens( op.index1, op.index2, this.service.actionOption.layers );
 	}
 
 	public removeTweens() {
 		let op = this.getActionIndexs();
-		this.service.removeTweens( op.index1, op.index2, this.service.timeline.actionOption.layers );
+		this.service.removeTweens( op.index1, op.index2, this.service.actionOption.layers );
 	}
 
 	public moveFrames( index1: number, index2: number, offset: number, layers: string[] ) {
@@ -107,16 +107,16 @@ export class TimelineComponent implements OnInit {
 	}
 
 	private moveFramesStart(frameIdx: number) {
-		this.moveDistance = frameIdx - this.service.timeline.actionOption.start;
+		this.moveDistance = frameIdx - this.service.actionOption.start;
 	}
 
 	private moveingFrames(frameIdx: number) {
-		let ao = this.service.timeline.actionOption;
+		let ao = this.service.actionOption;
 		ao.start = frameIdx - this.moveDistance;
 	}
 	
 	private moveFramesEnd(frameIdx: number, layerId) {
-		let ao = this.service.timeline.actionOption;
+		let ao = this.service.actionOption;
 		if(this.actionStart.frameIdx != ao.start) {
 			this.moveingFrames(frameIdx);
 			this.moveFrames(this.actionStart.frameIdx, this.actionEnd.frameIdx, ao.start - this.actionStart.frameIdx, ao.layers);
@@ -151,7 +151,7 @@ export class TimelineComponent implements OnInit {
 					this.actionIsChanging = true;
 					this.actionChangeEnd(evt.frameIdx, evt.layerId);
 				}
-			} else if(!this.service.timeline.isInAction(evt.frameIdx, evt.layerId)) { 
+			} else if(!this.service.isInAction(evt.frameIdx, evt.layerId)) { 
 				this.actionChangeStart(evt.frameIdx, evt.layerId);
 			} else {
 				this.moveFramesStart(evt.frameIdx);
@@ -188,7 +188,7 @@ export class TimelineComponent implements OnInit {
 		this.actionStart.frameIdx = frameIdx;
 		this.actionEnd.layerId = null;
 		this.actionEnd.frameIdx = -1;
-		let ao = this.service.timeline.actionOption;
+		let ao = this.service.actionOption;
 		ao.layers.length = 0;
 		ao.layers.push(layerId);
 		ao.start = frameIdx;
@@ -199,7 +199,7 @@ export class TimelineComponent implements OnInit {
 		if(!this.actionIsChanging) return;
 		clearTimeout(this.mouseEventTimer);
 		let layers: LayerModel[] = this.service.timeline.layers;
-		let ao = this.service.timeline.actionOption;
+		let ao = this.service.actionOption;
 		let layerStartIdx: number = layers.findIndex(layer => {return layer.id == this.actionStart.layerId});
 		let layerEndIdx: number = layers.findIndex(layer => {return layer.id == layerId});
 		let oldLayerEndIdx: number = layers.findIndex(layer => {return layer.id == this.actionEnd.layerId});
@@ -241,7 +241,7 @@ export class TimelineComponent implements OnInit {
 	 * 根据actionOption获取起始帧和末尾帧
 	 */
 	private getActionIndexs(): { index1: number, index2: number } {
-		let ac = this.service.timeline.actionOption;
+		let ac = this.service.actionOption;
 		if( ac.duration >= 0 ) {
 			return {
 				index1: ac.start,
@@ -256,7 +256,7 @@ export class TimelineComponent implements OnInit {
 	}
 
 	public getLayerAction(layerId: string) {
-		let ao = this.service.timeline.actionOption;
+		let ao = this.service.actionOption;
 		if(ao.layers.indexOf(layerId) >= 0) {
 			return {
 				start: ao.start,
@@ -268,20 +268,6 @@ export class TimelineComponent implements OnInit {
 				duration: 0
 			}
 		}
-	}
-
-	/**
-	 * @desc	用户在画板中选择了元素，时间轴做出相应的改变
-	 */
-	public elementSelected() {
-
-	}
-
-	/**
-	 * @desc	画板中的元素进行了改变，时间轴做出响应的改变
-	 */
-	public elementsChanged() {
-
 	}
 
 	ngOnInit() {

@@ -61,9 +61,12 @@ export class MainService {
 	 */
 	private itemDeleteHandler( item: ItemModel ) {
 		this.options.pages.forEach( page => {
+			let layers: LayerModel[] = page.timeline.layers;
+			
 			page.timeline.removeLayersWithElement( ( ele: ElementModel ) => {
 				return ele.item === item.id;
 			});
+			page.timeline.layers
 		});
 	}
 
@@ -121,6 +124,6 @@ export class MainService {
 		element: ElementModel,
 		state: ElementStateModel,
 	} {
-		return this.timelineService.timeline.getElementStateInActionFrameById(id);
+		return this.timelineService.getElementStateInActionFrameById(id);
 	}
 }

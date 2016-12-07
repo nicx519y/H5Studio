@@ -90,7 +90,13 @@ export class CanvasComponent implements OnInit {
 
     private janvasSelectedHandler(eleArr: any[]) {
         // console.log('selected: ', eleArr);
-        this.elementsSelected.emit(this.filterJanvasData(eleArr));
+        let data = this.filterJanvasData(eleArr);
+        this.tlService.actionOption = {
+            start: data.frameIndex,
+            duration: 1,
+            layers: data.elements.map(ele => { return ele.layerId })
+        };
+        this.elementsSelected.emit(data);
     }
 
     private janvasChangeHandler(eleArr: any[]) {
@@ -148,7 +154,7 @@ export class CanvasComponent implements OnInit {
         console.log(this.data);
         this.data && this.janvas.updateJanvasData(this.data, () => {
             this.janvas.gotoPage(this.tlService.stageId);
-            this.janvas.gotoFrame(Math.max(this.tlService.timeline.actionOption.start, 0));
+            this.janvas.gotoFrame(Math.max(this.tlService.actionOption.start, 0));
             callback && callback();
         });
     }
