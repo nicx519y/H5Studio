@@ -65,7 +65,11 @@
 				<ide-toolsbar #toolsbar></ide-toolsbar>
 			</div>
 			<div block="center">
-				<app-canvas #canvas  [mode]="toolsbar.state" 
+				<app-canvas #canvas  
+					[mode]="toolsbar.state"
+					[timeline]="timeline"
+					[frame]="timeline.actionFrame"
+					[page]="timeline.stageId" 
 				></app-canvas>
 			</div>
 			<div block="bottom">
@@ -87,25 +91,25 @@
 								</a>
 							</div>
 							<div class="tools-right">
-								<a href="javascript:void(0)" (click)="timeline.changeToKeyFrames()">
+								<a href="javascript:void(0)" (click)="timeline.changeActiveToKeyFrames()">
 								[转换关键帧]
 								</a>
-								<a href="javascript:void(0)" (click)="timeline.changeToEmptyKeyFrames()">
+								<a href="javascript:void(0)" (click)="timeline.changeActiveToEmptyKeyFrames()">
 								[转换空白关键帧]
 							</a>
-								<a href="javascript:void(0)" (click)="timeline.removeKeyFrames()">
+								<a href="javascript:void(0)" (click)="timeline.removeActiveKeyFrames()">
 								[删除关键帧]
 							</a>
-								<a href="javascript:void(0)" (click)="timeline.changeToFrames()">
+								<a href="javascript:void(0)" (click)="timeline.changeActiveToFrames()">
 								[转换帧]
 							</a>
-								<a href="javascript:void(0)" (click)="timeline.removeFrames()">
+								<a href="javascript:void(0)" (click)="timeline.removeActiveFrames()">
 								[删除帧]
 							</a>
-								<a href="javascript:void(0)" (click)="timeline.createTweens()">
+								<a href="javascript:void(0)" (click)="timeline.createActiveTweens()">
 								[新建动画]
 							</a>
-								<a href="javascript:void(0)" (click)="timeline.removeTweens()">
+								<a href="javascript:void(0)" (click)="timeline.removeActiveTweens()">
 								[删除动画]
 							</a>
 							</div>

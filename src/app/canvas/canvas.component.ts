@@ -14,8 +14,8 @@ import {
     ChangeDetectorRef,
 } from '@angular/core';
 import { MainService } from '../main.service';
-import { TimelineService } from '../timeline.service';
 import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel } from '../models';
+import { TimelineComponent } from '../timeline/timeline.component';
 import Developer from '@JDB/janvas-developer/app/main/developer';
 
 @Component({
@@ -25,14 +25,17 @@ import Developer from '@JDB/janvas-developer/app/main/developer';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CanvasComponent implements OnInit {
+    private _mode: EditorState;
+    private _page: string = 'stage';
+    private _frameIdx: number = 0;
+    private data: any;
+    private janvas: any;
 
     @ViewChild('dev')
     private devCanvas: ElementRef;
 
     @ViewChild('box')
     private box: ElementRef;
-
-    private _mode: EditorState;
 
     @Output()
     public elementsSelected: EventEmitter<{
@@ -48,12 +51,12 @@ export class CanvasComponent implements OnInit {
     @Output()
     public elementsChanged: EventEmitter<any> = new EventEmitter();
 
-    private data: any;
-    private janvas: any;
+    @Input()
+    private timeline: TimelineComponent;
 
     constructor(
         private service: MainService,
-        private tlService: TimelineService,
+        // private tlService: TimelineService,
         private container: ViewContainerRef,
         private cdRef: ChangeDetectorRef
     ) {
@@ -85,8 +88,20 @@ export class CanvasComponent implements OnInit {
         }
     }
 
-    public get mode(): EditorState {
-        return this._mode;
+    @Input()
+    public set page(p: string) {
+        if(this._page != p) {
+            this._page = p;
+            this.janvas && this.janvas.gotoPage(p);
+        }
+    }
+
+    @Input()
+    public set frame(f: number) {
+        if(this._frameIdx != f) {
+            this._frameIdx = f;
+            this.janvas && this.janvas.gotoFrame(f);
+        }
     }
 
     @HostListener('window:resize')
@@ -110,9 +125,8 @@ export class CanvasComponent implements OnInit {
                 target.changeMode(Developer.MODE.READ_MODE);
                 target.addEventHandler(Developer.EVENTS.ELEMENT_SELECTED, ele => this.janvasSelectedHandler(ele));
                 target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGE, ele => this.janvasChangeHandler(ele));
-                this.service.timelineChange.subscribe((tlService: TimelineService) => this.timelineDateChange(tlService));
+                this.timeline.dataChange.subscribe(() => this.timelineDateChange());
                 this.janvasResize(target);
-                this.mode = this._mode;
             }
         );
     }
@@ -120,11 +134,11 @@ export class CanvasComponent implements OnInit {
     private janvasSelectedHandler(eleArr: any[]) {
         // console.log('selected: ', eleArr);
         let data = this.filterJanvasData(eleArr);
-        this.tlService.actionOption = {
+        this.timeline.setActionOptions({
             start: data.frameIndex,
             duration: 1,
             layers: data.elements.map(ele => { return ele.layerId })
-        };
+        });
         this.elementsSelected.emit(data);
     }
 
@@ -133,7 +147,7 @@ export class CanvasComponent implements OnInit {
         let data = this.filterJanvasData(eleArr);
         this.elementsChanged.emit(data);
         let layerIds: string[] = data.elements.map(ele => { return ele.layerId });
-        this.tlService.changeToKeyFrames(data.frameIndex, data.frameIndex, layerIds);
+        this.timeline.changeToKeyFrames(data.frameIndex, data.frameIndex, layerIds);
         let changes = data.elements.map(ele => {
             return {
                 layerId: ele.layerId,
@@ -142,7 +156,7 @@ export class CanvasComponent implements OnInit {
                 },
             };
         });
-        this.tlService.changeKeyFramesState(data.frameIndex, changes);
+        this.timeline.changeKeyFramesState(data.frameIndex, changes);
     }
 
     private filterJanvasData(eleArr: any[]): {
@@ -182,13 +196,13 @@ export class CanvasComponent implements OnInit {
         this.data = this.service.data.getValue();
         console.log(this.data);
         this.data && this.janvas.updateJanvasData(this.data, () => {
-            this.janvas.gotoPage(this.tlService.stageId);
-            this.janvas.gotoFrame(Math.max(this.tlService.actionOption.start, 0));
+            this.janvas.gotoPage(this._page);
+            this.janvas.gotoFrame(this._frameIdx);
             callback && callback();
         });
     }
 
-    public timelineDateChange(tlService: TimelineService) {
+    public timelineDateChange() {
         this.janvasUpdate();
     }
 

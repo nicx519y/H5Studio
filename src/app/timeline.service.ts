@@ -20,19 +20,6 @@ export class TimelineService {
 	@Output()
 	public dataChange: EventEmitter<TimelineService> = new EventEmitter();
 
-	@Output()
-	public actionChange: EventEmitter<{layers: string[], start: number, duration: number}> = new EventEmitter();
-
-	public actionOption: {
-		layers: string[],
-		start: number,
-		duration: number
-	}={
-		layers: [],
-		start: -1,
-		duration: 0
-	};
-
 	constructor() {
 		
 	}
@@ -287,11 +274,6 @@ export class TimelineService {
 		if(this._stateId != stageId) {
 			this._stateId = stageId;
 			this._timeline = tl;
-			this.actionOption = {
-				layers: [],
-				start: -1,
-				duration: 0
-			};
 			this.dataChange.emit(this);
 		}
 	}
@@ -310,44 +292,44 @@ export class TimelineService {
 		return frameArr;
 	}
 
-	/**
-	 * @desc	根据element id获取当前活动帧下的某一个element及其状态
-	 */
-	public getElementStateInActionFrameById(elementId: string): {
-		element: ElementModel,
-		state: ElementStateModel,
-	} {
-		let element: ElementModel;
-		let elementState: ElementStateModel;
-		let result: {
-			element: ElementModel,
-			state: ElementStateModel,
-		};
-		let layer: LayerModel = this.timeline.layers.find(l => {
-			return l.element.id == elementId;
-		});
-		if(layer) {
-			element = layer.element;
-			let frame: FrameModel = layer.getKeyFrameByFrame(Math.max(this.actionOption.start, 0));
-			frame && (elementState = frame.elementState);
-		}
-		result = {
-			element: element,
-			state: elementState,
-		};
+	// /**
+	//  * @desc	根据element id获取当前活动帧下的某一个element及其状态
+	//  */
+	// public getElementStateInActionFrameById(elementId: string): {
+	// 	element: ElementModel,
+	// 	state: ElementStateModel,
+	// } {
+	// 	let element: ElementModel;
+	// 	let elementState: ElementStateModel;
+	// 	let result: {
+	// 		element: ElementModel,
+	// 		state: ElementStateModel,
+	// 	};
+	// 	let layer: LayerModel = this.timeline.layers.find(l => {
+	// 		return l.element.id == elementId;
+	// 	});
+	// 	if(layer) {
+	// 		element = layer.element;
+	// 		let frame: FrameModel = layer.getKeyFrameByFrame(Math.max(this.actionOption.start, 0));
+	// 		frame && (elementState = frame.elementState);
+	// 	}
+	// 	result = {
+	// 		element: element,
+	// 		state: elementState,
+	// 	};
 
-		return result;
-	}
+	// 	return result;
+	// }
 
-	public isInAction(frameIdx: number, layerId: string): boolean {
-		if(this.actionOption.layers.indexOf(layerId) < 0) return false;
-		let start = this.actionOption.start;
-		let duration = this.actionOption.duration;
-		let n = Math.min(start, start + duration - 1);
-		let m = Math.max(start, start + duration - 1);
-		if(frameIdx < n || frameIdx > m) return false;
-		return true;
-	}
+	// public isInAction(frameIdx: number, layerId: string): boolean {
+	// 	if(this.actionOption.layers.indexOf(layerId) < 0) return false;
+	// 	let start = this.actionOption.start;
+	// 	let duration = this.actionOption.duration;
+	// 	let n = Math.min(start, start + duration - 1);
+	// 	let m = Math.max(start, start + duration - 1);
+	// 	if(frameIdx < n || frameIdx > m) return false;
+	// 	return true;
+	// }
 
 	/**
 	 * @desc	改变可见状态
@@ -359,4 +341,6 @@ export class TimelineService {
 			this.dataChange.emit(this);
 		}
 	}
+
+	
 }

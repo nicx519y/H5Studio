@@ -120,10 +120,10 @@ export class MainService {
 		return this.options;
 	}
 
-	public getElementStateInActionFrameById(id: string): {
-		element: ElementModel,
-		state: ElementStateModel,
-	} {
-		return this.timelineService.getElementStateInActionFrameById(id);
-	}
+	// public getElementStateInActionFrameById(id: string): {
+	// 	element: ElementModel,
+	// 	state: ElementStateModel,
+	// } {
+	// 	return this.timelineService.getElementStateInActionFrameById(id);
+	// }
 }

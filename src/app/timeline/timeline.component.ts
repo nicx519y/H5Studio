@@ -1,6 +1,6 @@
-import { Component, ViewChild, ViewChildren, ElementRef, Input, Output, QueryList, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ViewChildren, ElementRef, Input, Output, QueryList, OnInit, AfterViewInit, EventEmitter } from '@angular/core';
 import { TimelineService } from '../timeline.service';
-import { TimelineModel, LayerModel, TweenType } from '../models';
+import { TimelineModel, LayerModel, TweenType, FrameModel } from '../models';
 import { LayerComponent } from '../layer/layer.component';
 import { TimelineRulerComponent } from '../timeline-ruler/timeline-ruler.component';
 
@@ -23,12 +23,24 @@ export class TimelineComponent implements OnInit {
 	@ViewChild('marking')
 	marking: ElementRef;
 
+	@Output()
+	dataChange: EventEmitter<any> = new EventEmitter();
+
 	private lastHoverLayer: string = null;
 	private lastActionLayer: string = null;
 	private scaleFrame: number = 9;				//每帧的宽度
 	private actionIsChanging: boolean = false;
 	private moveDistance: number = -1;
 	private mouseEventTimer: any;
+	private actionOption: {
+		layers: string[],
+		start: number,
+		duration: number
+	}={
+		layers: [],
+		start: -1,
+		duration: 0
+	};
 	private actionStart: {
 		layerId: string,
 		frameIdx: number
@@ -49,77 +61,122 @@ export class TimelineComponent implements OnInit {
 	) {
 	}
 
-	public removeLayers() {
-		let actionLayers: string[] = this.service.actionOption.layers;
+	public get stageId(): string {
+		return this.service.stageId;
+	}
+
+	public get actionFrame(): number {
+		return this.actionOption.start;
+	}
+
+	public removeActiveLayers() {
+		let actionLayers: string[] = this.actionOption.layers;
 		if( !actionLayers || actionLayers.length <= 0 ) return;
 		this.service.removeLayers( actionLayers );
 	}
 
-	public upLayers() {
-		let actionLayers: string[] = this.service.actionOption.layers;
+	public upActiveLayers() {
+		let actionLayers: string[] = this.actionOption.layers;
 		if( !actionLayers || actionLayers.length <= 0 ) return;
 		this.service.upLayers( actionLayers );
 	}
 
-	public downLayers() {
-		let actionLayers: string[] = this.service.actionOption.layers;
+	public downActiveLayers() {
+		let actionLayers: string[] = this.actionOption.layers;
 		if( !actionLayers || actionLayers.length <= 0 ) return;
 		this.service.downLayers( actionLayers );
 	}
 
-	public changeToKeyFrames() {
+	public changeActiveToKeyFrames() {
 		let op = this.getActionIndexs();
-		this.service.changeToKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.changeToKeyFrames( op.index1, op.index2, this.actionOption.layers );
 	}
 
-	public changeToEmptyKeyFrames() {
+	public changeActiveToEmptyKeyFrames() {
 		let op = this.getActionIndexs();
-		this.service.changeToEmptyKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.changeToEmptyKeyFrames( op.index1, op.index2, this.actionOption.layers );
 	}
 
-	public changeToFrames() {
+	public changeActiveToFrames() {
 		let op = this.getActionIndexs();
-		this.service.changeToFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.changeToFrames( op.index1, op.index2, this.actionOption.layers );
 	}
 
-	public removeKeyFrames() {
+	public removeActiveKeyFrames() {
 		let op = this.getActionIndexs();
-		this.service.removeKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.removeKeyFrames( op.index1, op.index2, this.actionOption.layers );
 	}
 
-	public removeFrames() {
+	public removeActiveFrames() {
 		let op = this.getActionIndexs();
-		this.service.removeFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.removeFrames( op.index1, op.index2, this.actionOption.layers );
 	}
 	
-	public createTweens() {
+	public createActiveTweens() {
 		let op = this.getActionIndexs();
-		this.service.createTweens( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.createTweens( op.index1, op.index2, this.actionOption.layers );
 	}
 
-	public removeTweens() {
+	public removeActiveTweens() {
 		let op = this.getActionIndexs();
-		this.service.removeTweens( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.removeTweens( op.index1, op.index2, this.actionOption.layers );
 	}
 
-	public moveFrames( index1: number, index2: number, offset: number, layers: string[] ) {
-		this.service.moveFrames( index1, index2, offset, layers );
+	public getLayerAction(layerId: string) {
+		let ao = this.actionOption;
+		if(ao.layers.indexOf(layerId) >= 0) {
+			return {
+				start: ao.start,
+				duration: ao.duration
+			};
+		} else {
+			return {
+				start: -1,
+				duration: 0
+			}
+		}
+	}
+
+	public isInAction(frameIdx: number, layerId: string): boolean {
+		if(this.actionOption.layers.indexOf(layerId) < 0) return false;
+		let start = this.actionOption.start;
+		let duration = this.actionOption.duration;
+		let n = Math.min(start, start + duration - 1);
+		let m = Math.max(start, start + duration - 1);
+		if(frameIdx < n || frameIdx > m) return false;
+		return true;
+	}
+
+	public setActionOptions(options: {
+		start?: number,
+		duration?: number,
+		layers?: string[],
+	}) {
+		Object.assign(this.actionOption, options);
+	}
+
+	public changeKeyFramesState(frameIdx: number, changes: {layerId: string, frame: any}[] = []): FrameModel[] {
+		return this.service.changeKeyFramesState(frameIdx, changes);
+	}
+
+	public changeToKeyFrames( index1: number, index2: number, layerIds: string[] ) {
+		this.service.changeToKeyFrames(index1, index2, layerIds);
 	}
 
 	private moveFramesStart(frameIdx: number) {
-		this.moveDistance = frameIdx - this.service.actionOption.start;
+		this.moveDistance = frameIdx - this.actionOption.start;
 	}
 
 	private moveingFrames(frameIdx: number) {
-		let ao = this.service.actionOption;
+		let ao = this.actionOption;
 		ao.start = frameIdx - this.moveDistance;
 	}
 	
 	private moveFramesEnd(frameIdx: number, layerId) {
-		let ao = this.service.actionOption;
+		let ao = this.actionOption;
 		if(this.actionStart.frameIdx != ao.start) {
 			this.moveingFrames(frameIdx);
-			this.moveFrames(this.actionStart.frameIdx, this.actionEnd.frameIdx, ao.start - this.actionStart.frameIdx, ao.layers);
+			this.service.moveFrames(this.actionStart.frameIdx, this.actionEnd.frameIdx, ao.start - this.actionStart.frameIdx, ao.layers);
 			this.actionStart.frameIdx = ao.start;
 			this.actionEnd.frameIdx = ao.start + ao.duration;
 			this.moveDistance = -1;
@@ -151,7 +208,7 @@ export class TimelineComponent implements OnInit {
 					this.actionIsChanging = true;
 					this.actionChangeEnd(evt.frameIdx, evt.layerId);
 				}
-			} else if(!this.service.isInAction(evt.frameIdx, evt.layerId)) { 
+			} else if(!this.isInAction(evt.frameIdx, evt.layerId)) { 
 				this.actionChangeStart(evt.frameIdx, evt.layerId);
 			} else {
 				this.moveFramesStart(evt.frameIdx);
@@ -188,7 +245,7 @@ export class TimelineComponent implements OnInit {
 		this.actionStart.frameIdx = frameIdx;
 		this.actionEnd.layerId = null;
 		this.actionEnd.frameIdx = -1;
-		let ao = this.service.actionOption;
+		let ao = this.actionOption;
 		ao.layers.length = 0;
 		ao.layers.push(layerId);
 		ao.start = frameIdx;
@@ -199,7 +256,7 @@ export class TimelineComponent implements OnInit {
 		if(!this.actionIsChanging) return;
 		clearTimeout(this.mouseEventTimer);
 		let layers: LayerModel[] = this.service.timeline.layers;
-		let ao = this.service.actionOption;
+		let ao = this.actionOption;
 		let layerStartIdx: number = layers.findIndex(layer => {return layer.id == this.actionStart.layerId});
 		let layerEndIdx: number = layers.findIndex(layer => {return layer.id == layerId});
 		let oldLayerEndIdx: number = layers.findIndex(layer => {return layer.id == this.actionEnd.layerId});
@@ -231,7 +288,7 @@ export class TimelineComponent implements OnInit {
 	 * 根据actionOption获取起始帧和末尾帧
 	 */
 	private getActionIndexs(): { index1: number, index2: number } {
-		let ac = this.service.actionOption;
+		let ac = this.actionOption;
 		if( ac.duration >= 0 ) {
 			return {
 				index1: ac.start,
@@ -245,22 +302,9 @@ export class TimelineComponent implements OnInit {
 		}
 	}
 
-	public getLayerAction(layerId: string) {
-		let ao = this.service.actionOption;
-		if(ao.layers.indexOf(layerId) >= 0) {
-			return {
-				start: ao.start,
-				duration: ao.duration
-			};
-		} else {
-			return {
-				start: -1,
-				duration: 0
-			}
-		}
-	}
 
 	ngOnInit() {
+		this.service.dataChange.subscribe(() => this.dataChange.emit());
 	}
 
 	ngAfterViewInit() {

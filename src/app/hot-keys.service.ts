@@ -12,46 +12,46 @@ export class HotKeysService {
 			new HotKeyModel({
 				target: 'timeline',
 				key: 'f6',
-				api: 'changeToKeyFrames',
+				api: 'changeActiveToKeyFrames',
 				desc: '转换为关键帧'
 			}),
 			new HotKeyModel({
 				target: 'timeline',
 				key: 'f6',
 				shift: true,
-				api: 'removeKeyFrames',
+				api: 'removeActiveKeyFrames',
 				desc: '删除关键帧'
 			}),
 			new HotKeyModel({
 				target: 'timeline',
 				key: 'f5',
-				api: 'changeToFrames',
+				api: 'changeActiveToFrames',
 				desc: '转换为普通帧'
 			}),
 			new HotKeyModel({
 				target: 'timeline',
 				key: 'f5',
 				shift: true,
-				api: 'removeFrames',
+				api: 'removeActiveFrames',
 				desc: '删除帧'
 			}),
 			new HotKeyModel({
 				target: 'timeline',
 				key: 'f7',
-				api: 'changeToEmptyKeyFrames',
+				api: 'changeActiveToEmptyKeyFrames',
 				desc: '转换为空白关键帧'
 			}),
 			new HotKeyModel({
 				target: 'timeline',
 				key: 'f8',
-				api: 'createTweens',
+				api: 'createActiveTweens',
 				desc: '添加补间动画'
 			}),
 			new HotKeyModel({
 				target: 'timeline',
 				key: 'f8',
 				shift: true,
-				api: 'removeTweens',
+				api: 'removeActiveTweens',
 				desc: '删除补间动画'
 			}),
 			new HotKeyModel({
