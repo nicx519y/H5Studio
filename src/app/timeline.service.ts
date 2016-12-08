@@ -11,6 +11,7 @@ import {
 	ElementType
 } from './models';
 
+
 @Injectable()
 export class TimelineService {
 	private _timeline: TimelineModel = new TimelineModel();
@@ -18,6 +19,9 @@ export class TimelineService {
 
 	@Output()
 	public dataChange: EventEmitter<TimelineService> = new EventEmitter();
+
+	@Output()
+	public actionChange: EventEmitter<{layers: string[], start: number, duration: number}> = new EventEmitter();
 
 	public actionOption: {
 		layers: string[],
@@ -343,5 +347,16 @@ export class TimelineService {
 		let m = Math.max(start, start + duration - 1);
 		if(frameIdx < n || frameIdx > m) return false;
 		return true;
+	}
+
+	/**
+	 * @desc	改变可见状态
+	 */
+	public toggleVisible( layerId: string ) {
+		let layer: LayerModel = this.getLayerById( layerId );
+		if(layer.element) {
+			layer.element.visible = !layer.element.visible;
+			this.dataChange.emit(this);
+		}
 	}
 }

@@ -17,10 +17,10 @@
 				<form #layerForm="ngForm" >
 					<input class="layer-name" [(ngModel)]="layer.name" id="layer-name" name="layer-name" type="text" onfocus="this.select()" autocomplete="off" />
 				</form>
-				<span style="cursor: pointer" (click)="toggleVisible(layer.id)" [ngClass]="{
+				<span style="cursor: pointer" (click)="service.toggleVisible(layer.id)" [ngClass]="{
 					true: 'glyphicon glyphicon-eye-open',
 					false: 'glyphicon glyphicon-eye-close'
-				}[layer.visible]" ></span>
+				}[layer.element.visible]" ></span>
 			</div>
 		</div>
 		<div class="right list" #timelineContainer  >

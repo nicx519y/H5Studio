@@ -220,16 +220,6 @@ export class TimelineComponent implements OnInit {
 		this.actionIsChanging = false;
 	}
  
-	/**
-	 * @desc	改变可见状态
-	 */
-	public toggleVisible( layerId: string ) {
-		let layer: LayerModel = this.service.getLayerById( layerId );
-		if(layer.element) {
-			layer.element.visible = !layer.element.visible;
-		}
-	}
-
 	private getLayerById( id: string ): LayerComponent {
 		let layer: LayerComponent = this.layers.filter( item => {
 			return item.id == id; 

@@ -60,6 +60,35 @@ export class CanvasComponent implements OnInit {
         
     }
 
+    @Input()
+    public set mode(mode: EditorState) {
+        this._mode = mode;
+
+        if(this.janvas) {
+            switch(mode) {
+                case EditorState.none:
+                    this.janvas.changeMode(Developer.MODE.READ_MODE);
+                    break;
+                case EditorState.choose:
+                    this.janvas.changeMode(Developer.MODE.EDIT_MODE);
+                    break;
+                case EditorState.text:
+                    this.janvas.changeMode(Developer.MODE.TEXT_MODE);
+                    break;
+                case EditorState.zoom: 
+                    
+                    break;
+                case EditorState.draw:
+                    this.janvas.changeMode(Developer.MODE.DRAW_MODE);
+                    break;
+            }
+        }
+    }
+
+    public get mode(): EditorState {
+        return this._mode;
+    }
+
     @HostListener('window:resize')
     private janvasResize(target=null) {
         let w: number = this.container.element.nativeElement.offsetWidth;
@@ -163,34 +192,7 @@ export class CanvasComponent implements OnInit {
         this.janvasUpdate();
     }
 
-    @Input()
-    public set mode(mode: EditorState) {
-        this._mode = mode;
-
-        if(this.janvas) {
-            switch(mode) {
-                case EditorState.none:
-                    this.janvas.changeMode(Developer.MODE.READ_MODE);
-                    break;
-                case EditorState.choose:
-                    this.janvas.changeMode(Developer.MODE.EDIT_MODE);
-                    break;
-                case EditorState.text:
-                    this.janvas.changeMode(Developer.MODE.TEXT_MODE);
-                    break;
-                case EditorState.zoom: 
-                    
-                    break;
-                case EditorState.draw:
-                    this.janvas.changeMode(Developer.MODE.DRAW_MODE);
-                    break;
-            }
-        }
-    }
-
-    public get mode(): EditorState {
-        return this._mode;
-    }
+    
 
     ngOnInit() {
         setTimeout(this.initJanvas.bind(this), 100);
