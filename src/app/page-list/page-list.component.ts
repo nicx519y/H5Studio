@@ -64,6 +64,10 @@ export class PageListComponent implements OnInit {
 				this.nameInputList.toArray()[this.services.active].nativeElement.focus();
 			}, 100);
 		});
+		//如果没有页面，自动增加一个空白页
+		if(this.services.pages.length <= 0) {
+			this.addEmptyPageAtLast();
+		}
 	}
 
 	ngOnInit() {

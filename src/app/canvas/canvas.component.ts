@@ -56,7 +56,6 @@ export class CanvasComponent implements OnInit {
 
     constructor(
         private service: MainService,
-        // private tlService: TimelineService,
         private container: ViewContainerRef,
         private cdRef: ChangeDetectorRef
     ) {
@@ -129,11 +128,13 @@ export class CanvasComponent implements OnInit {
                 this.janvasResize(target);
             }
         );
+        this.mode = this._mode;
     }
 
     private janvasSelectedHandler(eleArr: any[]) {
         // console.log('selected: ', eleArr);
         let data = this.filterJanvasData(eleArr);
+        console.log('selected: ', data);
         this.timeline.setActionOptions({
             start: data.frameIndex,
             duration: 1,
@@ -156,7 +157,7 @@ export class CanvasComponent implements OnInit {
                 },
             };
         });
-        this.timeline.changeKeyFramesState(data.frameIndex, changes);
+        this.timeline.changeKeyFramesState(this._frameIdx, changes);
     }
 
     private filterJanvasData(eleArr: any[]): {
@@ -197,7 +198,7 @@ export class CanvasComponent implements OnInit {
         console.log(this.data);
         this.data && this.janvas.updateJanvasData(this.data, () => {
             this.janvas.gotoPage(this._page);
-            this.janvas.gotoFrame(this._frameIdx);
+            this.janvas.gotoFrame(Math.max(this._frameIdx, 0));
             callback && callback();
         });
     }
@@ -213,5 +214,6 @@ export class CanvasComponent implements OnInit {
     }
 
     // ngOnChanges(change) {
+    //     console.log(change.frame, this._frameIdx);
     // }
 }

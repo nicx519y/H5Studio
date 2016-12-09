@@ -5,8 +5,9 @@
 	font-size: 0;
 	position: relative;
 	overflow: hidden;
-	background: url(assets/frames.png) repeat;
+	background: linear-gradient(90deg, #eee 20%, transparent 20%, transparent 100%);
 	background-size: 45px 23px;
+	background-repeat: repeat-x;
 }
 
 .framebase {
