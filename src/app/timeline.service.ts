@@ -15,7 +15,9 @@ import {
 @Injectable()
 export class TimelineService {
 	private _timeline: TimelineModel = new TimelineModel();
-	private _stateId: string = '';
+	private _stageId: string = '';
+	private _stageName: string = '';
+	private _stageType: string = 'page';
 	private _dataChangeTimer: any;
 
 	@Output()
@@ -268,13 +270,30 @@ export class TimelineService {
 	}
 
 	public get stageId(): string {
-		return this._stateId;
+		return this._stageId;
 	}
 
-	public setTimeline(stageId: string, tl: TimelineModel) {
-		if(this._stateId != stageId) {
-			this._stateId = stageId;
-			this._timeline = tl;
+	public get stageName(): string{
+		return this._stageName;
+	}
+
+	public get stageType(): string{
+		return this._stageType;
+	}
+
+
+	public setTimeline(stageOptions: {
+		id: string,
+		name: string,
+		type: string,
+		timeline: TimelineModel,
+	}) {
+		console.log(stageOptions);
+		if(this._stageId != stageOptions.id) {
+			this._stageId = stageOptions.id;
+			this._stageType = stageOptions.type;
+			this._stageName = stageOptions.name;
+			this._timeline = stageOptions.timeline;
 			this.dataChangeHandler();
 		}
 	}
@@ -292,45 +311,6 @@ export class TimelineService {
 		this.dataChangeHandler();
 		return frameArr;
 	}
-
-	// /**
-	//  * @desc	根据element id获取当前活动帧下的某一个element及其状态
-	//  */
-	// public getElementStateInActionFrameById(elementId: string): {
-	// 	element: ElementModel,
-	// 	state: ElementStateModel,
-	// } {
-	// 	let element: ElementModel;
-	// 	let elementState: ElementStateModel;
-	// 	let result: {
-	// 		element: ElementModel,
-	// 		state: ElementStateModel,
-	// 	};
-	// 	let layer: LayerModel = this.timeline.layers.find(l => {
-	// 		return l.element.id == elementId;
-	// 	});
-	// 	if(layer) {
-	// 		element = layer.element;
-	// 		let frame: FrameModel = layer.getKeyFrameByFrame(Math.max(this.actionOption.start, 0));
-	// 		frame && (elementState = frame.elementState);
-	// 	}
-	// 	result = {
-	// 		element: element,
-	// 		state: elementState,
-	// 	};
-
-	// 	return result;
-	// }
-
-	// public isInAction(frameIdx: number, layerId: string): boolean {
-	// 	if(this.actionOption.layers.indexOf(layerId) < 0) return false;
-	// 	let start = this.actionOption.start;
-	// 	let duration = this.actionOption.duration;
-	// 	let n = Math.min(start, start + duration - 1);
-	// 	let m = Math.max(start, start + duration - 1);
-	// 	if(frameIdx < n || frameIdx > m) return false;
-	// 	return true;
-	// }
 
 	/**
 	 * @desc	改变可见状态

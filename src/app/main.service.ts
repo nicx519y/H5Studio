@@ -12,7 +12,10 @@ export class MainService {
 	private options: MainModel = new MainModel();
 
 	@Output()
-	timelineChange: EventEmitter<any> = new EventEmitter();
+	timelineChange: EventEmitter<{
+		type: 'page' | 'item',
+		model: PageModel
+	}> = new EventEmitter();
 
 	constructor(
 		private itemsService: ItemsService,
@@ -34,13 +37,13 @@ export class MainService {
 
 	private activeStageChangeHandler( index: number ) {
 		let page: PageModel = this.options.pages[index];
-		this.timelineService.setTimeline(page.id, page.timeline);
+		this.changeActivePage(page.id);
 	}
 
 	private itemEditHandler( item: ItemModel ) {
-		if(item.type == ItemType.movieclip)
-			this.timelineService.setTimeline(item.id, item.source.timeline);
-		else {
+		if(item.type == ItemType.movieclip){
+			this.changeActivePage(item.source.id);
+		} else {
 			alert('只能编辑 Movie Clip 类型的元件！');
 		}
 	}
@@ -81,11 +84,60 @@ export class MainService {
 	}
 
 	private timelineDataChangeHandler(tlService: TimelineService) {
-		this.timelineChange.emit(tlService);
+		let pageId: string = tlService.stageId;
+		this.timelineChange.emit();
 	}
 
 	private attrsSubmitHandler() {
-		this.timelineChange.emit(this.timelineService);
+		this.timelineChange.emit();
+	}
+
+	private getPageModelType(pageId: string): {
+		id: string,
+		name: string,
+		type: string,
+		timeline: TimelineModel,
+	} {
+		let result = null;
+		let page: PageModel = this.options.pages.find(page => { return page.id == pageId }); 
+		if(page) {
+			result = {
+				id: pageId,
+				name: page.name,
+				type: 'page',
+				timeline: page.timeline,
+			};
+		} else {
+			let it: ItemModel = this.options.library.find(item => {
+				return (item.type == ItemType.movieclip && item.source.id == pageId);
+			});
+			
+			if(it){
+				result = {
+					id: pageId,
+					name: it.name,
+					type: 'movieclip',
+					timeline: it.source.timeline
+				};
+			}
+		}
+		
+		return result;
+	}
+
+	public changeActivePage(pageId: string) {
+		let obj = this.getPageModelType(pageId);
+		this.timelineService.setTimeline(obj);
+		this.pagesService.activeId = pageId;
+	}
+
+	public get activeStageName(): string {
+		let id: string = this.timelineService.stageId;
+		let obj = this.getPageModelType(id);
+		if(obj)
+			return obj.name;
+		else
+			return '';
 	}
 
 	/**

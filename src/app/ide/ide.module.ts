@@ -24,6 +24,7 @@ import { LayerComponent } from '../layer/layer.component';
 import { ToolsbarComponent } from '../toolsbar/toolsbar.component';
 import { PageConfigerComponent } from '../page-configer/page-configer.component';
 import { TimelineRulerComponent } from '../timeline-ruler/timeline-ruler.component';
+import { OnionSkinComponent } from '../onion-skin/onion-skin.component';
 
 import { MainService } from '../main.service';
 import { TimelineService } from '../timeline.service';
@@ -65,6 +66,7 @@ const ROUTES: Routes = [
 		ToolsbarComponent,
 		PageConfigerComponent,
 		TimelineRulerComponent,
+		OnionSkinComponent,
 	],
 	providers: [
 		MainService,

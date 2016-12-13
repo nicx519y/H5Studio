@@ -19,6 +19,17 @@
 	flex-direction: row;
 }
 
+.center-top-top-content-wrap {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 0;
+	padding: 0 2px 2px 2px;
+}
+
+:host /deep/ [block=centertop] {
+	display: flex;
+}
+
 .center-content-wrap {
 	flex-grow: 1;
 	display: flex;

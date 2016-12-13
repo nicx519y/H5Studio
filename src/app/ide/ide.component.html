@@ -48,11 +48,14 @@
 					</ide-panel>
 				</ide-accordion>
 			</div>
+			<div block="centertop" >
+				<ide-onion-skin [stageName]="service.activeStageName" ></ide-onion-skin>
+			</div>
 			<div block="centerleft">
 				<ide-toolsbar #toolsbar></ide-toolsbar>
 			</div>
 			<div block="center">
-				<app-canvas #canvas [mode]="toolsbar.state" [timeline]="timeline" [frame]="timeline.actionFrame" [page]="timeline.stageId"></app-canvas>
+				<ide-canvas #canvas [mode]="toolsbar.state" [timeline]="timeline" [frame]="timeline.actionFrame" [page]="timeline.stageId"></ide-canvas>
 			</div>
 			<div block="bottom">
 				<ide-accordion>
@@ -113,12 +116,6 @@
 								<a href="javascript:void(0)" (click)="itemList.removeItem()" [tooltip]="'删除元素'">
 								[删除]
 								</a>
-								<!--<a href="javascript:void(0)" (click)="itemList.editItem()" [tooltip]="'编辑元素'">
-								[编辑]
-								</a>
-								<a href="javascript:void(0)" (click)="itemList.insertItem()" [tooltip]="'插入场景'">
-								[插入]
-								</a>-->
 							</div>
 						</div>
 					</ide-panel>

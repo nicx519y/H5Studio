@@ -13,6 +13,8 @@ export class PagesService {
 	pageActiveChangeEvent: EventEmitter<number> = new EventEmitter<number>();
 
 	private _active: number = -1;
+	private _activeName: string = '';
+	private _activeId: string = '';
 
 	constructor() {
 
@@ -29,14 +31,42 @@ export class PagesService {
 	}
 
 	set active( index: number ) {
-		if( index >= 0 && index <= this.list.length - 1 && index !== this._active ) {
+		if(index < 0 || index > this.list.length - 1) {
+			this._active = -1;
+			this._activeId = '';
+			this._activeName = '';
+			return;
+		}
+		if( index !== this._active ) {
 			this._active = index;
+			this._activeId = this.list[this._active].name;
+			this._activeName = this.list[this._active].id;
 			this.pageActiveChangeEvent.emit( this.active );
 		}
 	}
 
 	get active() {
 		return this._active;
+	}
+
+	set activeName(name: string) {
+		this.active = this.list.findIndex(p => {
+			return p.name == name;
+		});
+	}
+
+	get activeName() {
+		return this._activeName;
+	}
+
+	set activeId(id: string) {
+		this.active = this.list.findIndex(p => {
+			return p.id == id;
+		});
+	}
+
+	get activeId() {
+		return this._activeId;
 	}
 
 	getStage(index: number) {

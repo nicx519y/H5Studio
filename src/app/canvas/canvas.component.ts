@@ -19,7 +19,7 @@ import { TimelineComponent } from '../timeline/timeline.component';
 import Developer from '@JDB/janvas-developer/app/main/developer';
 
 @Component({
-    selector: 'app-canvas',
+    selector: 'ide-canvas',
     templateUrl: './canvas.component.html',
     styleUrls: ['./canvas.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
