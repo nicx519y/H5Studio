@@ -37,4 +37,8 @@ export class IdeComponent {
 	public createNewProject() {
 		this.service.createNewProject();
 	}
+
+	public fullscreen() {
+		document.documentElement.webkitRequestFullscreen();
+	}
 }

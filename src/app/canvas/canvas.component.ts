@@ -14,7 +14,7 @@ import {
     ChangeDetectorRef,
 } from '@angular/core';
 import { MainService } from '../main.service';
-import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel } from '../models';
+import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel, TimelineModel } from '../models';
 import { TimelineComponent } from '../timeline/timeline.component';
 import Developer from '@JDB/janvas-developer/app/main/developer';
 
@@ -54,12 +54,12 @@ export class CanvasComponent implements OnInit {
     @Input()
     private timeline: TimelineComponent;
 
+
     constructor(
         private service: MainService,
         private container: ViewContainerRef,
         private cdRef: ChangeDetectorRef
     ) {
-        
     }
 
     @Input()
@@ -91,13 +91,21 @@ export class CanvasComponent implements OnInit {
     public set page(p: string) {
         if(this._page != p) {
             this._page = p;
-            this.janvas && this.janvas.gotoPage(p);
+            if(this.janvas) {
+                this.janvas.gotoPage(p);
+                this.janvas.gotoFrame(0);
+                this.timeline.setActionOptions({
+                    start: -1,
+                    duration: 0,
+                    layers: []
+                });
+            }
         }
     }
 
     @Input()
     public set frame(f: number) {
-        if(this._frameIdx != f) {
+        if(this._frameIdx != f && f >= 0) {
             this._frameIdx = f;
             this.janvas && this.janvas.gotoFrame(f);
         }
@@ -124,11 +132,11 @@ export class CanvasComponent implements OnInit {
                 target.changeMode(Developer.MODE.READ_MODE);
                 target.addEventHandler(Developer.EVENTS.ELEMENT_SELECTED, ele => this.janvasSelectedHandler(ele));
                 target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGE, ele => this.janvasChangeHandler(ele));
-                this.timeline.dataChange.subscribe(() => this.timelineDateChange());
                 this.janvasResize(target);
             }
         );
         this.mode = this._mode;
+        this.service.timelineChange.subscribe(() => this.timelineDateChange());
     }
 
     private janvasSelectedHandler(eleArr: any[]) {
@@ -194,11 +202,12 @@ export class CanvasComponent implements OnInit {
     }
  
     private janvasUpdate(callback: Function=null) {
+        console.log('update');
         this.data = this.service.data.getValue();
-        console.log(this.data);
         this.data && this.janvas.updateJanvasData(this.data, () => {
             this.janvas.gotoPage(this._page);
             this.janvas.gotoFrame(Math.max(this._frameIdx, 0));
+            console.log('janvas go to frame ', Math.max(this._frameIdx, 0));
             callback && callback();
         });
     }
@@ -214,6 +223,6 @@ export class CanvasComponent implements OnInit {
     }
 
     // ngOnChanges(change) {
-    //     console.log(change.frame, this._frameIdx);
+    //     console.log(change);
     // }
 }

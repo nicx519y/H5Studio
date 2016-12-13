@@ -1,34 +1,37 @@
 <app-layout>
 	<div block="top">
 		<app-nav>
-			<li class="nav-item" dropdown >
+			<li class="nav-item" dropdown>
 				<a dropdownToggle id="fileBtn" href="javascript:void(0)">文件 <span class="caret"></span> </a>
-				<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="fileBtn" >
-					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="createNewProject()" >新建</a>
+				<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="fileBtn">
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item" (click)="createNewProject()">新建</a>
 					</li>
-					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="saveData()" >保存</a>
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item" (click)="saveData()">保存</a>
 					</li>
-					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="preview()" >预览</a>
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item" (click)="preview()">预览</a>
 					</li>
-					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="publish()" >发布</a>
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item" (click)="publish()">发布</a>
 					</li>
-					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="pageConfiger.show()" >页面配置</a>
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item" (click)="pageConfiger.show()">页面配置</a>
+					</li>
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item" (click)="fullscreen()">全屏</a>
 					</li>
 				</ul>
 			</li>
-			<li class="nav-item" dropdown >
+			<li class="nav-item" dropdown>
 				<a dropdownToggle id="sourceBtn" href="javascript:void(0)">资源 <span class="caret"></span> </a>
-				<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="sourceBtn" >
-					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item" (click)="bitmapImporter.show()" >导入图片</a>
+				<ul dropdownMenu role="menu" class="dropdown-menu" aria-labelledby="sourceBtn">
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item" (click)="bitmapImporter.show()">导入图片</a>
 					</li>
-					<li role="menuitem" >
-						<a href="javascript:void(0)" class="dropdown-item"  >导入视频</a>
+					<li role="menuitem">
+						<a href="javascript:void(0)" class="dropdown-item">导入视频</a>
 					</li>
 				</ul>
 			</li>
@@ -38,25 +41,9 @@
 		<app-ide-layout>
 			<div block="left">
 				<ide-accordion>
-					<ide-panel [title]="'页面'" [isOpen]="true" [closeAble]="false" [hasTools]="true">
+					<ide-panel [title]="'页面'" [isOpen]="true" [closeAble]="false" >
 						<div block="main">
 							<ide-page-list #pageList></ide-page-list>
-						</div>
-						<div block="tools">
-							<div>
-								<a href="javascript:void(0)" (click)="pageList.addEmptyPageAfterActive()" [tooltip]="'新增页面'">
-								[新增]
-							</a>
-								<a href="javascript:void(0)" (click)="pageList.removeActivePage()" [tooltip]="'删除页面'">
-								[删除]
-							</a>
-								<a href="javascript:void(0)" (click)="pageList.upActivePage()" [tooltip]="'上移页面'">
-								[上移]
-							</a>
-								<a href="javascript:void(0)" (click)="pageList.downActivePage()" [tooltip]="'下移页面'">
-								[下移]
-							</a>
-							</div>
 						</div>
 					</ide-panel>
 				</ide-accordion>
@@ -65,18 +52,13 @@
 				<ide-toolsbar #toolsbar></ide-toolsbar>
 			</div>
 			<div block="center">
-				<app-canvas #canvas  
-					[mode]="toolsbar.state"
-					[timeline]="timeline"
-					[frame]="timeline.actionFrame"
-					[page]="timeline.stageId" 
-				></app-canvas>
+				<app-canvas #canvas [mode]="toolsbar.state" [timeline]="timeline" [frame]="timeline.actionFrame" [page]="timeline.stageId"></app-canvas>
 			</div>
 			<div block="bottom">
 				<ide-accordion>
 					<ide-panel [title]="'时间轴'" [hasTitle]="false" [isOpen]="true" [hasTools]="true" [closeAble]="false" [autoHeight]="300" #timelinepanel>
 						<div block="main">
-							<ide-timeline #timeline ></ide-timeline>
+							<ide-timeline #timeline></ide-timeline>
 						</div>
 						<div block="tools">
 							<div class="tools-left" style="width: 180px;">
@@ -127,22 +109,22 @@
 							<div>
 								<a href="javascript:void(0)" (click)="itemList.addItem()" [tooltip]="'添加元素'">
 								[添加]
-							</a>
+								</a>
 								<a href="javascript:void(0)" (click)="itemList.removeItem()" [tooltip]="'删除元素'">
 								[删除]
-							</a>
-								<a href="javascript:void(0)" (click)="itemList.editItem()" [tooltip]="'编辑元素'">
+								</a>
+								<!--<a href="javascript:void(0)" (click)="itemList.editItem()" [tooltip]="'编辑元素'">
 								[编辑]
-							</a>
+								</a>
 								<a href="javascript:void(0)" (click)="itemList.insertItem()" [tooltip]="'插入场景'">
 								[插入]
-							</a>
+								</a>-->
 							</div>
 						</div>
 					</ide-panel>
 					<ide-panel [title]="'属性'">
 						<div block="main">
-							<ide-attrs #attrSetter [state]="toolsbar.state" ></ide-attrs>
+							<ide-attrs #attrSetter [state]="toolsbar.state"></ide-attrs>
 						</div>
 					</ide-panel>
 				</ide-accordion>
@@ -160,6 +142,6 @@
 	'itemList': 
 	itemList, 
 	'pageList': pageList 
-	}" ></ide-hot-keys>
-<ide-bitmap-importer #bitmapImporter ></ide-bitmap-importer>
-<ide-page-configer #pageConfiger ></ide-page-configer>
+	}"></ide-hot-keys>
+<ide-bitmap-importer #bitmapImporter></ide-bitmap-importer>
+<ide-page-configer #pageConfiger></ide-page-configer>

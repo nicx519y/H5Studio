@@ -1,10 +1,15 @@
 <ul class="ide-stages"  >
-	<li *ngFor="let stage of model; let i = index" [ngClass]="{true: 'active', false: 'unactive'}[i===services.active]" (click)="pageActive(i)"  >
+	<li *ngFor="let stage of model; let i = index" [ngClass]="{true: 'active', false: 'unactive'}[i===services.active]" (click)="pageActive(i)"   >
 		<div class="thumbnail" >
 			<img [src]="stage.thumbnail" />
 			<ide-previewer [src]="stage.thumbnail" [width]="78" [height]="78" ></ide-previewer>
 		</div>
 		<input #nameInput type="text" onfocus="this.select()" (keyup.enter)="nameInput.blur()" [(ngModel)]="stage.name" />
+		<div class="stages-tools" >
+			<span class="stages-btn glyphicon glyphicon-menu-up" (click)="upPage(i)" ></span>
+			<span class="stages-btn glyphicon glyphicon-trash" (click)="removePage(i)" ></span>
+			<span class="stages-btn glyphicon glyphicon-menu-down" (click)="downPage(i)" ></span>
+		</div>
 	</li>
 	<li>
 		<div class="addBtn" (click)="addEmptyPageAtLast()" >

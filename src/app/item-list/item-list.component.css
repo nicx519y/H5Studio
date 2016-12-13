@@ -24,6 +24,7 @@ li.unactive:hover {
 }
 .activebox {
 	display: flex;
+	
 }
 .item-pic {
 	display: block;
@@ -84,3 +85,17 @@ li.unactive:hover {
 	text-overflow:ellipsis;
 	white-space:nowrap;
 }
+
+.item-btn {
+	flex-grow: 0;
+	font-size: 15px;
+	margin-top: 10px;
+	padding: 5px;
+	color: #999;
+	cursor: pointer;
+}
+
+.item-btn:hover {
+	color: #333;
+}
+

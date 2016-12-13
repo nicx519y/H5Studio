@@ -18,6 +18,8 @@
 					</div>
 				</form>
 			</div>
+			<span class="item-btn glyphicon glyphicon-cog" (click)="editItem()" ></span>
+			<span class="item-btn glyphicon glyphicon-circle-arrow-right" (click)="insertItem()" ></span>
 		</div>
 		<span *ngIf="idx!==service.active" class="item-name" >
 			<span class="glyphicon" [ngClass]="{ 

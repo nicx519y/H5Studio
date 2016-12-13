@@ -10,6 +10,7 @@ li {
 	margin: 0;
 	list-style: none;
 	cursor: pointer;
+	position: relative;
 }
 .thumbnail {
 	width: 80px;
@@ -42,3 +43,29 @@ li .addBtn span {
 	margin: 25px 0 0 5px;
 	font-size: 25px;
 }
+
+li:hover .stages-tools {
+	display: flex;
+}
+
+.stages-tools {
+	display: none;
+	flex-direction: column;
+	position: absolute;
+	right: 10px;
+	top: 0;
+	width: 20px;
+	height: 100px;
+}
+
+.stages-tools .stages-btn {
+	flex-grow: 1;
+	line-height: 2em;
+	color: #999;
+	cursor: pointer;
+}
+
+.stages-tools .stages-btn:hover {
+	color:#333;
+}
+

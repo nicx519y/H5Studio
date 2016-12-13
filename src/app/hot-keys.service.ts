@@ -97,6 +97,12 @@ export class HotKeysService {
 				desc: '预览'
 			}),
 			new HotKeyModel({
+				target: 'ide',
+				key: 'f',
+				api: 'fullscreen',
+				desc: '全屏'
+			}),
+			new HotKeyModel({
 				target: 'pageConfiger',
 				ctrl: true,
 				key: ',',

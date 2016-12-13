@@ -478,18 +478,10 @@ export class FrameModel extends BasicModel {
 	}
 
 	public copy(): FrameModel {
-		let newFrame: FrameModel = new FrameModel({
-			name: this.name,
-			index: this.index,
-			isKeyFrame: this.isKeyFrame,
-			isEmpty: this.isEmpty,
-			tweenType: TweenType.none,				//不复制动画
-			duration: this.duration
-		});
+		let newFrame: FrameModel = new FrameModel();
 
-		newFrame.elementState = new ElementStateModel();
-		Object.assign( newFrame.elementState, this.elementState );
-
+		newFrame.init(this.getValue());
+		newFrame.tweenType = TweenType.none;
 		return newFrame;
 	}
 
@@ -544,6 +536,7 @@ export class LayerModel extends BasicModel {
 			if( !keyframe ) continue;
 			let f: FrameModel = keyframe.copy();
 			f.index = i;
+			// f.elementState.matrix.b += 0.05;
 			tempArr.push( f );
 		}
 

@@ -16,6 +16,7 @@ import {
 export class TimelineService {
 	private _timeline: TimelineModel = new TimelineModel();
 	private _stateId: string = '';
+	private _dataChangeTimer: any;
 
 	@Output()
 	public dataChange: EventEmitter<TimelineService> = new EventEmitter();
@@ -48,7 +49,7 @@ export class TimelineService {
 
 		this.timeline.layers.push(newLayer);
 
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 	/**
 	 * @desc	删除一个element
@@ -59,7 +60,7 @@ export class TimelineService {
 			return ele.id === elementId;
 		});
 
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	/**
@@ -70,7 +71,7 @@ export class TimelineService {
 		this.timeline.removeLayers( ( layer: LayerModel ) => {
 			return (layerIds.indexOf(layer.id) >= 0);
 		});
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	public upLayers(layerIds: string[]) {
@@ -87,7 +88,7 @@ export class TimelineService {
 		});
 
 		ids.forEach(id => this.upLayer(id));
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	/**
@@ -119,7 +120,7 @@ export class TimelineService {
 			else return 0;
 		});
 		ids.forEach(id => this.downLayer(id));
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	/**
@@ -155,7 +156,7 @@ export class TimelineService {
 			let temp: LayerModel = this.timeline.layers[idx2];
 			this.timeline.layers[idx2] = this.timeline.layers[idx1];
 			this.timeline.layers[idx1] = temp;
-			this.dataChange.emit(this);
+			this.dataChangeHandler();
 			return true;
 		}
 
@@ -173,14 +174,14 @@ export class TimelineService {
 			let layer: LayerModel = this.getLayerById(id);
 			layer && layer.changeToKeyFrames(index1, index2);
 		});
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	public changeToEmptyKeyFrames( index1: number, index2: number, layerIds: string[] ) {
 		layerIds.forEach(id => {
 			this.getLayerById(id).changeToEmptyKeyFrames(index1, index2);
 		});
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	/**
@@ -193,7 +194,7 @@ export class TimelineService {
 		layerIds.forEach(id => {
 			this.getLayerById(id).changeToFrames(index1, index2);
 		});
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	/**
@@ -206,7 +207,7 @@ export class TimelineService {
 		layerIds.forEach(id => {
 			this.getLayerById(id).removeKeyFrames(index1, index2);
 		});
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 
 	/**
@@ -219,7 +220,7 @@ export class TimelineService {
 		layerIds.forEach(id => {
 			this.getLayerById(id).removeFrames(index1, index2);
 		});
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 	}
 	
 	/**
@@ -230,7 +231,7 @@ export class TimelineService {
 	public createTweens( index1: number, index2: number, layerIds: string[], tweenType: TweenType = TweenType.normal ) {
 		layerIds.forEach(id => {
 			this.getLayerById( id ).createTweens( index1, index2, tweenType );
-			this.dataChange.emit(this);
+			this.dataChangeHandler();
 		});
 	}
 
@@ -242,7 +243,7 @@ export class TimelineService {
 	public removeTweens( index1: number, index2: number, layerIds: string[] ) {
 		layerIds.forEach(id => {
 			this.getLayerById( id ).removeTweens( index1, index2 );
-			this.dataChange.emit(this);
+			this.dataChangeHandler();
 		});
 	}
 
@@ -252,7 +253,7 @@ export class TimelineService {
 	public moveFrames( index1: number, index2: number, offset: number, layerIds: string[] ) {
 		layerIds.forEach(id => {
 			this.getLayerById( id ).moveFrames( index1, index2, offset );
-			this.dataChange.emit(this);
+			this.dataChangeHandler();
 		});
 	}
 
@@ -274,7 +275,7 @@ export class TimelineService {
 		if(this._stateId != stageId) {
 			this._stateId = stageId;
 			this._timeline = tl;
-			this.dataChange.emit(this);
+			this.dataChangeHandler();
 		}
 	}
 
@@ -288,7 +289,7 @@ export class TimelineService {
 				.frames.find(f => { return f.index == frameIdx })
 					.init(change.frame);
 		});
-		this.dataChange.emit(this);
+		this.dataChangeHandler();
 		return frameArr;
 	}
 
@@ -338,9 +339,15 @@ export class TimelineService {
 		let layer: LayerModel = this.getLayerById( layerId );
 		if(layer.element) {
 			layer.element.visible = !layer.element.visible;
-			this.dataChange.emit(this);
+			this.dataChangeHandler();
 		}
 	}
 
+	private dataChangeHandler() {
+		clearTimeout(this._dataChangeTimer);
+		this._dataChangeTimer = setTimeout(() => {
+			this.dataChange.emit(this);
+		}, 50);
+	}
 	
 }

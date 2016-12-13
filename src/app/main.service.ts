@@ -62,12 +62,12 @@ export class MainService {
 	private itemDeleteHandler( item: ItemModel ) {
 		this.options.pages.forEach( page => {
 			let layers: LayerModel[] = page.timeline.layers;
-			
 			page.timeline.removeLayersWithElement( ( ele: ElementModel ) => {
 				return ele.item === item.id;
 			});
-			page.timeline.layers
 		});
+		//通知canvas刷新
+		this.timelineChange.emit();
 	}
 
 	private importBitmapCompleteHandler( bitmaps: BitmapSourceModel[] ) {
@@ -120,10 +120,4 @@ export class MainService {
 		return this.options;
 	}
 
-	// public getElementStateInActionFrameById(id: string): {
-	// 	element: ElementModel,
-	// 	state: ElementStateModel,
-	// } {
-	// 	return this.timelineService.getElementStateInActionFrameById(id);
-	// }
 }

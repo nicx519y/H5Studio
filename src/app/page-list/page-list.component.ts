@@ -36,21 +36,21 @@ export class PageListComponent implements OnInit {
 	/**
 	 * 删除
 	 */
-	removeActivePage() {
-		this.services.removeStage(this.services.active);
+	removePage(index: number) {
+		this.services.removeStage(index);
 	}
 	/**
 	 * @dest 上移
 	 */
-	upActivePage() {
-		this.services.upStage(this.services.active);
+	upPage(index: number) {
+		this.services.upStage(index);
 	}
 
 	/**
 	 * @dest 下移
 	 */
-	downActivePage() {
-		this.services.downStage(this.services.active);
+	downPage(index: number) {
+		this.services.downStage(index);
 	}
 
 	pageActive(index: number) {
