@@ -899,8 +899,8 @@ export class ItemModel extends BasicModel {
 	} = {}) {
 		super();
 		super.init(options);
-		this.type = options.type;
-		this.source = options.source;
+		this._type = options.type;
+		this._source = options.source;
 	}
 
 	get type(): ItemType {

@@ -60,6 +60,7 @@ export class ItemListComponent implements OnInit {
 	}
 
 	private addNewItem(value: { name: string, type: ItemType }) {
+		// console.log(value);
 		this.service.addItem({
 			thumbnail: '',
 			name: value.name,
