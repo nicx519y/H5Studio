@@ -532,11 +532,12 @@ export class LayerModel extends BasicModel {
 		let tempArr: Array<FrameModel> = [];
 		
 		for( let i: number = index1; i <= index2; i ++ ) {
+			let f: FrameModel = this.frames.find(frame => { return frame.index == i });
+			if(f) continue;
 			let keyframe: FrameModel = this.getKeyFrameByFrame( i );
 			if( !keyframe ) continue;
-			let f: FrameModel = keyframe.copy();
+			f = keyframe.copy();
 			f.index = i;
-			// f.elementState.matrix.b += 0.05;
 			tempArr.push( f );
 		}
 
@@ -746,15 +747,9 @@ export class LayerModel extends BasicModel {
 	private mergeFrames( fs: Array<FrameModel> ) {
 		let temp: Map<number, FrameModel> = new Map<number, FrameModel>();
 		let tempArr: Array<FrameModel> = [];
-		this.frames.forEach( f => {
-			temp.set( f.index, f );
-		} );
-		fs.forEach( f => {
-			temp.set( f.index, f );
-		} );
-		temp.forEach( (f: FrameModel, i: number) => {
-			tempArr.push(f);
-		} );
+		this.frames.forEach( f => temp.set( f.index, f ));
+		fs.forEach( f => temp.set( f.index, f ));
+		temp.forEach( (f: FrameModel, i: number) => tempArr.push(f));
 
 		this.frames = tempArr.sort( ( a, b ) => {
 			if( b.index < a.index )
@@ -899,8 +894,10 @@ export class ItemModel extends BasicModel {
 	} = {}) {
 		super();
 		super.init(options);
-		this._type = options.type;
-		this._source = options.source;
+		if(options.hasOwnProperty('type'))
+			this._type = options.type;
+		if(options.hasOwnProperty('source'))
+			this._source = options.source;
 	}
 
 	get type(): ItemType {

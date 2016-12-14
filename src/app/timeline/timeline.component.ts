@@ -26,6 +26,9 @@ export class TimelineComponent implements OnInit {
 	@Output()
 	dataChange: EventEmitter<any> = new EventEmitter();
 
+	@Output()
+	actionChanged: EventEmitter<any> = new EventEmitter();
+
 	private lastHoverLayer: string = null;
 	private lastActionLayer: string = null;
 	private scaleFrame: number = 9;				//每帧的宽度
@@ -68,6 +71,15 @@ export class TimelineComponent implements OnInit {
 	public get actionFrame(): number {
 		return this.actionOption.start;
 	}
+
+	public get elementsWithActionLayer(): string[] {
+		return this.actionOption.layers.map(layer => {
+			let l: LayerModel = this.service.timeline.layers
+				.find(l => { return l.id == layer });
+			if(l)
+				return l.element.id;
+		});
+	} 
 
 	public removeActiveLayers() {
 		let actionLayers: string[] = this.actionOption.layers;

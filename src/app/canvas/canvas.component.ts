@@ -26,8 +26,9 @@ import Developer from '@JDB/janvas-developer/app/main/developer';
 })
 export class CanvasComponent implements OnInit {
     private _mode: EditorState;
-    private _page: string = 'stage';
+    private _page: string = '';
     private _frameIdx: number = 0;
+    private _activeElements: string[] = [];
     private data: any;
     private janvas: any;
 
@@ -58,7 +59,6 @@ export class CanvasComponent implements OnInit {
     constructor(
         private service: MainService,
         private container: ViewContainerRef,
-        private cdRef: ChangeDetectorRef
     ) {
     }
 
@@ -88,26 +88,45 @@ export class CanvasComponent implements OnInit {
     }
 
     @Input()
-    public set page(p: string) {
+    public set activePage(p: string) {
         if(this._page != p) {
             this._page = p;
+            this._frameIdx = 0;
             if(this.janvas) {
-                this.janvas.gotoPage(p);
-                this.janvas.gotoFrame(0);
                 this.timeline.setActionOptions({
                     start: -1,
                     duration: 0,
                     layers: []
                 });
+                this.janvas && this.janvasUpdate();
             }
         }
     }
 
     @Input()
-    public set frame(f: number) {
+    public set activeFrame(f: number) {
         if(this._frameIdx != f && f >= 0) {
             this._frameIdx = f;
-            this.janvas && this.janvas.gotoFrame(f);
+            this.janvas && this.janvasUpdate();
+        }
+    }
+
+    @Input()
+    public set activeElements(elements: string[]) {
+        let result: boolean = false;
+        if(elements.length != this._activeElements.length) 
+            result = true;
+        else {
+            for(let ele of elements) {
+                if(this._activeElements.indexOf(ele) < 0) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        if(result) {
+            this._activeElements = elements;
+            this.janvas.selectElement(elements);
         }
     }
 
@@ -131,7 +150,8 @@ export class CanvasComponent implements OnInit {
             (target) => {
                 target.changeMode(Developer.MODE.READ_MODE);
                 target.addEventHandler(Developer.EVENTS.ELEMENT_SELECTED, ele => this.janvasSelectedHandler(ele));
-                target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGE, ele => this.janvasChangeHandler(ele));
+                target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGED, ele => this.janvasChangedHandler(ele));
+                target.addEventHandler(Developer.EVENTS.ELEMENT_ADDED, obj => this.janvasAddedHandler(obj));
                 this.janvasResize(target);
             }
         );
@@ -140,7 +160,6 @@ export class CanvasComponent implements OnInit {
     }
 
     private janvasSelectedHandler(eleArr: any[]) {
-        // console.log('selected: ', eleArr);
         let data = this.filterJanvasData(eleArr);
         console.log('selected: ', data);
         this.timeline.setActionOptions({
@@ -151,10 +170,8 @@ export class CanvasComponent implements OnInit {
         this.elementsSelected.emit(data);
     }
 
-    private janvasChangeHandler(eleArr: any[]) {
-        // console.log('change: ', eleArr);
+    private janvasChangedHandler(eleArr: any[]) {
         let data = this.filterJanvasData(eleArr);
-        this.elementsChanged.emit(data);
         let layerIds: string[] = data.elements.map(ele => { return ele.layerId });
         this.timeline.changeToKeyFrames(data.frameIndex, data.frameIndex, layerIds);
         let changes = data.elements.map(ele => {
@@ -166,6 +183,11 @@ export class CanvasComponent implements OnInit {
             };
         });
         this.timeline.changeKeyFramesState(this._frameIdx, changes);
+        this.elementsChanged.emit(data);
+    }
+
+    private janvasAddedHandler(obj: any) {
+
     }
 
     private filterJanvasData(eleArr: any[]): {
@@ -201,14 +223,14 @@ export class CanvasComponent implements OnInit {
         return result;
     }
  
-    private janvasUpdate(callback: Function=null) {
-        console.log('update');
+    private janvasUpdate() {
         this.data = this.service.data.getValue();
-        this.data && this.janvas.updateJanvasData(this.data, () => {
-            this.janvas.gotoPage(this._page);
-            this.janvas.gotoFrame(Math.max(this._frameIdx, 0));
-            console.log('janvas go to frame ', Math.max(this._frameIdx, 0));
-            callback && callback();
+        let page: string = this._page;
+        let frame: number = Math.max(this._frameIdx, 0);
+        console.log('update page: ', page, ', frame: ', frame);
+        this.data && this.janvas.updateJanvasData(this.data, {
+            page: page,
+            frameIndex: frame,
         });
     }
 

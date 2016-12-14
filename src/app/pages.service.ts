@@ -12,6 +12,9 @@ export class PagesService {
 	@Output()
 	pageActiveChangeEvent: EventEmitter<number> = new EventEmitter<number>();
 
+	@Output()
+	pageChangedEvent: EventEmitter<any> = new EventEmitter();
+
 	private _active: number = -1;
 	private _activeName: string = '';
 	private _activeId: string = '';
@@ -79,12 +82,14 @@ export class PagesService {
 		});
 
 		this.list.splice(index, 0, opt);
+		this.pageChangedEvent.emit();
 		this.active = index;
 	}
 
 	removeStage(index: number) {
 		if(index >= 0 && index <= this.list.length - 1) {
 			this.list.splice(index, 1);
+			this.pageChangedEvent.emit();
 			this.active = Math.max(0, this.active - 1);
 			this.pageActiveChangeEvent.emit( this.active );
 			return true;
@@ -95,6 +100,7 @@ export class PagesService {
 
 	swapStages(index1: number, index2: number) {
 		this.list[index1] = this.list.splice(index2, 1, this.list[index1])[0];
+		this.pageChangedEvent.emit();
 		return this.list;
 	}
 

@@ -27,11 +27,12 @@ export class MainService {
 		this.pagesService.stages = this.options.pages;
 		this.itemsService.items = this.options.library;
 		this.pagesService.pageActiveChangeEvent.subscribe(index => this.activeStageChangeHandler( index ));
+		this.pagesService.pageChangedEvent.subscribe(() => this.timelineDataChangeHandler());
 		this.itemsService.itemEditEvent.subscribe(item => this.itemEditHandler( item ));
 		this.itemsService.itemInsertEvent.subscribe(item => this.itemInsertHandler( item ));
 		this.itemsService.itemDeleteEvent.subscribe(item => this.itemDeleteHandler( item ));
 		this.importBitmapService.uploadCompleteEvent.subscribe((bitmaps: BitmapSourceModel[]) => this.importBitmapCompleteHandler( bitmaps ));
-		this.timelineService.dataChange.subscribe(timelineService => this.timelineDataChangeHandler(timelineService));
+		this.timelineService.dataChange.subscribe(timelineService => this.timelineDataChangeHandler());
 		this.attrsService.attrsSubmit.subscribe(() => this.attrsSubmitHandler());
 	}
 
@@ -83,8 +84,7 @@ export class MainService {
 		);
 	}
 
-	private timelineDataChangeHandler(tlService: TimelineService) {
-		let pageId: string = tlService.stageId;
+	private timelineDataChangeHandler() {
 		this.timelineChange.emit();
 	}
 

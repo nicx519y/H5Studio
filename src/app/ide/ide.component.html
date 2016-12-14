@@ -55,7 +55,13 @@
 				<ide-toolsbar #toolsbar></ide-toolsbar>
 			</div>
 			<div block="center">
-				<ide-canvas #canvas [mode]="toolsbar.state" [timeline]="timeline" [frame]="timeline.actionFrame" [page]="timeline.stageId"></ide-canvas>
+				<ide-canvas #canvas 
+					[mode]="toolsbar.state" 
+					[timeline]="timeline" 
+					[activeFrame]="timeline.actionFrame" 
+					[activePage]="timeline.stageId"
+					[activeElements]="timeline.elementsWithActionLayer"
+				></ide-canvas>
 			</div>
 			<div block="bottom">
 				<ide-accordion>

@@ -294,7 +294,7 @@ export class TimelineService {
 			this._stageType = stageOptions.type;
 			this._stageName = stageOptions.name;
 			this._timeline = stageOptions.timeline;
-			this.dataChangeHandler();
+			// this.dataChangeHandler();
 		}
 	}
 
