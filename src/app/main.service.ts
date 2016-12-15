@@ -50,7 +50,7 @@ export class MainService {
 	}
 
 	private itemInsertHandler( item: ItemModel ) {
-		if( this.pagesService.active >= 0 ) {
+		if( this.timelineService.stageId != '' ) {
 			this.timelineService.addElement(
 				ElementModel.fromItem( item )
 			);
