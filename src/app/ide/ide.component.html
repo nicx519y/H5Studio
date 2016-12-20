@@ -61,6 +61,7 @@
 					[activeFrame]="timeline.actionFrame" 
 					[activePage]="timeline.stageId"
 					[activeElements]="timeline.elementsWithActionLayer"
+					(elementsSelected)="attrSetter.setElements($event)"
 				></ide-canvas>
 			</div>
 			<div block="bottom">
@@ -127,7 +128,9 @@
 					</ide-panel>
 					<ide-panel [title]="'属性'">
 						<div block="main">
-							<ide-attrs #attrSetter [state]="toolsbar.state"></ide-attrs>
+							<ide-attrs #attrSetter 
+								[state]="toolsbar.state"
+							></ide-attrs>
 						</div>
 					</ide-panel>
 				</ide-accordion>

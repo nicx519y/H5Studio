@@ -311,8 +311,8 @@ export class ElementStateModel extends BasicModel {
 	protected idpre: string = 'eleState';
 	x: number = 0;			//父级坐标
 	y: number = 0;
-	originX: number = 0;	//原点X坐标
-	originY: number = 0;	//原点Y坐标
+	originX: number = null;	//原点X坐标
+	originY: number = null;	//原点Y坐标
 	rotation: number = 0;
 	scaleX: number = 1;
 	scaleY: number = 1;

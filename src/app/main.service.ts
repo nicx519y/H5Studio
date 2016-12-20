@@ -20,7 +20,6 @@ export class MainService {
 	constructor(
 		private itemsService: ItemsService,
 		private pagesService: PagesService,
-		private attrsService: AttrsService,
 		private timelineService: TimelineService,
 		private importBitmapService: BitmapImporterService,
 	) {
@@ -33,7 +32,6 @@ export class MainService {
 		this.itemsService.itemDeleteEvent.subscribe(item => this.itemDeleteHandler( item ));
 		this.importBitmapService.uploadCompleteEvent.subscribe((bitmaps: BitmapSourceModel[]) => this.importBitmapCompleteHandler( bitmaps ));
 		this.timelineService.dataChange.subscribe(timelineService => this.timelineDataChangeHandler());
-		this.attrsService.attrsSubmit.subscribe(() => this.attrsSubmitHandler());
 	}
 
 	private activeStageChangeHandler( index: number ) {
@@ -88,9 +86,6 @@ export class MainService {
 		this.timelineChange.emit();
 	}
 
-	private attrsSubmitHandler() {
-		this.timelineChange.emit();
-	}
 
 	private getPageModelType(pageId: string): {
 		id: string,

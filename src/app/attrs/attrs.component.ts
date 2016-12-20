@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { PropertyBasicModel } from '../properties';
 import { AttrsService, AttrMode } from '../attrs.service';
+import { TimelineService } from '../timeline.service';
 import { AttrFormComponent } from '../attr-form/attr-form.component';
 import { ElementModel, ElementStateModel, EditorState } from '../models';
 
@@ -11,19 +12,41 @@ import { ElementModel, ElementStateModel, EditorState } from '../models';
 })
 export class AttrsComponent implements OnInit {
 
-	options: PropertyBasicModel<string>[];
+	private activeFrame: number = -1;
+	public options: PropertyBasicModel<string>[];
 
 	constructor(
-		private service: AttrsService
+		private service: AttrsService,
+		private timelineService: TimelineService,
 	) {
 		
 	}
 
-	public setElement(options: {
-		element: ElementModel,
-		state: ElementStateModel, 
+	public setElements(options: {
+		frameIndex: number, 
+        elements: {
+            elementId: string,
+            layerId: string,
+            elementState: any,
+            bounds: any
+        }[]
 	}) {
-		this.service.setElement(options);
+		// this.service.setElement(options);
+		if(options.elements.length == 1) {
+			let ele = options.elements[0];
+			let result: {
+				element: ElementModel,
+				state: ElementStateModel,
+			} = {
+				element: this.timelineService.getLayerById(ele.layerId).element,
+				state: ele.elementState,
+			};
+			this.service.setElement(result);
+		} else if(options.elements.length > 1) {
+			
+		} else {
+			this.service.clear();
+		}
 	}
 
 	@Input()
@@ -39,6 +62,17 @@ export class AttrsComponent implements OnInit {
 				this.service.clear();
 				break;
 		}
+	}
+	/**
+	 * @desc	改变帧状态
+	 */
+	private changeFramesState(frameIndex: number, changes: {
+		layerId: string,
+		frame: any
+	}[]) {
+		let layers: string[] = changes.map(change => { return change.layerId; });
+		this.timelineService.changeToFrames(frameIndex, frameIndex, layers);
+		this.timelineService.changeKeyFramesState(frameIndex, changes);
 	}
 
 	private onSubmit() {

@@ -10,6 +10,7 @@ import { ElementModel, ElementStateModel } from './models';
 export enum AttrMode {
 	none,
 	property,
+	multipleProperties,
 	fontSetter,
 };
 
@@ -18,9 +19,6 @@ export class AttrsService {
 
 	private _mode: AttrMode = AttrMode.property;
 	public attrs: PropertyBasicModel<any>[] = [];
-
-	@Output()
-	attrsSubmit: EventEmitter<any> = new EventEmitter();
 
 	constructor() {
 		this.mode = AttrMode.none;
@@ -57,12 +55,6 @@ export class AttrsService {
 		let ele: ElementModel = options.element;
 		let state: ElementStateModel = options.state;
 		models.push(
-			new PropertyTextboxModel({
-				label: 'id: ',
-				key: 'instanceName',
-				value: ele.instanceName,
-				model: ele
-			}),
 			new PropertyTextboxModel({
 				label: 'item: ',
 				key: 'item',
@@ -137,6 +129,11 @@ export class AttrsService {
 		return models;
 	}
 
+	private getMultiplePropertiesModels(): PropertyBasicModel<any>[] {
+		let models: PropertyBasicModel<any>[] = [];
+		return models;
+	}
+
 	private getFontSettingModels({element: ElementModel, state: ElementStateModel}): PropertyBasicModel<any>[] {
 		let models: PropertyBasicModel<any>[] = [];
 		return models;
@@ -144,6 +141,5 @@ export class AttrsService {
 
 	public submit() {
 		this.attrs.forEach(attr => attr.setModel());
-		this.attrsSubmit.emit();
 	}
 }
