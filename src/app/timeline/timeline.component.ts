@@ -316,7 +316,7 @@ export class TimelineComponent implements OnInit {
 
 
 	ngOnInit() {
-		this.service.dataChange.subscribe(() => this.dataChange.emit());
+		this.service.dataChangeEvent.subscribe(() => this.dataChange.emit());
 	}
 
 	ngAfterViewInit() {

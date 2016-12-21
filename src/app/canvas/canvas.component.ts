@@ -227,7 +227,7 @@ export class CanvasComponent implements OnInit {
         this.data = this.service.data.getValue();
         let page: string = this._page;
         let frame: number = Math.max(this._frameIdx, 0);
-        console.log('update page: ', page, ', frame: ', frame);
+        console.log('update page: ', page, ', frame: ', frame, 'data: ', this.data);
         this.data && this.janvas.updateJanvasData(this.data, {
             page: page,
             frameIndex: frame,

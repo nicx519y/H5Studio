@@ -62,6 +62,7 @@
 					[activePage]="timeline.stageId"
 					[activeElements]="timeline.elementsWithActionLayer"
 					(elementsSelected)="attrSetter.setElements($event)"
+					(elementsChanged)="attrSetter.setElements($event)"
 				></ide-canvas>
 			</div>
 			<div block="bottom">

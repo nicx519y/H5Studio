@@ -77,6 +77,7 @@ export class AttrsComponent implements OnInit {
 
 	private onSubmit() {
 		this.service.submit();
+		this.timelineService.dataChange();
 	}
 
 	ngOnInit() {

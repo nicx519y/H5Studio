@@ -31,7 +31,7 @@ export class MainService {
 		this.itemsService.itemInsertEvent.subscribe(item => this.itemInsertHandler( item ));
 		this.itemsService.itemDeleteEvent.subscribe(item => this.itemDeleteHandler( item ));
 		this.importBitmapService.uploadCompleteEvent.subscribe((bitmaps: BitmapSourceModel[]) => this.importBitmapCompleteHandler( bitmaps ));
-		this.timelineService.dataChange.subscribe(timelineService => this.timelineDataChangeHandler());
+		this.timelineService.dataChangeEvent.subscribe(timelineService => this.timelineDataChangeHandler());
 	}
 
 	private activeStageChangeHandler( index: number ) {

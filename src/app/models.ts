@@ -119,7 +119,7 @@ export class BasicModel {
 				continue;
 			}
 
-			if(typeof property == 'undefined') {
+			if(typeof property == 'undefined' || property == null) {
 				Reflect.set(this, key, value);
 				continue;
 			}
