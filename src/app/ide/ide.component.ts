@@ -17,6 +17,7 @@ export class IdeComponent {
 
 	constructor(
 		private service: MainService,
+		private timelineService: TimelineService,
 	){
 		
 	}

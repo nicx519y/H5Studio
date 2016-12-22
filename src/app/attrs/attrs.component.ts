@@ -3,7 +3,7 @@ import { PropertyBasicModel } from '../properties';
 import { AttrsService, AttrMode } from '../attrs.service';
 import { TimelineService } from '../timeline.service';
 import { AttrFormComponent } from '../attr-form/attr-form.component';
-import { ElementModel, ElementStateModel, EditorState } from '../models';
+import { ElementModel, ElementStateModel, EditorState, FrameModel } from '../models';
 
 @Component({
 	selector: 'ide-attrs',
@@ -25,25 +25,24 @@ export class AttrsComponent implements OnInit {
 	public setElements(options: {
 		frameIndex: number, 
         elements: {
-            elementId: string,
             layerId: string,
-            elementState: any,
+			element: ElementModel,
+            elementState: ElementStateModel,
             bounds: any
         }[]
 	}) {
-		// this.service.setElement(options);
 		if(options.elements.length == 1) {
 			let ele = options.elements[0];
 			let result: {
 				element: ElementModel,
 				state: ElementStateModel,
 			} = {
-				element: this.timelineService.getLayerById(ele.layerId).element,
+				element: ele.element,
 				state: ele.elementState,
 			};
 			this.service.setElement(result);
 		} else if(options.elements.length > 1) {
-			
+			this.service.clear();
 		} else {
 			this.service.clear();
 		}
@@ -75,14 +74,18 @@ export class AttrsComponent implements OnInit {
 		this.timelineService.changeKeyFramesState(frameIndex, changes);
 	}
 
-	private onSubmit() {
-		this.service.submit();
-		this.timelineService.dataChange();
+	private onAttrsChange(evt) {
+		console.log('on attrs change: ', evt);
+		this.service.onAttrsChange(evt);
 	}
 
 	ngOnInit() {
-		// this.service.mode = AttrMode.fontSetter;
 		this.options = this.service.attrs;
+		this.timelineService.elementsSelected.subscribe((evt) => this.setElements(evt));
+	}
+
+	ngAfterViewInit() {
+		// if(this.service.)
 	}
 
 }

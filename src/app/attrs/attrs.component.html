@@ -1,6 +1,6 @@
 <div class="ide-attrs" >
 	<form #attrsForm="ngForm" (ngSubmit)="onSubmit()"   >
-		<ide-attr-form *ngFor="let opt of options" [options]="opt"  ></ide-attr-form>
+		<ide-attr-form *ngFor="let opt of options" [options]="opt" (changeEvent)="onAttrsChange($event)"  ></ide-attr-form>
 		<button type="submit" hidden >submit</button>
 	</form>
 </div>

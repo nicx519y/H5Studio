@@ -2,21 +2,21 @@
 	<label [attr.for]="options.key"  >{{options.label}}</label>
 	<div [ngSwitch]="options.controlType" class="attr-field" >
 
-		<input *ngSwitchCase="0"  type="text" [id]="options.key" [(ngModel)]="options.value" [disabled]="options.disabled"  />
+		<input *ngSwitchCase="0" #input  type="text" [id]="options.key" [(ngModel)]="options.value" [disabled]="options.disabled"  />
 
-		<input *ngSwitchCase="1"  type="number" [id]="options.key" [min]="options.min" [max]="options.max" [step]="options.step"  [(ngModel)]="options.value" [disabled]="options.disabled"  />
+		<input *ngSwitchCase="1" #input  type="number" [id]="options.key" [min]="options.min" [max]="options.max" [step]="options.step"  [(ngModel)]="options.value" [disabled]="options.disabled"  />
 
 		<span *ngSwitchCase="2"  >
-			<input  type="range" [id]="options.key"  [(ngModel)]="options.value" [min]="options.min" [max]="options.max" [step]="options.step" [disabled]="options.disabled"  />
-			<input class="range-value" type="number" [(ngModel)]="options.value" [disabled]="options.disabled" />
+			<input #input type="range" [id]="options.key"  [(ngModel)]="options.value" [min]="options.min" [max]="options.max" [step]="options.step" [disabled]="options.disabled"  />
+			<input #input class="range-value" type="number" [(ngModel)]="options.value" [disabled]="options.disabled" />
 		</span>
 
 		<span *ngSwitchCase="3" class="color-picker"  >
-			<input type="color" [id]="options.key"  [(ngModel)]="options.value" [disabled]="options.disabled" />
-			<input class="color-value" type="text" [(ngModel)]="options.value" onfocus="this.select()" [disabled]="options.disabled"  />
+			<input #input type="color" [id]="options.key"  [(ngModel)]="options.value" [disabled]="options.disabled" />
+			<input #input class="color-value" type="text" [(ngModel)]="options.value" onfocus="this.select()" [disabled]="options.disabled"  />
 		</span>
 
-		<select *ngSwitchCase="4"  [id]="options.key"  [(ngModel)]="options.value" [disabled]="options.disabled"  >
+		<select #select *ngSwitchCase="4"  [id]="options.key"  [(ngModel)]="options.value" [disabled]="options.disabled"  >
 			<option *ngFor="let opt of options.options" [value]="opt.value"  >{{opt.key}}</option>
 		</select>
 
@@ -28,12 +28,12 @@
 			</button>
 		</span>
 
-		<input *ngSwitchCase="7"  type="checkbox" [id]="options.key" [(ngModel)]="options.value" [disabled]="options.disabled"  />
+		<input #input *ngSwitchCase="7"  type="checkbox" [id]="options.key" [(ngModel)]="options.value" [disabled]="options.disabled"  />
 
 		<span *ngSwitchCase="8" class="file-select-btn" >
-			<input type="text" (focus)="fileInput.click()" />
+			<input #input type="text" (focus)="fileInput.click()" />
 			<button class="btn btn-primary" (focus)="fileInput.click()" >浏览</button>
-			<input type="file" [id]="options.key" #fileInput />
+			<input #input type="file" [id]="options.key" #fileInput />
 		</span>
 	</div>
 </div>

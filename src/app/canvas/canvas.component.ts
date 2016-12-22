@@ -15,7 +15,8 @@ import {
 } from '@angular/core';
 import { MainService } from '../main.service';
 import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel, TimelineModel } from '../models';
-import { TimelineComponent } from '../timeline/timeline.component';
+import { TimelineService } from '../timeline.service';
+import { AttrsService, AttrMode } from '../attrs.service';
 import Developer from '@JDB/janvas-developer/app/main/developer';
 
 @Component({
@@ -38,26 +39,10 @@ export class CanvasComponent implements OnInit {
     @ViewChild('box')
     private box: ElementRef;
 
-    @Output()
-    public elementsSelected: EventEmitter<{
-        frameIndex: number, 
-        elements: {
-            elementId: string,
-            layerId: string,
-            elementState: any,
-            bounds: any
-        }[]
-    }> = new EventEmitter();
-
-    @Output()
-    public elementsChanged: EventEmitter<any> = new EventEmitter();
-
-    @Input()
-    private timeline: TimelineComponent;
-
-
     constructor(
         private service: MainService,
+        private timelineService: TimelineService,
+        private attrsService: AttrsService,
         private container: ViewContainerRef,
     ) {
     }
@@ -93,7 +78,7 @@ export class CanvasComponent implements OnInit {
             this._page = p;
             this._frameIdx = 0;
             if(this.janvas) {
-                this.timeline.setActionOptions({
+                this.timelineService.setActionOptions({
                     start: -1,
                     duration: 0,
                     layers: []
@@ -111,24 +96,24 @@ export class CanvasComponent implements OnInit {
         }
     }
 
-    @Input()
-    public set activeElements(elements: string[]) {
-        let result: boolean = false;
-        if(elements.length != this._activeElements.length) 
-            result = true;
-        else {
-            for(let ele of elements) {
-                if(this._activeElements.indexOf(ele) < 0) {
-                    result = true;
-                    break;
-                }
-            }
-        }
-        if(result) {
-            this._activeElements = elements;
-            this.janvas.selectElement(elements);
-        }
-    }
+    // @Input()
+    // public set activeElements(elements: string[]) {
+    //     let result: boolean = false;
+    //     if(elements.length != this._activeElements.length) 
+    //         result = true;
+    //     else {
+    //         for(let ele of elements) {
+    //             if(this._activeElements.indexOf(ele) < 0) {
+    //                 result = true;
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     if(result) {
+    //         this._activeElements = elements;
+    //         this.janvas.selectElement(elements);
+    //     }
+    // }
 
     @HostListener('window:resize')
     private janvasResize(target=null) {
@@ -156,73 +141,35 @@ export class CanvasComponent implements OnInit {
             }
         );
         this.mode = this._mode;
-        this.service.timelineChange.subscribe(() => this.timelineDateChange());
+        this.service.timelineChange.subscribe(() => this.janvasUpdate());
     }
 
     private janvasSelectedHandler(eleArr: any[]) {
-        let data = this.filterJanvasData(eleArr);
-        console.log('selected: ', data);
-        this.timeline.setActionOptions({
-            start: data.frameIndex,
-            duration: 1,
-            layers: data.elements.map(ele => { return ele.layerId })
-        });
-        this.elementsSelected.emit(data);
+        console.log('selected: ', eleArr);
+        this.timelineService.setElementsSelected(eleArr);
     }
 
     private janvasChangedHandler(eleArr: any[]) {
-        let data = this.filterJanvasData(eleArr);
-        let layerIds: string[] = data.elements.map(ele => { return ele.layerId });
-        this.timeline.changeToKeyFrames(data.frameIndex, data.frameIndex, layerIds);
-        let changes = data.elements.map(ele => {
+        if(!eleArr || eleArr.length <= 0) return;
+        console.log('changed: ', eleArr);
+        let frameIndex: number = eleArr[0].frameIndex;
+        let layerIds: string[] = eleArr.map(ele => { return ele.layerId });
+        this.timelineService.changeToKeyFrames(frameIndex, frameIndex, layerIds);
+        let changes = eleArr.map(ele => {
             return {
                 layerId: ele.layerId,
                 frame: {
-                    elementState: ele.elementState
+                    elementState: ele.state
                 },
             };
         });
-        this.timeline.changeKeyFramesState(this._frameIdx, changes);
-        this.elementsChanged.emit(data);
+        this.timelineService.changeKeyFramesState(this._frameIdx, changes);
     }
 
     private janvasAddedHandler(obj: any) {
 
     }
 
-    private filterJanvasData(eleArr: any[]): {
-        frameIndex: number, 
-        elements: {
-            elementId: string,
-            layerId: string,
-            elementState: any,
-            bounds: any
-        }[]
-    } {
-        if(!eleArr || eleArr.length <= 0)
-            return null;
-
-        let elements: {
-            elementId: string,
-            layerId: string,
-            elementState: any,
-            bounds: any,
-        }[] = eleArr.map(ele => {
-            let result = {
-                elementId: ele.elementId,
-                layerId: ele.layerId,
-                elementState: ele.state,
-                bounds: ele.transformedBounds
-            };
-            return result;
-        });
-        let result = {
-            frameIndex: eleArr[0].frameIndex,
-            elements: elements
-        };
-        return result;
-    }
- 
     private janvasUpdate() {
         this.data = this.service.data.getValue();
         let page: string = this._page;
@@ -234,14 +181,46 @@ export class CanvasComponent implements OnInit {
         });
     }
 
-    public timelineDateChange() {
-        this.janvasUpdate();
+    private timelineActionInput() {
+        this.janvas.selectElement(this.timelineService.elementsWithActionLayer);
     }
 
-    
+    private attrsChange(options: {
+        key: string,
+        value: any,
+    }[]) {
+        let mode: AttrMode = this.attrsService.mode;
+        switch(mode) {
+            case AttrMode.property:
+                this.propertiesChange(options);
+                break;
+            case AttrMode.fontSetter:
+                break;
+            case AttrMode.multipleProperties:
+                break;
+            default:
+                break;
+        }
+    }
+
+    private propertiesChange(options: any) {
+        let frameIndex: number = this.timelineService.actionFrame;
+        let layerId: string = this.timelineService.actionOption.layers[0];
+        this.timelineService.changeToKeyFrames(frameIndex, frameIndex, [layerId]);
+        let changes = [{
+            layerId: layerId,
+            frame: {
+                elementState: options
+            },
+        }];
+        console.log('properties change: ', changes);
+        this.timelineService.changeKeyFramesState(this._frameIdx, changes);
+    }
 
     ngOnInit() {
         setTimeout(this.initJanvas.bind(this), 100);
+        this.timelineService.actionInputEvent.subscribe(() => this.timelineActionInput());
+        this.attrsService.attrsChangeEvent.subscribe((options) => this.attrsChange(options));
     }
 
     // ngOnChanges(change) {

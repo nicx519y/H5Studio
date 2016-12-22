@@ -8,7 +8,7 @@
 	<div class="flexbox" >
 		<div class="left list" >
 			<div *ngFor="let layer of service.timeline.layers" class="layer-item" 
-			[ngClass]="{true: 'active'}[actionOption.layers.indexOf(layer.id)>=0]"  >
+			[ngClass]="{true: 'active'}[service.actionOption.layers.indexOf(layer.id)>=0]"  >
 				<span [ngClass]="{
 					'0' : 'glyphicon glyphicon-file',
 					'1' : 'glyphicon glyphicon-adjust',

@@ -57,12 +57,8 @@
 			<div block="center">
 				<ide-canvas #canvas 
 					[mode]="toolsbar.state" 
-					[timeline]="timeline" 
-					[activeFrame]="timeline.actionFrame" 
-					[activePage]="timeline.stageId"
-					[activeElements]="timeline.elementsWithActionLayer"
-					(elementsSelected)="attrSetter.setElements($event)"
-					(elementsChanged)="attrSetter.setElements($event)"
+					[activeFrame]="timelineService.actionFrame" 
+					[activePage]="timelineService.stageId"
 				></ide-canvas>
 			</div>
 			<div block="bottom">

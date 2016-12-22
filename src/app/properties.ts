@@ -38,7 +38,11 @@ export class PropertyBasicModel<T> {
 
 	public setModel() {
 		if(typeof this.model == 'object')
-			Reflect.set(this.model, this.key, this.value);
+			Reflect.set(this.model, this.key, this.getValue());
+	}
+
+	public getValue(): T {
+		return this.value;
 	}
 }
 
@@ -80,6 +84,10 @@ export class PropertyRangeModel extends PropertyBasicModel<number> {
 	constructor(options: {} = {}) {
 		super(options);
 		Object.assign(this, options);
+	}
+
+	public getValue(): number {
+		return this.value * 1;
 	}
 }
 

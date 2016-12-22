@@ -19,6 +19,11 @@ export class AttrsService {
 
 	private _mode: AttrMode = AttrMode.property;
 	public attrs: PropertyBasicModel<any>[] = [];
+	private focusKey: string;
+	private model: any;
+
+	@Output()
+	attrsChangeEvent: EventEmitter<any> = new EventEmitter;
 
 	constructor() {
 		this.mode = AttrMode.none;
@@ -42,7 +47,12 @@ export class AttrsService {
 		element: ElementModel,
 		state: ElementStateModel
 	}) {
+		// if(this.elements.indexOf(options.element.id) >= 0 && this.oldMode == this.mode) return;
+
+		// this.oldMode = this.mode;
+		// this.elements = [options.element.id];
 		this.clear();
+
 		if(this.mode == AttrMode.property) {
 			this.getPropertysModels(options).forEach(model => this.attrs.push(model));
 		} else if(this.mode == AttrMode.fontSetter) {
@@ -54,6 +64,7 @@ export class AttrsService {
 		let models: PropertyBasicModel<any>[] = [];
 		let ele: ElementModel = options.element;
 		let state: ElementStateModel = options.state;
+		this.model = options.state;
 		models.push(
 			new PropertyTextboxModel({
 				label: 'item: ',
@@ -61,18 +72,6 @@ export class AttrsService {
 				value: ele.item,
 				disabled: true,
 				model: ele
-			}),
-			new PropertyNumberModel({
-				label: 'center x: ',
-				key: 'originX',
-				value: Math.round(state.originX),
-				model: state
-			}),
-			new PropertyNumberModel({
-				label: 'center y: ',
-				key: 'originY',
-				value: Math.round(state.originY),
-				model: state
 			}),
 			new PropertyNumberModel({
 				label: 'x: ',
@@ -85,12 +84,6 @@ export class AttrsService {
 				key: 'f',
 				value: Math.round(state.matrix.f),
 				model: state.matrix
-			}),
-			new PropertyNumberModel({
-				label: 'rotation: ',
-				key: 'rotation',
-				value: Math.round(state.rotation),
-				model: state
 			}),
 			new PropertyNumberModel({
 				label: 'scale x: ',
@@ -116,6 +109,12 @@ export class AttrsService {
 				value: Math.round(state.skewY * 10) / 10,
 				model: state
 			}),
+			new PropertyNumberModel({
+				label: 'rotation: ',
+				key: 'rotation',
+				value: Math.round(state.rotation),
+				model: state
+			}),
 			new PropertyRangeModel({
 				label: 'alpha: ',
 				key: 'alpha',
@@ -129,6 +128,21 @@ export class AttrsService {
 		return models;
 	}
 
+	public onAttrsChange(evt) {
+		this.attrs.forEach(attr => { attr.setModel() });
+		switch(this.mode) {
+			case AttrMode.property:
+				this.attrsChangeEvent.emit(this.model);
+				break;
+			case AttrMode.fontSetter:
+				break;
+			case AttrMode.multipleProperties:
+				break;
+			default:
+				break;
+		}
+	}
+
 	private getMultiplePropertiesModels(): PropertyBasicModel<any>[] {
 		let models: PropertyBasicModel<any>[] = [];
 		return models;
@@ -139,7 +153,4 @@ export class AttrsService {
 		return models;
 	}
 
-	public submit() {
-		this.attrs.forEach(attr => attr.setModel());
-	}
 }
