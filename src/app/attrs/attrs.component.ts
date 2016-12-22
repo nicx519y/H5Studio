@@ -14,6 +14,7 @@ export class AttrsComponent implements OnInit {
 
 	private activeFrame: number = -1;
 	public options: PropertyBasicModel<string>[];
+	private focusKey: string;
 
 	constructor(
 		private service: AttrsService,
@@ -79,13 +80,21 @@ export class AttrsComponent implements OnInit {
 		this.service.onAttrsChange(evt);
 	}
 
+	private onFocus(key: string) {
+		this.focusKey = key;
+	}
+
+	private isFocus(key: string) {
+		return this.focusKey == key;
+	}
+
 	ngOnInit() {
 		this.options = this.service.attrs;
 		this.timelineService.elementsSelected.subscribe((evt) => this.setElements(evt));
 	}
 
 	ngAfterViewInit() {
-		// if(this.service.)
+		
 	}
 
 }

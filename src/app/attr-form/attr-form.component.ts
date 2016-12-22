@@ -35,6 +35,9 @@ export class AttrFormComponent implements OnInit {
 		disabled?: boolean,
 	};
 
+	@Input()
+	private isFocus: boolean;
+
 	private oldValue: any;
 	private changeTimer: any;
 
@@ -53,6 +56,9 @@ export class AttrFormComponent implements OnInit {
 		},
 	}> = new EventEmitter;
 
+	@Output()
+	focusEvent: EventEmitter<string> = new EventEmitter;
+
 	constructor() {
 		
 	}
@@ -67,6 +73,16 @@ export class AttrFormComponent implements OnInit {
 		this.oldValue = this.options.value;
 	}
 
+	private focusHandler() {
+		this.focusEvent.emit(this.options.key);
+	}
+
+	public focus() {
+		if(this.inputs.length > 0) {
+			this.inputs.last.nativeElement.focus();
+		}
+	}
+
 	ngOnInit() {
 
 	}
@@ -74,12 +90,20 @@ export class AttrFormComponent implements OnInit {
 	ngAfterViewInit() {
 		this.inputs.forEach(input => input.nativeElement.addEventListener('input', this.changeHandler.bind(this)));
 		this.selects.forEach(input => input.nativeElement.addEventListener('input', this.changeHandler.bind(this)));
+		this.inputs.forEach(input => input.nativeElement.addEventListener('focus', this.focusHandler.bind(this)));
+		this.selects.forEach(input => input.nativeElement.addEventListener('focus', this.changeHandler.bind(this)));
 		this.oldValue = this.options.value;
+
+		if(this.isFocus) {
+			this.focus();
+		}
 	}
 
 	ngOnDestroy() {
 		this.inputs.forEach(input => input.nativeElement.removeEventListener('input', this.changeHandler.bind(this)));
 		this.selects.forEach(input => input.nativeElement.removeEventListener('input', this.changeHandler.bind(this)));
+		this.inputs.forEach(input => input.nativeElement.removeEventListener('focus', this.focusHandler.bind(this)));
+		this.selects.forEach(input => input.nativeElement.removeEventListener('focus', this.changeHandler.bind(this)));
 	}
 
 }

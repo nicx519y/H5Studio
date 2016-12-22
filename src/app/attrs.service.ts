@@ -19,7 +19,7 @@ export class AttrsService {
 
 	private _mode: AttrMode = AttrMode.property;
 	public attrs: PropertyBasicModel<any>[] = [];
-	private focusKey: string;
+	public focusKey: string;
 	private model: any;
 
 	@Output()

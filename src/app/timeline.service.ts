@@ -159,6 +159,8 @@ export class TimelineService {
                 duration: 0,
                 layers: []
             });
+			let data = this.initData(eleArr);
+			this.elementsSelected.emit(data);
         } else {
 			// console.log('set selects: ', eleArr.map(ele => { return ele.layerId; }));
             this.setActionOptions({
@@ -180,7 +182,13 @@ export class TimelineService {
             bounds: any
         }[]
 	} {
-		if(!eleArr || eleArr.length <= 0) return null;
+		if(!eleArr || eleArr.length <= 0) {
+			return {
+				frameIndex: 0,
+				elements: []
+			};
+		}
+
 		let result: {
 			frameIndex: number, 
 			elements: {
