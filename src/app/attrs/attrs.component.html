@@ -3,6 +3,7 @@
 		<ide-attr-form *ngFor="let opt of options" [options]="opt" [isFocus]="isFocus(opt.key)"
 			(changeEvent)="onAttrsChange($event)"
 			(focusEvent)="onFocus($event)"
+			(blurEvent)="onBlur($event)"
 		></ide-attr-form>
 		<button type="submit" hidden >submit</button>
 	</form>

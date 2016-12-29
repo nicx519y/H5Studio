@@ -3,3 +3,4 @@
 
 declare var System: any;
 declare module '@JDB/janvas-developer/app/main/developer';
+declare module 'immutable/dist/immutable';

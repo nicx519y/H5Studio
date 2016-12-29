@@ -96,6 +96,9 @@ export class CanvasComponent implements OnInit {
         }
     }
 
+    @Input()
+    private mainData: MainModel;
+
     // @Input()
     // public set activeElements(elements: string[]) {
     //     let result: boolean = false;
@@ -145,13 +148,11 @@ export class CanvasComponent implements OnInit {
     }
 
     private janvasSelectedHandler(eleArr: any[]) {
-        console.log('selected: ', eleArr);
         this.timelineService.setElementsSelected(eleArr);
     }
 
     private janvasChangedHandler(eleArr: any[]) {
         if(!eleArr || eleArr.length <= 0) return;
-        console.log('changed: ', eleArr);
         let frameIndex: number = eleArr[0].frameIndex;
         let layerIds: string[] = eleArr.map(ele => { return ele.layerId });
         this.timelineService.changeToKeyFrames(frameIndex, frameIndex, layerIds);
@@ -174,7 +175,6 @@ export class CanvasComponent implements OnInit {
         this.data = this.service.data.getValue();
         let page: string = this._page;
         let frame: number = Math.max(this._frameIdx, 0);
-        console.log('update page: ', page, ', frame: ', frame, 'data: ', this.data);
         this.data && this.janvas.updateJanvasData(this.data, {
             page: page,
             frameIndex: frame,
@@ -213,7 +213,6 @@ export class CanvasComponent implements OnInit {
                 elementState: options
             },
         }];
-        console.log('properties change: ', changes);
         this.timelineService.changeKeyFramesState(this._frameIdx, changes);
     }
 
@@ -223,7 +222,10 @@ export class CanvasComponent implements OnInit {
         this.attrsService.attrsChangeEvent.subscribe((options) => this.attrsChange(options));
     }
 
-    // ngOnChanges(change) {
-    //     console.log(change);
-    // }
+    ngOnChanges(change) {
+        console.log(change);
+        if(change.mainData) {
+            console.log(this.mainData);
+        }
+    }
 }

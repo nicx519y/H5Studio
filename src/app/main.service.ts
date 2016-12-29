@@ -5,6 +5,8 @@ import { AttrsService } from './attrs.service';
 import { TimelineService } from './timeline.service';
 import { BitmapImporterService } from './bitmap-importer.service';
 import { MainModel, BitmapSourceModel, ElementModel, ElementStateModel, ItemModel, ItemType, TimelineModel, PageModel, LayerModel } from './models';
+import Immutable from 'immutable/dist/immutable';
+
 
 @Injectable()
 export class MainService {
@@ -32,6 +34,7 @@ export class MainService {
 		this.itemsService.itemDeleteEvent.subscribe(item => this.itemDeleteHandler( item ));
 		this.importBitmapService.uploadCompleteEvent.subscribe((bitmaps: BitmapSourceModel[]) => this.importBitmapCompleteHandler( bitmaps ));
 		this.timelineService.dataChangeEvent.subscribe(timelineService => this.timelineDataChangeHandler());
+
 	}
 
 	private activeStageChangeHandler( index: number ) {

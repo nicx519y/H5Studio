@@ -445,11 +445,14 @@ export class TimelineService {
 		}
 	}
 
+	/**
+	 * @desc	触发janvas渲染的唯一入口
+	 */
 	public dataChange() {
-		clearTimeout(this._dataChangeTimer);
-		this._dataChangeTimer = setTimeout(() => {
+		// clearTimeout(this._dataChangeTimer);
+		// this._dataChangeTimer = setTimeout(() => {
 			this.dataChangeEvent.emit(this);
-		}, 200);
+		// }, 200);
 	}
 	
 }

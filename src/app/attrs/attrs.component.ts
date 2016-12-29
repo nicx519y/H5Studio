@@ -15,6 +15,8 @@ export class AttrsComponent implements OnInit {
 	private activeFrame: number = -1;
 	public options: PropertyBasicModel<string>[];
 	private focusKey: string;
+	private changeTimer: any;
+	private changeDur: number = 200;
 
 	constructor(
 		private service: AttrsService,
@@ -76,12 +78,23 @@ export class AttrsComponent implements OnInit {
 	}
 
 	private onAttrsChange(evt) {
-		console.log('on attrs change: ', evt);
-		this.service.onAttrsChange(evt);
+		clearTimeout(this.changeTimer);
+		this.changeTimer = setTimeout(() => {
+			console.log('on attrs change: ', evt);
+			this.service.onAttrsChange(evt);
+		}, this.changeDur);
 	}
 
+	/**
+	 * @desc	控制重新生成表单的时候，默认focus表单
+	 */
 	private onFocus(key: string) {
 		this.focusKey = key;
+	}
+
+	private onBlur(key: string) {
+		// if(this.focusKey == key)
+		// 	this.focusKey = null;
 	}
 
 	private isFocus(key: string) {

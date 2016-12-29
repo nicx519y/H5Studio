@@ -59,6 +59,9 @@ export class AttrFormComponent implements OnInit {
 	@Output()
 	focusEvent: EventEmitter<string> = new EventEmitter;
 
+	@Output()
+	blurEvent: EventEmitter<string> = new EventEmitter;
+
 	constructor() {
 		
 	}
@@ -77,6 +80,10 @@ export class AttrFormComponent implements OnInit {
 		this.focusEvent.emit(this.options.key);
 	}
 
+	private blurHandler() {
+		this.blurEvent.emit(this.options.key);
+	}
+
 	public focus() {
 		if(this.inputs.length > 0) {
 			this.inputs.last.nativeElement.focus();
@@ -91,7 +98,9 @@ export class AttrFormComponent implements OnInit {
 		this.inputs.forEach(input => input.nativeElement.addEventListener('input', this.changeHandler.bind(this)));
 		this.selects.forEach(input => input.nativeElement.addEventListener('input', this.changeHandler.bind(this)));
 		this.inputs.forEach(input => input.nativeElement.addEventListener('focus', this.focusHandler.bind(this)));
-		this.selects.forEach(input => input.nativeElement.addEventListener('focus', this.changeHandler.bind(this)));
+		this.selects.forEach(select => select.nativeElement.addEventListener('focus', this.focusHandler.bind(this)));
+		this.inputs.forEach(input => input.nativeElement.addEventListener('blur', this.blurHandler.bind(this)));
+		this.selects.forEach(select => select.nativeElement.addEventListener('blur', this.blurHandler.bind(this)));
 		this.oldValue = this.options.value;
 
 		if(this.isFocus) {
@@ -103,7 +112,9 @@ export class AttrFormComponent implements OnInit {
 		this.inputs.forEach(input => input.nativeElement.removeEventListener('input', this.changeHandler.bind(this)));
 		this.selects.forEach(input => input.nativeElement.removeEventListener('input', this.changeHandler.bind(this)));
 		this.inputs.forEach(input => input.nativeElement.removeEventListener('focus', this.focusHandler.bind(this)));
-		this.selects.forEach(input => input.nativeElement.removeEventListener('focus', this.changeHandler.bind(this)));
+		this.selects.forEach(select => select.nativeElement.removeEventListener('focus', this.changeHandler.bind(this)));
+		this.inputs.forEach(input => input.nativeElement.removeEventListener('blur', this.blurHandler.bind(this)));
+		this.selects.forEach(select => select.nativeElement.removeEventListener('blur', this.blurHandler.bind(this)));
 	}
 
 }
