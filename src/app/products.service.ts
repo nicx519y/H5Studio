@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import 'rxjs/add/operator/toPromise'
-import { ProductModel, MainModel } from './models';
+import { MF, ProductModel, MainModel } from './models';
 
 @Injectable()
 export class ProductsService {
@@ -10,7 +10,7 @@ export class ProductsService {
 	private createURL: string = '/api/create';
 	private removeURL: string = '/api/remove';
 
-	options: ProductModel[] = [];
+	options: Immutable.List<any> = Immutable.List<any>();
 
 	constructor(
 		private http: Http
@@ -19,38 +19,14 @@ export class ProductsService {
 	}
 
 	public fetch() {
-		this.options = [
-			new ProductModel({
-				title: 'One Product',
-				user: 'Lily',
+		this.options = this.options.push(
+			MF.g(ProductModel, {
+				title: 'title',
+				user: 'jone',
 				lastModify: new Date().getTime(),
-				prodId: 'aad'
-			}),
-			new ProductModel({
-				title: 'One Product',
-				user: 'Lily',
-				lastModify: new Date().getTime(),
-				prodId: 'aad'
-			}),
-			new ProductModel({
-				title: 'One Product',
-				user: 'Lily',
-				lastModify: new Date().getTime(),
-				prodId: 'aad'
-			}),
-			new ProductModel({
-				title: 'One Product',
-				user: 'Lily',
-				lastModify: new Date().getTime(),
-				prodId: 'aad'
-			}),
-			new ProductModel({
-				title: 'One Product',
-				user: 'Lily',
-				lastModify: new Date().getTime(),
-				prodId: 'aad'
-			}),
-		];
+				prodId: 'aas'
+			})
+		);
 	}
 
 	public createNewProject() {

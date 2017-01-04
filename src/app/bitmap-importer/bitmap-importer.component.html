@@ -2,10 +2,10 @@
 	<form #bitmapForm="ngForm" class="modal-form" (submit)="importStart()" >
 		<div class="bitmaps" >
 			<ul>
-				<li  *ngFor="let bitmap of bitmaps; let i = index;" (click)="nameInput.focus()"  >
+				<li  *ngFor="let bitmap of model; let i = index;" (click)="nameInput.focus()"  >
 					<ide-previewer [src]="bitmap.url" [width]="90" [height]="90"  ></ide-previewer>
 					<span class="glyphicon glyphicon-remove deleteBtn " (click)="removeBitmap(i)" ></span>
-					<input #nameInput type="text" [(ngModel)]="bitmap.fileName" name="name" required  onfocus="this.select()" autocomplete="off"  />
+					<input #nameInput type="text" [value]="bitmap.name" (blur)="submitName(i, nameInput.value)" name="name" required  onfocus="this.select()" autocomplete="off"  />
 				</li>
 				<li>
 					<button class="fileBtn" >

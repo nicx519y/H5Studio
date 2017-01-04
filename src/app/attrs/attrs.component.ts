@@ -73,7 +73,7 @@ export class AttrsComponent implements OnInit {
 		frame: any
 	}[]) {
 		let layers: string[] = changes.map(change => { return change.layerId; });
-		this.timelineService.changeToFrames(frameIndex, frameIndex, layers);
+		this.timelineService.changeToFrames([frameIndex], layers);//?
 		this.timelineService.changeKeyFramesState(frameIndex, changes);
 	}
 
@@ -103,7 +103,7 @@ export class AttrsComponent implements OnInit {
 
 	ngOnInit() {
 		this.options = this.service.attrs;
-		this.timelineService.elementsSelected.subscribe((evt) => this.setElements(evt));
+		// this.timelineService.elementsSelected.subscribe((evt) => this.setElements(evt));
 	}
 
 	ngAfterViewInit() {

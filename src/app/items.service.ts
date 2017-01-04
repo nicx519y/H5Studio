@@ -1,74 +1,88 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
-import { ItemModel, ItemType } from './models';
+import { ItemModel, ItemType, BitmapModel, MF } from './models';
 
+/// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
+import { List, Map } from 'immutable';
 
 @Injectable()
 export class ItemsService {
-	private itemsList: Array<ItemModel>=[];
+
+	private _data: List<ItemModel>;
 	private _active: number = -1;
 
-	@Output()
-	itemEditEvent: EventEmitter<ItemModel> = new EventEmitter();
-
-	@Output()
-	itemInsertEvent: EventEmitter<ItemModel> = new EventEmitter();
-
-	@Output()
-	itemDeleteEvent: EventEmitter<ItemModel> = new EventEmitter();
-
 	constructor() {
+		this._data = Immutable.List<ItemModel>();
+		this._data = this._data.push(new ItemModel({
+			name: 'item1'
+		}));
+		this._data = this._data.push(new ItemModel({
+			name: 'item2'
+		}));
 	}
 
-	get active(): number {
+	public setData(data: List<ItemModel>) {
+		this._data = data;
+	}
+
+	public getData() {
+		return this._data;
+	}
+
+	public set active(index: number) {
+		if(this._data.has(index)) {
+			this._active = index;
+		} else {
+			this._active = -1;
+		}
+	}
+
+	public get active(): number {
 		return this._active;
 	}
 
-	set active( index: number ) {
-		if( index >= 0 && index <= this.itemsList.length - 1 && index != this.active ) {
-			this._active = index;
-		}
+	public setItem(item: ItemModel, index: number) {
+		if(this._data.has(index))
+			this._data = this._data.set(index, item);
 	}
 
-	get items() {
-		return this.itemsList;
+	public getItem(index: number): ItemModel {
+		return this._data.get(index);
 	}
 
-	set items( list: Array<ItemModel> ) {
-		this.itemsList = list;
+	public removeItem(index: number) {
+		this._data = this._data.delete(index);
 	}
 
-	getItemById( id: string ) {
-		let item: ItemModel = this.items.find( i => {
-			return ( i.id === id );
-		});
-	}
- 
-	addItem(options) {
-		this.itemsList.push(new ItemModel(options));
-		return true;
-	}
-
-	removeItem(index: number) {
-		if(index >= 0) {
-			let item: ItemModel = this.items[ index ];
-			this.itemsList.splice(index, 1);
-			this.itemDeleteEvent.emit( item );
-			return true;
+	public addItem(item: ItemModel, index: number = -1) {
+		if(index >= 0 && index < this._data.size) {
+			this._data = this._data.insert(index, item);
 		} else {
-			return false;
+			this._data = this._data.push(item);
 		}
 	}
 
-	editItem(index: number) {
-		if( index >= 0 && index <= this.items.length - 1 ) {
-			this.itemEditEvent.emit( this.items[index] );
-		}
+	public addItems(items: List<ItemModel>, index: number = -1) {
+		if(items.size <= 0) return;
+		let data = this._data;
+		let idx: number = index;
+		if(index < 0 || index > this._data.size)
+			idx = this._data.size;
+
+		items.forEach(item => {
+			data = data.insert(idx, item);
+			idx ++;
+		});
+
+		this._data = data;
 	}
 
-	insertItem(index: number) {
-		if( index >= 0 && index <= this.items.length - 1 ) {
-			this.itemInsertEvent.emit( this.items[index] );
-		}
+	public addBitmaps(bitmaps: List<BitmapModel>) {
+		let items = bitmaps.map(bitmap => MF.g(ItemModel, {
+			name: bitmap.get('name'),
+			type: ItemType.bitmap,
+			thumbnail: bitmap.get('url'),
+			source: bitmap.get('url'),
+		}));
+		this.addItems(items as List<ItemModel>);
 	}
-
 }

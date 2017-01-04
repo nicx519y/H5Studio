@@ -4,7 +4,7 @@
 			<img [src]="stage.thumbnail" />
 			<ide-previewer [src]="stage.thumbnail" [width]="78" [height]="78" ></ide-previewer>
 		</div>
-		<input #nameInput type="text" onfocus="this.select()" (keyup.enter)="nameInput.blur()" [(ngModel)]="stage.name" />
+		<input #nameInput type="text" onfocus="this.select()" (blur)="nameInputSubmit(i, nameInput.value)" (keyup.enter)="nameInput.blur()" [value]="stage.name" />
 		<div class="stages-tools" >
 			<span class="stages-btn glyphicon glyphicon-menu-up" (click)="upPage(i)" ></span>
 			<span class="stages-btn glyphicon glyphicon-trash" (click)="removePage(i)" ></span>

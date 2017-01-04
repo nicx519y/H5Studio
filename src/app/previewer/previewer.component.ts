@@ -4,25 +4,23 @@ import { Component, Input, ElementRef, AfterViewInit, ViewChild, OnInit, ChangeD
   selector: 'ide-previewer',
   templateUrl: './previewer.component.html',
   styleUrls: ['./previewer.component.css'],
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewerComponent implements OnInit {
 
   	@Input()
-	public src: string;
+	private src: string;
 
 	@Input()
-	public width: number;
+	private width: number;
 
 	@Input()
-	public height: number;
+	private height: number;
 
-	@ViewChild('canvas')
-	public canvas: ElementRef;
+	@ViewChild('image')
+	private image: ElementRef;
 
-	public previewData: string = '';
-
-	public n: number = 2;
+	private n: number = 2;		//像素倍数
 
 	constructor() {
 		
@@ -30,7 +28,7 @@ export class PreviewerComponent implements OnInit {
 
 	private loadImage() {
 		if( this.src == '' ) {
-			this.previewData = '';
+			this.image && (this.image.nativeElement.src = 'about:blank');
 			return;
 		}
 		let image = new Image();
@@ -72,20 +70,22 @@ export class PreviewerComponent implements OnInit {
 		ocx.drawImage(oc, 0, 0, oc.width / 2, oc.height / 2);
 		icx.drawImage( oc, 0, 0, oc.width / 2, oc.height / 2, Math.floor(sx), Math.floor(sy), Math.floor(sw), Math.floor(sh) );
 		
-		this.previewData = ic.toDataURL('image/png');
+		this.image.nativeElement.src = ic.toDataURL('image/png');
 
 		ic = oc = icx = ocx = null;
 	}
 
 
 	ngAfterViewInit() {
-		this.loadImage();
+		
 	}
 	ngOnInit() {
 
 	}
-	ngOnChanges(change) {
-		
+	ngOnChanges(changes) {
+		if(changes.hasOwnProperty('src')) {
+			this.loadImage();
+		}
 	}
 
 	

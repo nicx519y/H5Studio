@@ -1,14 +1,18 @@
-import { Component, Input, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, ChangeDetectionStrategy, EventEmitter, OnInit } from '@angular/core';
 import { ModalComponent } from '../modal/modal.component';
-import { BitmapSourceModel } from '../models';
+import { MF, BitmapModel } from '../models';
 import { BitmapImporterService } from '../bitmap-importer.service';
+import { ItemsService } from '../items.service';
+
+/// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
+import { List, Map } from 'immutable';
 
 
 @Component({
 	selector: 'ide-bitmap-importer',
 	templateUrl: './bitmap-importer.component.html',
 	styleUrls: ['./bitmap-importer.component.css', '../../assets/modal.form.css'],
-	changeDetection: ChangeDetectionStrategy.Default,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BitmapImporterComponent implements OnInit {
 
@@ -18,15 +22,13 @@ export class BitmapImporterComponent implements OnInit {
 	@ViewChild('fileInput')
 	public fileInput: ElementRef;
 
-	public bitmaps: BitmapSourceModel[];
+	@Input()
+	private model: List<BitmapModel>;
 
 	constructor(
 		private service: BitmapImporterService,
-		private cd: ChangeDetectorRef,
+		private itemsService: ItemsService,
 	) {
-		this.service.uploadCompleteEvent.subscribe( bitmaps => {
-			this.hide();
-		});
 	}
 
 	public show() {
@@ -49,7 +51,6 @@ export class BitmapImporterComponent implements OnInit {
 	private fileInputChange( evt ) {
 		if( evt.target.value == '' ) return;
 		let files: FileList = evt.target.files;
-		console.log(files);
 		for( let i = 0, file: File; file = files[i]; i ++ ) {
 			if( !this.fileFilter( file.type ) ) {  
 				continue;
@@ -61,11 +62,13 @@ export class BitmapImporterComponent implements OnInit {
 
 			let reader: FileReader = new FileReader();
 			reader.onload = ( evt: ProgressEvent ) => {
-				this.service.createNewBitmap({
+				let bitmap = MF.g(BitmapModel, {
 					url: String(reader.result),
+					name: file.name,
+					fileSize: file.size,
 					fileName: file.name,
-					size: file.size
 				});
+				this.service.addBitmap(bitmap);
 			};
 			reader.readAsDataURL( file );
 		}
@@ -73,9 +76,7 @@ export class BitmapImporterComponent implements OnInit {
 	}
 
 	private hasFile( file: File ): boolean {
-		let bitmap: BitmapSourceModel = this.bitmaps.find((value: BitmapSourceModel, index: number) => {
-			return value.fileName === file.name;
-		});
+		let bitmap: BitmapModel = this.model.find(value => value.get('fileName') === file.name);
 		return !!bitmap;
 	}
 
@@ -84,14 +85,21 @@ export class BitmapImporterComponent implements OnInit {
 		return regexp.test(value);
 	}
 
+	private uploadCompleteHandler(data: List<BitmapModel>) {
+		this.itemsService.addBitmaps(data);
+	}
+
+	private submitName(index: number, value: string) {
+		this.service.setBitmap(this.service.getBitmap(index).set('name', value), index);
+	}
+
 	ngAfterViewInit() {
-		this.modal.onHidden.subscribe( () => {
-			this.service.clearData();
-		});
+		this.modal.onHidden.subscribe( () => this.service.clearData() );
+		this.service.uploadCompleteEvent.subscribe(data => this.uploadCompleteHandler(data));
 	}
 
 	ngOnInit() {
-		this.bitmaps = this.service.bitmaps;
+		this.service.uploadCompleteEvent.subscribe( bitmaps => this.hide());
 	}
 
 	ngOnChanges(change) {

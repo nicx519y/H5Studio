@@ -1,14 +1,23 @@
-import { Component, ViewChildren, QueryList, ElementRef, OnInit } from '@angular/core';
+import { Component, Input, ViewChildren, QueryList, ElementRef, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { PagesService } from '../pages.service';
+import { MF, PageModel } from '../models';
+
+/// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
+import { List, Map } from 'immutable';
 
 @Component({
 	selector: 'ide-page-list',
 	templateUrl: './page-list.component.html',
-	styleUrls: ['./page-list.component.css']
+	styleUrls: ['./page-list.component.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageListComponent implements OnInit {
 
-	private model;
+	@Input()
+	private model: List<PageModel>;
+
+	@Input()
+	private active: number;
 
 	@ViewChildren('nameInput')
 	nameInputList: QueryList<ElementRef>;
@@ -16,61 +25,60 @@ export class PageListComponent implements OnInit {
 	constructor(
 		private services: PagesService
 	) {
-		this.model = services.pages;
-	}
 
-	/**
-	 * 新增空白场景
-	 */
-	addEmptyPageAfterActive() {
-		this.services.addEmptyStage(this.services.active + 1, 'New Page');
 	}
 
 	/**
 	 * 在最后新增空白页
 	 */
 	addEmptyPageAtLast() {
-		this.services.addEmptyStage(this.services.pages.length, 'New Page');
+		this.services.addPage(MF.g(PageModel, { name: 'New Page' }), this.model.size);
+		this.services.active = this.services.getData().size - 1;
 	}
 
 	/**
 	 * 删除
 	 */
 	removePage(index: number) {
-		this.services.removeStage(index);
+		this.services.removePage(index);
+		this.services.active --;
 	}
 	/**
 	 * @dest 上移
 	 */
 	upPage(index: number) {
-		this.services.upStage(index);
+		this.services.upPage(index);
 	}
 
 	/**
 	 * @dest 下移
 	 */
 	downPage(index: number) {
-		this.services.downStage(index);
+		this.services.downPage(index);
 	}
 
 	pageActive(index: number) {
 		this.services.active = index;
-		this.nameInputList.toArray()[index].nativeElement.focus();
+	}
+
+	nameInputSubmit(index: number, value: string) {
+		let page: PageModel = this.services.getPage(index);
+		this.services.setPage(page.set('name', value), index);
 	}
 
 	ngAfterViewInit() {
-		this.nameInputList.changes.subscribe((list: QueryList<ElementRef>) => {
-			setTimeout(() => {
-				this.nameInputList.toArray()[this.services.active].nativeElement.focus();
-			}, 100);
-		});
 		//如果没有页面，自动增加一个空白页
-		if(this.services.pages.length <= 0) {
+		if(this.model.size <= 0) {
 			this.addEmptyPageAtLast();
 		}
 	}
 
 	ngOnInit() {
+
+	}
+
+	ngOnChanges(changes) {
+
 	}
 
 }

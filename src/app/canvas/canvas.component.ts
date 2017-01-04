@@ -155,7 +155,7 @@ export class CanvasComponent implements OnInit {
         if(!eleArr || eleArr.length <= 0) return;
         let frameIndex: number = eleArr[0].frameIndex;
         let layerIds: string[] = eleArr.map(ele => { return ele.layerId });
-        this.timelineService.changeToKeyFrames(frameIndex, frameIndex, layerIds);
+        this.timelineService.changeToKeyFrames([frameIndex], layerIds);
         let changes = eleArr.map(ele => {
             return {
                 layerId: ele.layerId,

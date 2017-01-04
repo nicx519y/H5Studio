@@ -1,9 +1,8 @@
 import { Component, ViewContainerRef, ChangeDetectionStrategy } from '@angular/core';
-import { MainService } from '../main.service';
-import { ItemsService } from '../items.service';
 import { PagesService } from '../pages.service';
-import { AttrsService } from '../attrs.service';
-import { TimelineService } from '../timeline.service';
+// import { MainService } from '../main.service';
+import { ItemsService } from '../items.service';
+// import { AttrsService } from '../attrs.service';
 import { BitmapImporterService } from '../bitmap-importer.service';
 
 @Component({
@@ -16,15 +15,17 @@ import { BitmapImporterService } from '../bitmap-importer.service';
 export class IdeComponent {
 
 	constructor(
-		private service: MainService,
-		private timelineService: TimelineService,
+		// private service: MainService,
+		private pagesService: PagesService,
+		private itemsService: ItemsService,
+		private bitmapImporterService: BitmapImporterService,
 	){
 		
 	}
 
 	public saveData() {
 		console.log('save');
-		this.service.saveData();
+		// this.service.saveData();
 	}
 
 	public preview() {
@@ -36,7 +37,7 @@ export class IdeComponent {
 	}
 
 	public createNewProject() {
-		this.service.createNewProject();
+		// this.service.createNewProject();
 	}
 
 	public fullscreen() {

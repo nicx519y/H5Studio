@@ -6,21 +6,24 @@ import {
 	QueryList,
 	ElementRef,
 	ViewChildren,
-	OnInit
+	Input,
+	OnInit,
+	ChangeDetectionStrategy,
 } from '@angular/core';
 import { ItemsService } from '../items.service';
 import { ItemModel, ItemType } from '../models';
 import { ModalComponent } from '../modal/modal.component';
 
+/// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
+import { List, Map } from 'immutable';
+
 @Component({
 	selector: 'ide-item-list',
 	templateUrl: './item-list.component.html',
-	styleUrls: ['./item-list.component.css', '../../assets/modal.form.css']
+	styleUrls: ['./item-list.component.css', '../../assets/modal.form.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemListComponent implements OnInit {
-
-	@ViewChildren('itemContainer')
-	itemsEle: QueryList<ElementRef>;
 
 	@ViewChild('modal')
 	modal: ModalComponent;
@@ -28,49 +31,55 @@ export class ItemListComponent implements OnInit {
 	@ViewChild('nameInput')
 	nameInput: ElementRef;
 
-	private options: Array<ItemModel>;
-	private lastChange: 'added' | 'removed';
+	@Input()
+	private model: List<ItemModel>;
+
+	@Input()
+	private active: number;
 
 	constructor(
 		private service: ItemsService
 	) {
-		this.options = service.items;
+
 	}
 
-	public addItem() {
+	public openCreateItemModal() {
 		this.modal.show();
 	}
 
-	public removeItem() {
+	public removeActiveItem() {
 		this.service.removeItem(this.service.active);
-		this.service.active = -1;
-		this.lastChange = 'removed';
+		this.changeActive(-1);
 	}
 
-	public editItem() {
-		this.service.editItem(this.service.active);
-	}
-
-	public insertItem() {
-		this.service.insertItem(this.service.active);
-	}
-
-	public changeActive(index: number) {
+	private changeActive(index: number) {
 		this.service.active = index;
 	}
 
-	private addNewItem(value: { name: string, type: ItemType }) {
-		// console.log(value);
-		this.service.addItem({
-			thumbnail: '',
+	private insertActiveItem(index: number) {
+		//...todo
+	}
+
+	private editActiveItem() {
+		//...todo
+	}
+
+	private addNewEmptyItem(value: { name: string, type: ItemType }) {
+		let newItem: ItemModel = new ItemModel({
 			name: value.name,
 			type: Number(value.type)
 		});
-		this.changeActive(this.options.length - 1);
+		this.service.addItem(newItem);
+		this.changeActive(this.service.getData().size - 1);
 		this.modal.hide();
 	}
 
+	private submitItemName(index: number, value: string) {
+		this.service.setItem(this.service.getItem(index).set('name', value), index);
+	}
+
 	ngOnInit() {
+
 	}
 
 }

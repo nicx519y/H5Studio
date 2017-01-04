@@ -26,7 +26,8 @@
 				"../node_modules/@JDB/janvas/lib/easeljs.js",
 				"../node_modules/@JDB/janvas/lib/preloadjs.js",
 				"../node_modules/@JDB/janvas/lib/tweenjs.js",
-				"../node_modules/@JDB/janvas/dist/bundle.js"
+				"../node_modules/@JDB/janvas/dist/bundle.js",
+				"../node_modules/immutable/dist/immutable.js"
 			],
 			"environments": {
 				"source": "environments/environment.ts",

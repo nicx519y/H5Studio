@@ -65,66 +65,66 @@ export class AttrsService {
 		let ele: ElementModel = options.element;
 		let state: ElementStateModel = options.state;
 		this.model = options.state;
-		models.push(
-			new PropertyTextboxModel({
-				label: 'item: ',
-				key: 'item',
-				value: ele.item,
-				disabled: true,
-				model: ele
-			}),
-			new PropertyNumberModel({
-				label: 'x: ',
-				key: 'e',
-				value: Math.round(state.matrix.e),
-				model: state.matrix
-			}),
-			new PropertyNumberModel({
-				label: 'y: ',
-				key: 'f',
-				value: Math.round(state.matrix.f),
-				model: state.matrix
-			}),
-			new PropertyNumberModel({
-				label: 'scale x: ',
-				key: 'scaleX',
-				value: Math.round(state.scaleX * 10) / 10,
-				model: state
-			}),
-			new PropertyNumberModel({
-				label: 'scale y: ',
-				key: 'scaleY',
-				value: Math.round(state.scaleY * 10) / 10,
-				model: state
-			}),
-			new PropertyNumberModel({
-				label: 'skew x: ',
-				key: 'skewX',
-				value: Math.round(state.skewX * 10) / 10,
-				model: state
-			}),
-			new PropertyNumberModel({
-				label: 'skew y: ',
-				key: 'skewY',
-				value: Math.round(state.skewY * 10) / 10,
-				model: state
-			}),
-			new PropertyNumberModel({
-				label: 'rotation: ',
-				key: 'rotation',
-				value: Math.round(state.rotation),
-				model: state
-			}),
-			new PropertyRangeModel({
-				label: 'alpha: ',
-				key: 'alpha',
-				value: Math.round(state.alpha),
-				min: 0,
-				max: 100,
-				step: 1,
-				model: state
-			}),
-		);
+		// models.push(
+		// 	new PropertyTextboxModel({
+		// 		label: 'item: ',
+		// 		key: 'item',
+		// 		value: ele.item,
+		// 		disabled: true,
+		// 		model: ele
+		// 	}),
+		// 	new PropertyNumberModel({
+		// 		label: 'x: ',
+		// 		key: 'e',
+		// 		value: Math.round(state.matrix.e),
+		// 		model: state.matrix
+		// 	}),
+		// 	new PropertyNumberModel({
+		// 		label: 'y: ',
+		// 		key: 'f',
+		// 		value: Math.round(state.matrix.f),
+		// 		model: state.matrix
+		// 	}),
+		// 	new PropertyNumberModel({
+		// 		label: 'scale x: ',
+		// 		key: 'scaleX',
+		// 		value: Math.round(state.scaleX * 10) / 10,
+		// 		model: state
+		// 	}),
+		// 	new PropertyNumberModel({
+		// 		label: 'scale y: ',
+		// 		key: 'scaleY',
+		// 		value: Math.round(state.scaleY * 10) / 10,
+		// 		model: state
+		// 	}),
+		// 	new PropertyNumberModel({
+		// 		label: 'skew x: ',
+		// 		key: 'skewX',
+		// 		value: Math.round(state.skewX * 10) / 10,
+		// 		model: state
+		// 	}),
+		// 	new PropertyNumberModel({
+		// 		label: 'skew y: ',
+		// 		key: 'skewY',
+		// 		value: Math.round(state.skewY * 10) / 10,
+		// 		model: state
+		// 	}),
+		// 	new PropertyNumberModel({
+		// 		label: 'rotation: ',
+		// 		key: 'rotation',
+		// 		value: Math.round(state.rotation),
+		// 		model: state
+		// 	}),
+		// 	new PropertyRangeModel({
+		// 		label: 'alpha: ',
+		// 		key: 'alpha',
+		// 		value: Math.round(state.alpha),
+		// 		min: 0,
+		// 		max: 100,
+		// 		step: 1,
+		// 		model: state
+		// 	}),
+		// );
 		return models;
 	}
 

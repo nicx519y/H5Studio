@@ -1,5 +1,5 @@
 <ul class="itemslist"  >
-	<li *ngFor="let opt of options; let idx = index;" 
+	<li *ngFor="let opt of model; let idx = index;" 
 		[ngClass]="{true: 'active', false: 'unactive'}[idx===service.active]"
 		(click)="changeActive(idx); " #itemContainer >
 		<div *ngIf="idx===service.active" class="activebox" >
@@ -8,7 +8,7 @@
 			</div>
 			<div class="item-desc" >
 				<form #itemForm="ngForm" >
-					<input #nameInput name="name" type="text" class="item-name" [(ngModel)]="opt.name" on  onfocus="this.select()" (keyup.enter)="nameInput.blur()" autocomplete="off" />
+					<input #nameInput name="name" type="text" class="item-name" [value]="opt.name" onfocus="this.select()" (blur)="submitItemName(idx, nameInput.value)" (keyup.enter)="nameInput.blur()" autocomplete="off" />
 					<div [ngSwitch]="opt.type" class="item-type" >
 						<span *ngSwitchCase="0" >Movie Clip</span>
 						<span *ngSwitchCase="1" >Bitmap</span>
@@ -18,8 +18,8 @@
 					</div>
 				</form>
 			</div>
-			<span class="item-btn glyphicon glyphicon-cog" (click)="editItem()" *ngIf="opt.type==0" ></span>
-			<span class="item-btn glyphicon glyphicon-circle-arrow-right" (click)="insertItem()" ></span>
+			<span class="item-btn glyphicon glyphicon-cog" (click)="editActiveItem()" *ngIf="opt.type==0" ></span>
+			<span class="item-btn glyphicon glyphicon-circle-arrow-right" (click)="insertActiveItem()" ></span>
 		</div>
 		<span *ngIf="idx!==service.active" class="item-name" >
 			<span class="glyphicon" [ngClass]="{ 
@@ -35,7 +35,7 @@
 </ul>
 
 <ide-modal #modal [title]="'添加库元素'" [width]="400" (onShown)="nameInput.focus(); name='';"  >
-	<form #addItemForm="ngForm" (ngSubmit)="addNewItem(addItemForm.value)" class="modal-form" >
+	<form #addItemForm="ngForm" (ngSubmit)="addNewEmptyItem(addItemForm.value)" class="modal-form" >
 		<div class="form-row" >
 			<label>名称：</label>
 			<input class="form-input" type="text" name="name" [(ngModel)]="name" ngControl="name" autocomplete="off" required #nameInput />
