@@ -4,6 +4,7 @@ import { PagesService } from '../pages.service';
 import { ItemsService } from '../items.service';
 // import { AttrsService } from '../attrs.service';
 import { BitmapImporterService } from '../bitmap-importer.service';
+import { TimelineService } from '../timeline.service';
 
 @Component({
 	selector: 'ide',
@@ -18,6 +19,7 @@ export class IdeComponent {
 		// private service: MainService,
 		private pagesService: PagesService,
 		private itemsService: ItemsService,
+		private timelineService: TimelineService,
 		private bitmapImporterService: BitmapImporterService,
 	){
 		

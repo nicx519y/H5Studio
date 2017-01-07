@@ -1,12 +1,11 @@
-<div class="frame hover" #hover [style.width]="scaleFrame + 'px'"   ></div>
-<div class="frame action" #action [style.width]="scaleFrame + 'px'"  ></div>
-<div class="frame key" *ngFor="let frame of option.frames"
+<div class="frame action" #action [style.width]="frameWidth + 'px'"  ></div>
+<div class="frame key" *ngFor="let frame of model.frames"
 	[ngStyle]="{
-		left: frame.index * scaleFrame + 'px',
-		width: frame.duration * scaleFrame + 'px'
+		left: frame.index * frameWidth + 'px',
+		width: frame.duration * frameWidth + 'px'
 	}"
 	[ngClass]="[
-		{true: 'empty', false: 'full'}[frame.isEmpty],
+		{true: 'empty', false: 'full'}[frame.isEmptyFrame],
 		{'0': 'tween-none', '1': 'tween-normal', '2': 'tween-shape'}[frame.tweenType]
 	]"
  >

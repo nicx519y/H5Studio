@@ -21,19 +21,21 @@ import { ItemsService } from '../items.service';
 
 import { BitmapImporterComponent } from '../bitmap-importer/bitmap-importer.component';
 import { BitmapImporterService } from '../bitmap-importer.service';
+
+import { LayerComponent } from '../layer/layer.component';
+import { TimelineComponent } from '../timeline/timeline.component';
+import { TimelineRulerComponent } from '../timeline-ruler/timeline-ruler.component';
+import { TimelineService } from '../timeline.service';
+
 // import { AttrFormComponent } from '../attr-form/attr-form.component';
 // import { AttrsComponent } from '../attrs/attrs.component';
 // import { CanvasComponent } from '../canvas/canvas.component';
 // import { HotKeysComponent } from '../hot-keys/hot-keys.component';
-// import { TimelineComponent } from '../timeline/timeline.component';
-// import { LayerComponent } from '../layer/layer.component';
 // import { ToolsbarComponent } from '../toolsbar/toolsbar.component';
 // import { PageConfigerComponent } from '../page-configer/page-configer.component';
-// import { TimelineRulerComponent } from '../timeline-ruler/timeline-ruler.component';
 // import { OnionSkinComponent } from '../onion-skin/onion-skin.component';
 
 // import { MainService } from '../main.service';
-// import { TimelineService } from '../timeline.service';
 // import { AttrsService } from '../attrs.service';
 // import { PageConfigerService } from '../page-configer.service';
 
@@ -57,27 +59,27 @@ const ROUTES: Routes = [
 		PanelComponent,
 		PreviewerComponent,
 		PageListComponent,
+		ModalComponent,
+		BitmapImporterComponent,
+		ItemListComponent,
+		LayerComponent,
+		TimelineComponent,
+		TimelineRulerComponent,
 		// AttrFormComponent,
 		// AttrsComponent,
 		// CanvasComponent,
 		// HotKeysComponent,
-		ModalComponent,
-		BitmapImporterComponent,
-		ItemListComponent,
-		// TimelineComponent,
-		// LayerComponent,
 		// ToolsbarComponent,
 		// PageConfigerComponent,
-		// TimelineRulerComponent,
 		// OnionSkinComponent,
 	],
 	providers: [
 		// MainService,
-		// TimelineService,
-		// AttrsService,
 		ItemsService,
 		PagesService,
 		BitmapImporterService,
+		TimelineService,
+		// AttrsService,
 		// PageConfigerService,
 	],
 	exports: [

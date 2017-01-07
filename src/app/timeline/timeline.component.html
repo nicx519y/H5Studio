@@ -1,33 +1,37 @@
 <div class="topnav flexbox" >
 	<div class="left" ></div>
 	<div class="right" >
-		<ide-timeline-ruler #ruler [scaleFrame]="scaleFrame" ></ide-timeline-ruler>
+		<ide-timeline-ruler #ruler [scaleFrame]="frameWidth" ></ide-timeline-ruler>
 	</div>
 </div>
 <div class="main" >
 	<div class="flexbox" >
 		<div class="left list" >
-			<div *ngFor="let layer of service.timeline.layers" class="layer-item" 
-			[ngClass]="{true: 'active'}[service.actionOption.layers.indexOf(layer.id)>=0]"  >
+			<div *ngFor="let layer of model; let idx = index;" class="layer-item" 
+			[ngClass]="{true: 'active'}[isElementActive(layer.element.id)]"  >
 				<span [ngClass]="{
 					'0' : 'glyphicon glyphicon-file',
 					'1' : 'glyphicon glyphicon-adjust',
 					'2' : 'glyphicon glyphicon-wrench'
 				}[layer.type]"></span>
-				<form #layerForm="ngForm" >
-					<input class="layer-name" [(ngModel)]="layer.name" id="layer-name" name="layer-name" type="text" onfocus="this.select()" autocomplete="off" />
-				</form>
-				<span style="cursor: pointer" (click)="service.toggleVisible(layer.id)" [ngClass]="{
+				<input #nameInput 
+					class="layer-name" [value]="layer.name" id="layer-name" name="layer-name" type="text" 
+					onfocus="this.select()" 
+					(blur)="submitLayerName(idx, nameInput.value)" 
+					(keyup.enter)="nameInput.blur()" 
+					autocomplete="off" />
+				<span style="cursor: pointer" (click)="toggleElementVisible(layer.element.id)" [ngClass]="{
 					true: 'glyphicon glyphicon-eye-open',
 					false: 'glyphicon glyphicon-eye-close'
 				}[layer.element.visible]" ></span>
 			</div>
 		</div>
 		<div class="right list" #timelineContainer  >
-			<div class="timeline-list" [style.minWidth]="(service.timeline.frameCount + 100) * scaleFrame + 'px'"  >
-				<ide-layer *ngFor="let layer of service.timeline.layers" [scaleFrame]="scaleFrame" [option]="layer"
-					(mouseActionEvent)="layerMouseEventHandler($event)" 
-					[action]="getLayerAction(layer.id)"
+			<div class="timeline-list" #timelineBox [style.minWidth]="(frameCount + 100) * frameWidth + 'px'"  >
+				<div #hoverRanger class="hover-ranger" ></div>
+				<ide-layer *ngFor="let layer of model; let idx = index;"
+					[frameWidth]="frameWidth"
+					[model]="layer"
 				></ide-layer>
 			</div>
 			<div class="marking" #marking ></div>

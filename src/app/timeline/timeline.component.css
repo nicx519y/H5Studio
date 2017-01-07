@@ -41,8 +41,19 @@
 }
 
 .timeline-list {
+	position: relative;
 	flex-grow: 1;
 	overflow: auto;
+}
+
+.hover-ranger {
+	position: absolute;
+	left: -9px;
+	right: -9px;
+	background: rgba(100, 149, 237, 0.2);
+	pointer-events: none;
+	border: solid 1px rgba(100, 149, 237, 0.8);
+	z-index: 10000;
 }
 
 .right.list {

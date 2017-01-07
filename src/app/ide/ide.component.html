@@ -61,17 +61,21 @@
 				<ide-accordion>
 					<ide-panel [title]="'时间轴'" [hasTitle]="false" [isOpen]="true" [hasTools]="true" [closeAble]="false" [autoHeight]="300" #timelinepanel>
 						<div block="main">
-
+							<ide-timeline #timeline 
+								[model]="timelineService.getData()" 
+								[activeOptions]="timelineService.getActiveOptions()"
+								[frameCount]="timelineService.getFrameCount()" 
+							></ide-timeline>
 						</div>
 						<div block="tools">
 							<div class="tools-left" style="width: 180px;">
-								<a href="javascript:void(0)" [tooltip]="'删除图层'" (click)="timeline.removeActiveLayers()">
+								<a href="javascript:void(0)" [tooltip]="'删除图层'" (click)="timeline.removeActiveElements()">
 								[删除]
 								</a>
-								<a href="javascript:void(0)" [tooltip]="'上移图层'" (click)="timeline.upActiveLayers()">
+								<a href="javascript:void(0)" [tooltip]="'上移图层'" (click)="timeline.upActiveElements()">
 								[上移]
 								</a>
-								<a href="javascript:void(0)" [tooltip]="'下移图层'" (click)="timeline.downActiveLayers()">
+								<a href="javascript:void(0)" [tooltip]="'下移图层'" (click)="timeline.downActiveElements()">
 								[下移]
 								</a>
 							</div>

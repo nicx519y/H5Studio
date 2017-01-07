@@ -11,7 +11,8 @@ import {
 	ChangeDetectionStrategy,
 } from '@angular/core';
 import { ItemsService } from '../items.service';
-import { ItemModel, ItemType } from '../models';
+import { TimelineService } from '../timeline.service';
+import { MF, ItemModel, ItemType, ElementModel, ElementType } from '../models';
 import { ModalComponent } from '../modal/modal.component';
 
 /// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
@@ -38,7 +39,8 @@ export class ItemListComponent implements OnInit {
 	private active: number;
 
 	constructor(
-		private service: ItemsService
+		private service: ItemsService,
+		private timelineService: TimelineService,
 	) {
 
 	}
@@ -56,8 +58,13 @@ export class ItemListComponent implements OnInit {
 		this.service.active = index;
 	}
 
-	private insertActiveItem(index: number) {
-		//...todo
+	private insertActiveItem() {
+		let ele: ElementModel = MF.g(ElementModel, {
+			type: ElementType.symbol,
+			item: this.model.getIn([this.active, 'id']), 
+		});
+
+		this.timelineService.addElement(ele);
 	}
 
 	private editActiveItem() {
@@ -65,7 +72,7 @@ export class ItemListComponent implements OnInit {
 	}
 
 	private addNewEmptyItem(value: { name: string, type: ItemType }) {
-		let newItem: ItemModel = new ItemModel({
+		let newItem: ItemModel = MF.g(ItemModel, {
 			name: value.name,
 			type: Number(value.type)
 		});

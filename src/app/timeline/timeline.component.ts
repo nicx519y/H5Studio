@@ -1,13 +1,21 @@
-import { Component, ViewChild, ViewChildren, ElementRef, Input, Output, QueryList, OnInit, AfterViewInit, EventEmitter } from '@angular/core';
+import { Component, ViewChild, ViewChildren, ElementRef, Input, Output, QueryList, OnInit, OnDestroy, AfterViewInit, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { TimelineService } from '../timeline.service';
-import { TimelineModel, LayerModel, TweenType, FrameModel } from '../models';
+import { MF, LayerModel, TweenType, FrameModel, ElementModel, TweenModel } from '../models';
 import { LayerComponent } from '../layer/layer.component';
 import { TimelineRulerComponent } from '../timeline-ruler/timeline-ruler.component';
+
+/// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
+import { List, Map } from 'immutable';
+
+const FRAME_WIDTH: number = 9;
+const LAYER_HEIGHT: number = 23;
+const LAYER_GAP: number = 0;
 
 @Component({
 	selector: 'ide-timeline',
 	templateUrl: './timeline.component.html',
-	styleUrls: ['./timeline.component.css']
+	styleUrls: ['./timeline.component.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimelineComponent implements OnInit {
 
@@ -17,39 +25,30 @@ export class TimelineComponent implements OnInit {
 	@ViewChild('timelineContainer')
 	tlContainer: ElementRef;
 
+	@ViewChild('timelineBox')
+	timelineBox: ElementRef;
+
 	@ViewChild('ruler')
 	ruler: TimelineRulerComponent;
+
+	@ViewChild('hoverRanger')
+	hoverRanger: ElementRef;
 
 	@ViewChild('marking')
 	marking: ElementRef;
 
-	@Output()
-	dataChange: EventEmitter<any> = new EventEmitter();
+	@Input()
+	model: List<LayerModel>;
 
-	@Output()
-	actionChanged: EventEmitter<any> = new EventEmitter();
+	@Input()
+	activeOptions: List<Map<string, any>>;
 
-	private lastHoverLayer: string = null;
-	private lastActionLayer: string = null;
-	private scaleFrame: number = 9;				//每帧的宽度
-	private actionIsChanging: boolean = false;
-	private moveDistance: number = -1;
-	private mouseEventTimer: any;
-	
-	private actionStart: {
-		layerId: string,
-		frameIdx: number
-	} = {
-		layerId: null,
-		frameIdx: -1
-	};
-	private actionEnd: {
-		layerId: string,
-		frameIdx: number
-	} = {
-		layerId: null,
-		frameIdx: -1
-	};
+	@Input()
+	frameCount: number;
+
+	private frameWidth: number = FRAME_WIDTH;
+	private isRange: boolean;
+	private range: number[] = [-1, -1, -1, -1];
 
 	constructor(
 		private service: TimelineService
@@ -57,233 +56,196 @@ export class TimelineComponent implements OnInit {
 	}
 
 
-	public removeActiveLayers() {
-		let actionLayers: string[] = this.service.actionOption.layers;
-		if( !actionLayers || actionLayers.length <= 0 ) return;
-		this.service.removeLayers( actionLayers );
+	public removeActiveElements() {
+		let ids: string[] = this.getActiveElements();
+		this.service.removeElements(ids);
 	}
 
-	public upActiveLayers() {
-		let actionLayers: string[] = this.service.actionOption.layers;
-		if( !actionLayers || actionLayers.length <= 0 ) return;
-		this.service.upLayers( actionLayers );
+	public upActiveElements() {
+		let ids: string[] = this.getActiveElements();
+		this.service.upElements(ids);
 	}
 
-	public downActiveLayers() {
-		let actionLayers: string[] = this.service.actionOption.layers;
-		if( !actionLayers || actionLayers.length <= 0 ) return;
-		this.service.downLayers( actionLayers );
+	public downActiveElements() {
+		let ids: string[] = this.getActiveElements();
+		this.service.downElements(ids);
 	}
 
 	public changeActiveToKeyFrames() {
-		let op = this.getActionIndexs();
-		this.service.changeToKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.setData(this.service.changeToKeyFrames(this.activeOptions.toJS()));
 	}
 
 	public changeActiveToEmptyKeyFrames() {
-		let op = this.getActionIndexs();
-		this.service.changeToEmptyKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.setData(this.service.changeToEmptyKeyFrames(this.activeOptions.toJS()));
 	}
 
 	public changeActiveToFrames() {
-		let op = this.getActionIndexs();
-		this.service.changeToFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.setData(this.service.changeToFrames(this.activeOptions.toJS()));
 	}
 
 	public removeActiveKeyFrames() {
-		let op = this.getActionIndexs();
-		this.service.removeKeyFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.setData(this.service.removeKeyFrames(this.activeOptions.toJS()));
 	}
 
 	public removeActiveFrames() {
-		let op = this.getActionIndexs();
-		this.service.removeFrames( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.setData(this.service.removeFrames(this.activeOptions.toJS()));
 	}
 	
 	public createActiveTweens() {
-		let op = this.getActionIndexs();
-		this.service.createTweens( op.index1, op.index2, this.service.actionOption.layers );
+		this.service.setData(this.service.setTweens(this.activeOptions.toJS()));
 	}
 
 	public removeActiveTweens() {
-		let op = this.getActionIndexs();
-		this.service.removeTweens( op.index1, op.index2, this.service.actionOption.layers );
-	}
-
-	public getLayerAction(layerId: string) {
-		let ao = this.service.actionOption;
-		if(ao.layers.indexOf(layerId) >= 0) {
-			return {
-				start: ao.start,
-				duration: ao.duration
-			};
-		} else {
-			return {
-				start: -1,
-				duration: 0
-			}
-		}
-	}
-
-
-
-	public changeKeyFramesState(frameIdx: number, changes: {layerId: string, frame: any}[] = []): FrameModel[] {
-		return this.service.changeKeyFramesState(frameIdx, changes);
-	}
-
-	public changeToKeyFrames( index1: number, index2: number, layerIds: string[] ) {
-		this.service.changeToKeyFrames(index1, index2, layerIds);
-	}
-
-	private moveFramesStart(frameIdx: number) {
-		this.moveDistance = frameIdx - this.service.actionOption.start;
-	}
-
-	private moveingFrames(frameIdx: number) {
-		let ao = this.service.actionOption;
-		ao.start = frameIdx - this.moveDistance;
-	}
-	
-	private moveFramesEnd(frameIdx: number, layerId) {
-		let ao = this.service.actionOption;
-		if(this.actionStart.frameIdx != ao.start) {
-			this.moveingFrames(frameIdx);
-			this.service.moveFrames(this.actionStart.frameIdx, this.actionEnd.frameIdx, ao.start - this.actionStart.frameIdx, ao.layers);
-			this.actionStart.frameIdx = ao.start;
-			this.actionEnd.frameIdx = ao.start + ao.duration;
-			this.moveDistance = -1;
-		} else {
-			this.moveDistance = -1;
-			this.actionChangeStart(frameIdx, layerId);
-			this.actionChangeEnd(frameIdx, layerId);
-		}
-	}
-
-	private layerMouseEventHandler(evt: {
-		event: MouseEvent,
-		frameIdx: number,
-		layerId: string,
-	}) {
-		let event = evt.event;
-		if(event.type == 'mousemove') {
-			this.hoverChange(evt.frameIdx, evt.layerId);
-			if(this.actionIsChanging)
-				this.actionChange(evt.frameIdx, evt.layerId);
-			else if(this.moveDistance >= 0)
-				this.moveingFrames(evt.frameIdx);
-		}else if(event.type == 'mouseout') {
-			this.hoverChange();
-			this.actionIsChanging && (this.mouseEventTimer = setTimeout(() => this.actionChangeEnd(evt.frameIdx, evt.layerId), 500));
-		}else if(event.type == 'mousedown') {
-			if(event.shiftKey) {
-				if(this.actionStart.frameIdx >= 0) {
-					this.actionIsChanging = true;
-					this.actionChangeEnd(evt.frameIdx, evt.layerId);
-				}
-			} else if(!this.service.isInAction(evt.frameIdx, evt.layerId)) { 
-				this.actionChangeStart(evt.frameIdx, evt.layerId);
-			} else {
-				this.moveFramesStart(evt.frameIdx);
-			}
-		}else if(event.type == 'mouseup') {
-			if(this.actionIsChanging)
-				this.actionChangeEnd(evt.frameIdx, evt.layerId);
-			else if(this.moveDistance >= 0) {
-				this.moveFramesEnd(evt.frameIdx, evt.layerId);
-			}
-		}
-	}
-
-	private hoverChange(frameIdx: number=-1, layerId: string=null) {
-		let lastHoverLayer: LayerComponent;
-		if(this.lastHoverLayer && this.lastHoverLayer != '') {
-			lastHoverLayer = this.getLayerById(this.lastHoverLayer);
-			lastHoverLayer.hoverIndex = -1;
-			this.lastHoverLayer = '';
-		}
-		
-		if(layerId && layerId != '') {
-			this.getLayerById(layerId).hoverIndex = frameIdx;
-			this.lastHoverLayer = layerId;
-		}
-
-		this.marking.nativeElement.style.left = frameIdx * this.scaleFrame + 'px';
-	}
-
-	private actionChangeStart(frameIdx: number, layerId: string) {
-		clearTimeout(this.mouseEventTimer);
-		this.actionIsChanging = true;
-		this.actionStart.layerId = layerId;
-		this.actionStart.frameIdx = frameIdx;
-		this.actionEnd.layerId = null;
-		this.actionEnd.frameIdx = -1;
-		let ao = this.service.actionOption;
-		ao.layers.length = 0;
-		ao.layers.push(layerId);
-		ao.start = frameIdx;
-		ao.duration = 1;
-	}
-
-	private actionChange(frameIdx: number, layerId: string) {
-		if(!this.actionIsChanging) return;
-		clearTimeout(this.mouseEventTimer);
-		let layers: LayerModel[] = this.service.timeline.layers;
-		let ao = this.service.actionOption;
-		let layerStartIdx: number = layers.findIndex(layer => {return layer.id == this.actionStart.layerId});
-		let layerEndIdx: number = layers.findIndex(layer => {return layer.id == layerId});
-		let oldLayerEndIdx: number = layers.findIndex(layer => {return layer.id == this.actionEnd.layerId});
-		if(oldLayerEndIdx != layerEndIdx) {
-			ao.layers.length = 0;
-			for(let i: number = Math.min(layerStartIdx, layerEndIdx); i <= Math.max(layerEndIdx, layerStartIdx); i ++)
-				ao.layers.push(layers[i].id);
-		}
-		ao.start = Math.min(this.actionStart.frameIdx, frameIdx);
-		ao.duration = Math.abs(this.actionStart.frameIdx - frameIdx) + 1;
-		this.actionEnd.layerId = layerId;
-		this.actionEnd.frameIdx = frameIdx;
-	}
-
-	private actionChangeEnd(frameIdx: number, layerId: string) {
-		clearTimeout(this.mouseEventTimer);
-		this.actionChange(frameIdx, layerId);
-		this.actionIsChanging = false;
-		this.service.actionInputEvent.emit();
-	}
- 
-	private getLayerById( id: string ): LayerComponent {
-		let layer: LayerComponent = this.layers.filter( item => {
-			return item.id == id; 
-		} )[0];
-		return layer;
+		console.log('remove tweens.');
+		this.service.setData(this.service.setTweens(this.activeOptions.toJS(), {
+			type: TweenType.none,
+			tween: MF.g(TweenModel),
+		}));
 	}
 
 	/**
-	 * 根据actionOption获取起始帧和末尾帧
+	 * 获取被选中的所有element索引值
 	 */
-	private getActionIndexs(): { index1: number, index2: number } {
-		let ac = this.service.actionOption;
-		if( ac.duration >= 0 ) {
-			return {
-				index1: ac.start,
-				index2: ac.start + ac.duration - 1
-			}
-		} else {
-			return {
-				index1: ac.start + ac.duration,
-				index2: ac.start
-			}
-		}
+	private getActiveElements(): string[] {
+		return this.activeOptions.map(ao => ao.get('elementId')).toJS();
 	}
 
+	/**
+	 * 用于改变element的被选中状态
+	 */
+	private isElementActive(eleId: string): boolean {
+		if(!this.activeOptions || this.activeOptions.size <= 0) return false;
+		let activeOption: Map<string, any> = this.activeOptions.find(ao => ao.get('elementId') === eleId);
+		if(!activeOption) return false;
+		return (activeOption.get('start') >= 0 && activeOption.get('duration') > 0);
+	}
+
+	private toggleElementVisible(eleId: string) {
+		let index: number = this.model.findIndex(layer => layer.getIn(['element', 'id']) === eleId);
+		if(index < 0) return;
+		let isVisible: boolean = this.model.getIn([index, 'element', 'visible']);
+		this.service.setData(this.model.setIn([index, 'element', 'visible'], !isVisible));
+	}
+
+	private timelineBoxMouseEventHandler(evt: MouseEvent) {
+		let x: number = evt.offsetX;
+		let y: number = evt.offsetY;
+		let pos = this.getFramePosition(x, y);
+		switch(evt.type) {
+			case 'mouseup':
+				this.service.setActiveOptions(this.range);
+				this.isRange = false;
+				break;
+			case 'mousedown':
+				this.isRange = true;
+				this.range = [pos.frame, pos.layer, pos.frame, pos.layer];
+				break;
+			case 'mousemove':
+				if(!this.isRange) {
+					this.range = [pos.frame, pos.layer, pos.frame, pos.layer];
+				} else {
+					this.range[2] = pos.frame;
+					this.range[3] = pos.layer;
+				}
+
+				this.markingPositionChange(pos.frame);
+
+				break;
+			case 'mouseout':
+				this.isRange = false;
+				this.range = [-1, -1, -1, -1];
+
+				this.markingPositionChange();
+
+				break;
+		}
+		this.setHoverRanger();
+	}
+
+	private scrollHandler(evt: Event) {
+		this.ruler.render( (evt.target as Element).scrollLeft );
+	}
+
+	private setHoverRanger() {
+		if(this.range.length < 4) return;
+		let frame1 = Math.min(this.range[0], this.range[2]);
+		let layer1 = Math.min(this.range[1], this.range[3]);
+		let frame2 = Math.max(this.range[0], this.range[2]);
+		let layer2 = Math.max(this.range[1], this.range[3]);
+		let ne = this.hoverRanger.nativeElement;
+		ne.style.left = FRAME_WIDTH * frame1 + 'px';
+		ne.style.top = (LAYER_HEIGHT + LAYER_GAP) * layer1 + 'px';
+		ne.style.width = (frame2 - frame1 + 1) * FRAME_WIDTH + 'px';
+		ne.style.height = (layer2 - layer1 + 1) * (LAYER_HEIGHT + LAYER_GAP) - LAYER_GAP + 'px'; 
+	}
+
+	private getFramePosition(x: number, y: number): {
+		frame: number, layer: number,
+	} {
+		let fidx: number = Math.floor(x / FRAME_WIDTH);
+		let lidx: number = Math.floor(y / (LAYER_HEIGHT + LAYER_GAP));
+		return {
+			frame: fidx,
+			layer: lidx,
+		};
+	}
+
+	private markingPositionChange(frame: number = -1) {
+		this.marking.nativeElement.style.left = frame * this.frameWidth + 'px';
+	}
+
+	/**
+	 * 设置layer component的active状态
+	 */
+	private setLayersActive() {
+		if(!this.layers) return;
+		let eles: string[] = this.getActiveElements();
+		let aos = this.activeOptions;
+		this.layers.forEach(layer => {
+			let eleId = layer.elementId;
+			if(eles.indexOf(eleId) >= 0) {
+				layer.changeActiveOptions(aos.find(ao => ao.get('elementId') === eleId));
+			} else {
+				layer.changeActiveOptions();
+			}
+		});
+	}
+
+	/**
+	 * 更改一个图层的name
+	 */
+	private submitLayerName(index: number, value: string) {
+		this.service.setData(this.model.setIn([index, 'name'], value));
+	}
 
 	ngOnInit() {
-		this.service.dataChangeEvent.subscribe(() => this.dataChange.emit());
+
 	}
 
 	ngAfterViewInit() {
-		this.tlContainer.nativeElement.addEventListener('scroll', (evt: Event) => {
-			this.ruler.render( (evt.target as Element).scrollLeft );
-		});
+		this.tlContainer.nativeElement.addEventListener('scroll', this.scrollHandler.bind(this));
+		this.timelineBox.nativeElement.addEventListener('mousedown', this.timelineBoxMouseEventHandler.bind(this));
+		this.timelineBox.nativeElement.addEventListener('mouseup', this.timelineBoxMouseEventHandler.bind(this));
+		this.timelineBox.nativeElement.addEventListener('mousemove', this.timelineBoxMouseEventHandler.bind(this));
+		this.timelineBox.nativeElement.addEventListener('mouseout', this.timelineBoxMouseEventHandler.bind(this));
+		this.setHoverRanger();
+		// this.layers.forEach((layer, index) => layer.changeActiveOptions(this.activeOptions.get(index)));
+		this.layers.changes.subscribe(this.setLayersActive.bind(this));
+	}
+
+	ngOnDestroy() {
+		this.tlContainer.nativeElement.removeEventListener('scroll', this.scrollHandler.bind(this));
+		this.timelineBox.nativeElement.removeEventListener('mousedown', this.timelineBoxMouseEventHandler.bind(this));
+		this.timelineBox.nativeElement.removeEventListener('mouseup', this.timelineBoxMouseEventHandler.bind(this));
+		this.timelineBox.nativeElement.removeEventListener('mousemove', this.timelineBoxMouseEventHandler.bind(this));
+		this.timelineBox.nativeElement.removeEventListener('mouseout', this.timelineBoxMouseEventHandler.bind(this));
+	}
+
+	ngOnChanges(changes) {
+		//设置layer组件的active状态
+		if(changes.hasOwnProperty('activeOptions') && this.layers) {
+			this.setLayersActive();
+		}
 	}
 
 }

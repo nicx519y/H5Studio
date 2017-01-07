@@ -111,6 +111,7 @@ export class MF {
 			id: createNewId()
 		}));
 	}
+
 }
 
 export class BackgroundModel extends Immutable.Record({
@@ -193,12 +194,13 @@ export class TweenModel extends Immutable.Record({
 }) {}
 
 export class ElementModel extends Immutable.Record({
+	id: '',
 	visible: true,
 	type: ElementType.symbol,
-	item: null,
+	item: '',
 }) {
 	public static fromItem( item: ItemModel ) {
-		let ele: ElementModel = new ElementModel({
+		let ele: ElementModel = MF.g(ElementModel, {
 			type: ElementType.symbol,
 			item: item.get('id')
 		});
@@ -220,7 +222,25 @@ export class FrameModel extends Immutable.Record({
 	tween: new TweenModel(),
 	elementState: new ElementStateModel(),
 	duration: 1,
-}) {}
+}) {
+	static clone(frame: FrameModel): FrameModel {
+		let newFrame: FrameModel = MF.g(FrameModel, {
+			name: frame.get('name'),
+			index: frame.get('index'),
+			isKeyFrame: frame.get('isKeyFrame'),
+			isEmptyFrame: frame.get('isEmptyFrame'),
+			tweenType: frame.get('tweenType'),
+			tween: frame.get('tween'),
+			elementState: frame.get('elementState'),
+			duration: frame.get('duration'),
+		});
+		if(newFrame.has('tween') && newFrame.get('tween'))
+			newFrame = newFrame.setIn(['tween', 'id'], createNewId());
+		if(newFrame.has('elementState') && newFrame.get('elementState'))
+			newFrame = newFrame.setIn(['elementState', 'id'], createNewId());
+		return newFrame;
+	}
+}
 
 
 export class LayerModel extends Immutable.Record({

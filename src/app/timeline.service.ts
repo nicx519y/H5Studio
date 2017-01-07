@@ -1,5 +1,6 @@
 import { Injectable, QueryList, Output, EventEmitter } from '@angular/core';
 import { 
+	MF,
 	LayerModel,
 	FrameModel,
 	ElementModel,
@@ -10,92 +11,97 @@ import {
 	ElementType
 } from './models';
 
+/// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
+import { List, Map, Iterable } from 'immutable';
+
 
 @Injectable()
 export class TimelineService {
-	// private _timeline: TimelineModel = new TimelineModel();
-	// private _stageId: string = '';
-	// private _stageName: string = '';
-	// private _stageType: string = 'page';
-	// private _dataChangeTimer: any;
 
-	// public actionOption: {
-	// 	layers: string[],
-	// 	start: number,
-	// 	duration: number
-	// }={
-	// 	layers: [],
-	// 	start: -1,
-	// 	duration: 0
-	// };
-
-	// @Output()
-    // public elementsSelected: EventEmitter<{
-    //     frameIndex: number, 
-    //     elements: {
-    //         layerId: string,
-	// 		element: ElementModel,
-    //         elementState: ElementStateModel,
-    //         bounds: any,
-    //     }[]
-    // }> = new EventEmitter();
-
-	// @Output()
-	// public actionInputEvent: EventEmitter<any> = new EventEmitter;
-
-    // // @Output()
-    // // public elementsChanged: EventEmitter<any> = new EventEmitter();
-
-	// @Output()
-	// public dataChangeEvent: EventEmitter<TimelineService> = new EventEmitter();
-
-	private _data: any = Immutable.List();
+	private _data: List<LayerModel> = Immutable.List<LayerModel>();
+	private _activeOptions: List<Map<string, number>> = Immutable.List<Map<string, any>>();
 
 	constructor() {
 		
 	}
 
-	public setData(options: Immutable.List<LayerModel>) {
-		this._data = options;
+	public setData(options: List<LayerModel>) {
+		if(!Immutable.is(options, this._data))
+			this._data = options;
 	}
 
 	public getData() {
 		return this._data;
 	}
 
-	public addElement(element: ElementModel, index: number = -1) {
-		let idx: number;
-		if(this._data.has(index)){
-			idx = index;
-		} else {
-			idx = this._data.size - 1;
-		}
+	public getActiveOptions(): List<Map<string, any>> {
+		return this._activeOptions;
+	}
 
-		let newKeyFrame: FrameModel = new FrameModel({
+	public resetActiveOptions() {
+		this._activeOptions = Immutable.List<Map<string, any>>();
+	}
+
+	public setActiveOptions(range: number[]) {
+		if(range.length < 4) {
+			this.resetActiveOptions();
+			return;
+		}
+		let frame1 = Math.min(range[0], range[2]);
+		let layer1 = Math.min(range[1], range[3]);
+		let frame2 = Math.max(range[0], range[2]);
+		let layer2 = Math.max(range[1], range[3]);
+		let ao = Immutable.List<Map<string, any>>();
+		this._data.forEach((layer, index) => {
+			(index >= layer1 && index <= layer2) &&
+			(ao = ao.push(Immutable.Map<string, any>({
+				elementId: layer.getIn(['element', 'id']),
+				start: frame1,
+				duration: frame2 - frame1 + 1,
+			})));
+		});
+
+		if(!Immutable.is(ao, this._activeOptions)) {
+			this._activeOptions = ao;
+		}
+	}
+
+	public getFrameCount(): number {
+		let count: number = 0;
+		this._data.forEach(layer => count = Math.max(count, layer.get('frameCount')));
+		return count;
+	}
+
+	public addElement(element: ElementModel, index: number = -1) {
+		let newKeyFrame: FrameModel = MF.g(FrameModel, {
 			name: '',
 			isKeyFrame: true,
 			isEmptyFrame: false,
 			index: 0,
 			elementState: new ElementStateModel()
 		});
-
 		let newLayer: LayerModel = new LayerModel({
 			name: 'New Element',
 			type: LayerType.normal,
+			frameCount: 1,
 			element: element,
-			frames: [
-				newKeyFrame
-			]
+			frames: Immutable.List<LayerModel>().push(newKeyFrame)
 		});
 
-		this._data = this._data.insert(idx, newLayer);
+		if(index >= 0 && index < this._data.size) {
+			this.setData(this._data.insert(index, newLayer));
+		} else {
+			this.setData(this._data = this._data.push(newLayer));
+		}
 	}
 
-	public removeElement(eleId: string) {
-		let idx: number = this._data.findIndex(layer => layer.getIn(['element', 'id']) === eleId);
-		if(idx >= 0) {
-			this._data = this._data.delete(idx);
-		}
+	/**
+	 * 批量删除elements
+	 */
+	public removeElements(eleIds: string[]) {
+		let data: List<LayerModel> = Immutable.List<LayerModel>();
+		data = this._data.filter(layer => eleIds.indexOf(layer.getIn(['element', 'id'])) < 0).toList();
+		(!Immutable.is(this._data, data)) && (this.setData(data));
 	}
 
 	public swapElements(eleId1: string, eleId2: string) {
@@ -112,9 +118,9 @@ export class TimelineService {
 		let eleIdxs: number[] = elementIds.map(id => this._data.findIndex(layer => layer.getIn(['element', 'id']) === id));
 		eleIdxs = eleIdxs.sort((a, b) => {
 			if(a < b)
-				return 1;
-			else if(a > b)
 				return -1;
+			else if(a > b)
+				return 1;
 			else
 				return 0;
 		});
@@ -126,22 +132,19 @@ export class TimelineService {
 			if(eleIdxs.indexOf(i) >= 0) 
 				this.swapArray(newIdxs, i, i - 1);
 		}
-		
-		let tempData = Immutable.List();
-		eleIdxs.forEach(idx => {
-			tempData = tempData.push(this._data.get(idx));
-		});
-		
-		this._data = tempData;
+
+		let tempData = Immutable.List<LayerModel>();
+		newIdxs.forEach(idx => tempData = tempData.push(this._data.get(idx)));
+		this.setData(tempData);
 	}
 
 	public downElements(elementIds: string[]) {
 		let eleIdxs: number[] = elementIds.map(id => this._data.findIndex(layer => layer.getIn(['element', 'id']) === id));
 		eleIdxs = eleIdxs.sort((a, b) => {
 			if(a < b)
-				return 1;
-			else if(a > b)
 				return -1;
+			else if(a > b)
+				return 1;
 			else
 				return 0;
 		});
@@ -154,58 +157,176 @@ export class TimelineService {
 				this.swapArray(newIdxs, i, i + 1);
 		}
 		
-		let tempData = Immutable.List();
-		eleIdxs.forEach(idx => {
-			tempData = tempData.push(this._data.get(idx));
-		});
-		
-		this._data = tempData;
+		let tempData = Immutable.List<LayerModel>();
+		newIdxs.forEach(idx => tempData = tempData.push(this._data.get(idx)));
+		this.setData(tempData);
 	}
 
-	public changeToKeyFrames(idxs: number[], eleIds: string[], frameFactory: Function) {
-		let data = this._data;
-		eleIds.map(eleId => this._data.find(layer => layer.getIn(['element', 'id']) === eleId))
-			.forEach(layer => {
-				let layerIndex: number = this._data.indexOf(layer);
-				idxs.forEach(idx => {
-					let eleId: string = layer.getIn(['element', 'id']);
-					let frame = frameFactory(eleId, idx);
-					let newKeyFrame: FrameModel = new FrameModel({
-						elementState: frame.elementState,
-						isKeyFrame: frame.isKeyFrame,
-						tweenType: frame.tweenType,
-						tween: frame.tween,
-						index: idx
-					});
-					let frames = data.getIn([layerIndex, 'frames']);
-					data = data.setIn([layerIndex, 'frames'], frames.push(newKeyFrame).sort());
-				});
-			});
-		this._data = data;
+	public changeToKeyFrames(options: {
+		elementId: string,
+		start: number,
+		duration: number,
+	}[]): List<LayerModel> {
+		let data: List<LayerModel> = this.changeToFrames(options)
+			.map(layer => {
+				let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
+				if(!obj) return layer;
+				let idx: number = obj.start;
+				let idx2: number = obj.start + obj.duration - 1;
+				let frames: List<FrameModel> = layer.get('frames');
+				for(let i = idx; i <= idx2; i ++) {
+					let frame: FrameModel = frames.find(frame => frame.get('index') === i);
+					if(frame) continue;
+					//克隆上一个关键帧，作为新的关键帧
+					let newFrame: FrameModel = FrameModel.clone(frames.findLast(frame => frame.get('index') < i))
+						.set('elementState', null)
+							.set('index', i);
+					frames = frames.push(newFrame);
+				}
+				frames = frames.sort((a, b) => {
+					if(a.get('index') > b.get('index')) return 1;
+					if(a.get('index') < b.get('index')) return -1;
+					if(a.get('index') === b.get('index')) return 0;
+				}).toList();
+				return layer.set('frames', frames);
+			}).toList();
+		return this.resetDuration(data);
 	}
 
-	public changeToEmptyKeyFrames(idxs: number[], eleIds: string[]) {
-
+	public changeToEmptyKeyFrames(options: {
+		elementId: string,
+		start: number,
+		duration: number,
+	}[]): List<LayerModel> {
+		let data: List<LayerModel> = this.changeToFrames(options)
+			.map(layer => {
+				let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
+				if(!obj) return layer;
+				let idx: number = obj.start;
+				let idx2: number = obj.start + obj.duration - 1;
+				let frames: List<FrameModel> = layer.get('frames');
+				for(let i = idx; i <= idx2; i ++) {
+					let frameIdx: number = frames.findIndex(frame => frame.get('index') === i);
+					if(frameIdx >= 0) {	//删除原有关键帧
+						frames = frames.setIn([frameIdx, 'elementState'], null);
+						frames = frames.setIn([frameIdx, 'isEmptyFrame'], true);
+					} else {
+						let newFrame: FrameModel = MF.g(FrameModel, {
+							elementState: null,
+							isEmptyFrame: true,
+							tweenType: TweenType.none,
+							index: i,
+						});
+						frames = frames.push(newFrame);
+					}
+				}
+				frames = frames.sort((a, b) => {
+					if(a.get('index') > b.get('index')) return 1;
+					if(a.get('index') < b.get('index')) return -1;
+					if(a.get('index') === b.get('index')) return 0;
+				}).toList();
+				return layer.set('frames', frames);
+			}).toList();
+		return this.resetDuration(data);
 	}
 
-	public changeToFrames(idxs: number[], eleIds: string[]) {
-
+	public changeToFrames(options: {
+		elementId: string,
+		start: number,
+		duration: number,
+	}[]): List<LayerModel> {
+		let data: List<LayerModel> = this._data.map(layer => {
+			let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
+			if(obj)
+				return layer.set('frameCount', Math.max(layer.get('frameCount'), obj.start + obj.duration));
+			else
+				return layer;
+		}).toList();
+		return this.resetDuration(data);
 	}
 
-	public removeKeyFrames(idxs: number[], eleIds: string[]) {
-
+	public removeKeyFrames(options: {
+		elementId: string,
+		start: number,
+		duration: number,
+	}[]): List<LayerModel> {
+		let data: List<LayerModel> = this._data.map(layer => {
+			let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
+			if(!obj) return layer;
+			let idx: number = obj.start;
+			let idx2: number = obj.start + obj.duration - 1;
+			let frames: List<FrameModel> = layer.get('frames');
+			while(idx <= idx2) {
+				let n: number = frames.findIndex(frame => frame.get('index') === idx);
+				if(n >= 0)
+					frames = frames.delete(n);
+				idx ++;
+			}
+			return layer.set('frames', frames);
+		}).toList();
+		return this.resetDuration(data);
 	}
 
-	public removeFrames(idxs: number[], eleIds: string[]) {
-
+	public removeFrames(options: {
+		elementId: string,
+		start: number,
+		duration: number,
+	}[]): List<LayerModel> {
+		let data: List<LayerModel> = this.removeKeyFrames(options)
+			.map(layer => {
+				let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
+				if(!obj) return layer;
+				let count: number = layer.get('frameCount');
+				if(obj.start > count - 1) return layer;
+				let lastIndex: number = Math.min(count - 1, obj.start + obj.duration -1);
+				let dur: number = lastIndex - obj.start + 1;
+				layer = layer.set('frameCount', layer.get('frameCount') - dur);
+				let frames: List<FrameModel> = layer.get('frames')
+					.map(frame => {
+						let idx: number = frame.get('index');
+						if(idx > obj.start + obj.duration - 1) {
+							frame = frame.set('index', idx - dur);
+						}
+						return frame;
+					}).toList();
+				
+				return layer.set('frames', frames);
+			}).toList();
+		return this.resetDuration(data);
 	}
 
-	public createTweens(idxs: number[], eleIds: string[]) {
-
-	}
-
-	public removeTweens(idxs: number[], eleIds: string[]) {
-
+	public setTweens(options: {
+		elementId: string,
+		start: number,
+		duration: number,
+	}[], tweenOptions: {
+		type: TweenType,
+		tween: TweenModel,
+	} = {
+		type: TweenType.normal,
+		tween: MF.g(TweenModel)
+	}): List<LayerModel> {
+		let data: List<LayerModel> = this._data.map(layer => {
+			let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
+			if(!obj) return layer;
+			let idx: number = obj.start;
+			let idx2: number = obj.start + obj.duration - 1;
+			let frames: List<FrameModel> = layer.get('frames');
+			for(let i = idx; i <= idx2; i ++) {
+				let fidx: number = frames.findIndex(
+					frame => frame.get('index') <= i 
+					&& frame.get('index') + frame.get('duration') - 1 >= i 
+					&& (frame.get('tweenType') !== tweenOptions.type
+					|| !Immutable.is(frame.get('tween').set('id', ''), tweenOptions.tween.set('id', '')))
+				);
+				if(fidx >= 0) {
+					frames = frames.setIn([fidx, 'tweenType'], tweenOptions.type);
+					frames = frames.setIn([fidx, 'tween'], tweenOptions.tween);
+				}
+			}
+			return layer.set('frames', frames);
+		}).toList();
+		return data;
 	}
 
 	public moveFrames(idxs: number[], eleIds: string[]) {
@@ -219,6 +340,27 @@ export class TimelineService {
 
 	}
 
+	private resetDuration(options: List<LayerModel>): List<LayerModel> {
+		return options.map(layer => {
+			let frames: List<FrameModel> = layer.get('frames');
+			frames = frames.map((frame, idx) => {
+				let dur: number;
+				if(idx < frames.size - 1) {
+					let next = frames.get(idx + 1);
+					dur = next.get('index') - frame.get('index');
+				} else {
+					dur = layer.get('frameCount') - frame.get('index');
+				}
+				frame = frame.set('duration', dur);
+				if(frame.has('tween') && frame.get('tween')) {
+					frame = frame.setIn(['tween', 'duration'], dur);
+				}
+				return frame;
+			}).toList();
+			return layer.set('frames', frames);
+		}).toList();
+	}
+
 	private swapArray(arr: any[], idx1: number, idx2: number) {
 		let e1 = arr[idx1];
 		let e2 = arr[idx2];
@@ -226,405 +368,5 @@ export class TimelineService {
 		arr[idx2] = e1;
 	}
 
-	// /**
-	//  * @desc	新增element到最上层，每新增一个element会同时新增一个layer
-	//  * @param	{ element }	添加的ElemntModel
-	//  */
-	// public addElement(element: ElementModel) {
-
-	// 	let newKeyFrame: FrameModel = new FrameModel({
-	// 		name: '',
-	// 		isKeyFrame: true,
-	// 		isEmpty: false,
-	// 		index: 0,
-	// 		elementState: new ElementStateModel()
-	// 	});
-
-	// 	let newLayer: LayerModel = new LayerModel({
-	// 		name: 'New Element',
-	// 		type: LayerType.normal,
-	// 		element: element,
-	// 		frames: [
-	// 			newKeyFrame
-	// 		]
-	// 	});
-
-	// 	this.timeline.layers.push(newLayer);
-
-	// 	this.dataChange();
-	// }
-	// /**
-	//  * @desc	删除一个element
-	//  * @param	{ elementId }	需要删除的elementModel id
-	//  */
-	// public removeElement(elementId: string) {
-	// 	this.timeline.removeLayersWithElement( ( ele: ElementModel ) => {
-	// 		return ele.id === elementId;
-	// 	});
-
-	// 	this.dataChange();
-	// }
-
-	// /**
-	//  * @desc	删除一个图层
-	//  * @param	{ layerId }		需要删除的图层id
-	//  */
-	// public removeLayers(layerIds: string[]) {
-	// 	this.timeline.removeLayers( ( layer: LayerModel ) => {
-	// 		return (layerIds.indexOf(layer.id) >= 0);
-	// 	});
-	// 	this.dataChange();
-	// }
-
-	// public upLayers(layerIds: string[]) {
-	// 	if(layerIds.length <= 0) return;
-	// 	let layers: LayerModel[] = this.timeline.layers;
-	// 	if(layerIds.indexOf(layers[0].id) >= 0) return;
-	// 	let ids: string[] = layerIds.concat();
-	// 	ids.sort((a, b) => {
-	// 		let idx1: number = layers.findIndex(layer => {return layer.id == a});
-	// 		let idx2: number = layers.findIndex(layer => {return layer.id == b});
-	// 		if(idx2 > idx1) return -1;
-	// 		else if(idx2 < idx1) return 1;
-	// 		else return 0;
-	// 	});
-
-	// 	ids.forEach(id => this.upLayer(id));
-	// 	this.dataChange();
-	// }
-
-	// public get actionFrame(): number {
-	// 	return this.actionOption.start;
-	// }
-
-	// public setActionOptions(options: {
-	// 	start?: number,
-	// 	duration?: number,
-	// 	layers?: string[],
-	// }) {
-	// 	Object.assign(this.actionOption, options);
-	// }
-
-	// public isInAction(frameIdx: number, layerId: string): boolean {
-	// 	if(this.actionOption.layers.indexOf(layerId) < 0) return false;
-	// 	let start = this.actionOption.start;
-	// 	let duration = this.actionOption.duration;
-	// 	let n = Math.min(start, start + duration - 1);
-	// 	let m = Math.max(start, start + duration - 1);
-	// 	if(frameIdx < n || frameIdx > m) return false;
-	// 	return true;
-	// }
-
-	// public get elementsWithActionLayer(): string[] {
-	// 	return this.actionOption.layers.map(layer => {
-	// 		let l: LayerModel = this.timeline.layers
-	// 			.find(l => { return l.id == layer });
-	// 		if(l)
-	// 			return l.element.id;
-	// 	});
-	// }
-
-	// public setElementsSelected(eleArr) {
-	// 	if(!eleArr || eleArr.length <= 0) {
-    //         this.setActionOptions({
-    //             start: -1,
-    //             duration: 0,
-    //             layers: []
-    //         });
-	// 		let data = this.initData(eleArr);
-	// 		this.elementsSelected.emit(data);
-    //     } else {
-	// 		// console.log('set selects: ', eleArr.map(ele => { return ele.layerId; }));
-    //         this.setActionOptions({
-    //             start: eleArr[0].frameIndex,
-    //             duration: 1,
-    //             layers: eleArr.map(ele => { return ele.layerId; })
-    //         });
-	// 		let data = this.initData(eleArr);
-	// 		this.elementsSelected.emit(data);
-    //     }
-	// }
-
-	// private initData(eleArr): {
-	// 	frameIndex: number, 
-    //     elements: {
-    //         layerId: string,
-	// 		element: ElementModel,
-    //         elementState: ElementStateModel,
-    //         bounds: any
-    //     }[]
-	// } {
-	// 	if(!eleArr || eleArr.length <= 0) {
-	// 		return {
-	// 			frameIndex: 0,
-	// 			elements: []
-	// 		};
-	// 	}
-
-	// 	let result: {
-	// 		frameIndex: number, 
-	// 		elements: {
-	// 			layerId: string,
-	// 			element: ElementModel,
-	// 			elementState: ElementStateModel,
-	// 			bounds: any
-	// 		}[]
-	// 	} = {
-	// 		frameIndex: eleArr[0].frameIndex,
-	// 		elements: eleArr.map(ele => {
-	// 			let layerId: string = ele.layerId;
-	// 			let layer: LayerModel = this.timeline.layers.find(l => { return l.id == layerId; });
-	// 			let element: ElementModel = layer.element;
-	// 			let elementState: ElementStateModel = new ElementStateModel().init(ele.state)
-	// 			let bounds: any = ele.transformedBounds;
-	// 			return {
-	// 				layerId: layerId,
-	// 				element: element,
-	// 				elementState: elementState,
-	// 				bounds: bounds,
-	// 			};
-	// 		})
-	// 	};
-	// 	return result;
-	// }
-
-	// /**
-	//  * @desc	上移图层
-	//  */
-	// private upLayer( layerId: string ){
-	// 	let layerIndex: number = this.timeline.layers.findIndex( layer => {
-	// 		return (layer.id === layerId);
-	// 	});
-	// 	if( layerIndex <= 0 ){
-	// 		return;
-	// 	} else {
-	// 		let temp: LayerModel = this.timeline.layers[layerIndex];
-	// 		this.timeline.layers[layerIndex] = this.timeline.layers[layerIndex - 1];
-	// 		this.timeline.layers[layerIndex - 1] = temp;
-	// 	}
-	// }
-
-	// public downLayers(layerIds: string[]) {
-	// 	if(layerIds.length <= 0) return;
-	// 	let layers: LayerModel[] = this.timeline.layers;
-	// 	if(layerIds.indexOf(layers[layers.length - 1].id) >= 0) return;
-	// 	let ids: string[] = layerIds.concat();
-	// 	ids.sort((a, b) => {
-	// 		let idx1: number = layers.findIndex(layer => {return layer.id == a});
-	// 		let idx2: number = layers.findIndex(layer => {return layer.id == b});
-	// 		if(idx2 > idx1) return 1;
-	// 		else if(idx2 < idx1) return -1;
-	// 		else return 0;
-	// 	});
-	// 	ids.forEach(id => this.downLayer(id));
-	// 	this.dataChange();
-	// }
-
-	// /**
-	//  * @desc	下移图层
-	//  */
-	// private downLayer( layerId: string ){
-	// 	let layerIndex: number = this.timeline.layers.findIndex( layer => {
-	// 		return (layer.id === layerId);
-	// 	});
-	// 	if( layerIndex < 0 || layerIndex >= this.timeline.layers.length - 1 ){
-	// 		return;
-	// 	} else {
-	// 		let temp: LayerModel = this.timeline.layers[layerIndex];
-	// 		this.timeline.layers[layerIndex] = this.timeline.layers[layerIndex + 1];
-	// 		this.timeline.layers[layerIndex + 1] = temp;
-	// 	}
-	// }
-
-	// /**
-	//  * @desc	交换两个layer的层级
-	//  */
-	// public swapLayerIndex(layerId1: string, layerId2: string): boolean {
-		
-	// 	let idx1: number = this.timeline.layers.findIndex((value: LayerModel) => {
-	// 		return (value.id === layerId1);
-	// 	});
-
-	// 	let idx2: number = this.timeline.layers.findIndex((value: LayerModel) => {
-	// 		return (value.id === layerId2);
-	// 	});
-
-	// 	if(idx1 >= 0 && idx2 >= 0) {
-	// 		let temp: LayerModel = this.timeline.layers[idx2];
-	// 		this.timeline.layers[idx2] = this.timeline.layers[idx1];
-	// 		this.timeline.layers[idx1] = temp;
-	// 		this.dataChange();
-	// 		return true;
-	// 	}
-
-	// 	return false;
-	// }
-
-	// /**
-	//  * @desc	转换成关键帧
-	//  * @param	{ index1 }	起始帧序号
-	//  * @param	{ index2 }	结束帧序号
-	//  * @param	{ layerIds }	要操作的图层ID
-	//  */
-	// public changeToKeyFrames( index1: number, index2: number, layerIds: string[] ) {
-	// 	layerIds.forEach(id => {
-	// 		let layer: LayerModel = this.getLayerById(id);
-	// 		layer && layer.changeToKeyFrames(index1, index2);
-	// 	});
-	// 	this.dataChange();
-	// }
-
-	// public changeToEmptyKeyFrames( index1: number, index2: number, layerIds: string[] ) {
-	// 	layerIds.forEach(id => {
-	// 		this.getLayerById(id).changeToEmptyKeyFrames(index1, index2);
-	// 	});
-	// 	this.dataChange();
-	// }
-
-	// /**
-	//  * @desc	增加新的普通帧
-	//  * @param	{ index1 }	起始帧序号
-	//  * @param	{ index2 }	结束帧序号
-	//  * @param	{ layerIds }	要操作的图层ID
-	//  */
-	// public changeToFrames( index1: number, index2: number, layerIds: string[] ) {
-	// 	layerIds.forEach(id => {
-	// 		this.getLayerById(id).changeToFrames(index1, index2);
-	// 	});
-	// 	this.dataChange();
-	// }
-
-	// /**
-	//  * @desc	移除关键帧属性
-	//  * @param	{ index1 }	起始帧序号
-	//  * @param	{ index2 }	结束帧序号
-	//  * @param	{ layerId }	要操作的图层ID
-	//  */
-	// public removeKeyFrames( index1: number, index2: number, layerIds: string[] ) {
-	// 	layerIds.forEach(id => {
-	// 		this.getLayerById(id).removeKeyFrames(index1, index2);
-	// 	});
-	// 	this.dataChange();
-	// }
-
-	// /**
-	//  * @desc	删除帧（包括关键帧）
-	//  * @param	{ index1 }	起始帧序号
-	//  * @param	{ index2 }	结束帧序号
-	//  * @param	{ layerId }	要操作的图层ID
-	//  */
-	// public removeFrames( index1: number, index2: number, layerIds: string[] ) {
-	// 	layerIds.forEach(id => {
-	// 		this.getLayerById(id).removeFrames(index1, index2);
-	// 	});
-	// 	this.dataChange();
-	// }
-	
-	// /**
-	//  * @desc	创建一个动画
-	//  * @param	{ index }	创建帧序号
-	//  * @param	{ layerId }	要操作的图层ID
-	//  */
-	// public createTweens( index1: number, index2: number, layerIds: string[], tweenType: TweenType = TweenType.normal ) {
-	// 	layerIds.forEach(id => {
-	// 		this.getLayerById( id ).createTweens( index1, index2, tweenType );
-	// 		this.dataChange();
-	// 	});
-	// }
-
-	// /**
-	//  * @desc	删除一个动画
-	//  * @param	{ index }	删除帧序号
-	//  * @param	{ layerId }	作用图层ID
-	//  */
-	// public removeTweens( index1: number, index2: number, layerIds: string[] ) {
-	// 	layerIds.forEach(id => {
-	// 		this.getLayerById( id ).removeTweens( index1, index2 );
-	// 		this.dataChange();
-	// 	});
-	// }
-
-	// /**
-	//  * @desc	移动一些帧
-	//  */
-	// public moveFrames( index1: number, index2: number, offset: number, layerIds: string[] ) {
-	// 	layerIds.forEach(id => {
-	// 		this.getLayerById( id ).moveFrames( index1, index2, offset );
-	// 		this.dataChange();
-	// 	});
-	// }
-
-	// public getLayerById( id: string ): LayerModel {
-	// 	return this.timeline.layers.find((layer: LayerModel) => {
-	// 		return ( layer.id === id );
-	// 	});
-	// }
-
-	// public get timeline(): TimelineModel {
-	// 	return this._timeline;
-	// }
-
-	// public get stageId(): string {
-	// 	return this._stageId;
-	// }
-
-	// public get stageName(): string{
-	// 	return this._stageName;
-	// }
-
-	// public get stageType(): string{
-	// 	return this._stageType;
-	// }
-
-
-	// public setTimeline(stageOptions: {
-	// 	id: string,
-	// 	name: string,
-	// 	type: string,
-	// 	timeline: TimelineModel,
-	// }) {
-	// 	if(this._stageId != stageOptions.id) {
-	// 		this._stageId = stageOptions.id;
-	// 		this._stageType = stageOptions.type;
-	// 		this._stageName = stageOptions.name;
-	// 		this._timeline = stageOptions.timeline;
-	// 		// this.dataChange();
-	// 	}
-	// }
-
-	// /**
-	//  * @desc	改变一个关键帧的状态
-	//  * @returns	FrameModel[]
-	//  */
-	// public changeKeyFramesState(frameIdx: number, changes: {layerId: string, frame: any}[] = []): FrameModel[] {
-	// 	let frameArr: FrameModel[] = changes.map(change => {
-	// 		return this.timeline.layers.find(l => { return l.id == change.layerId })
-	// 			.frames.find(f => { return f.index == frameIdx })
-	// 				.init(change.frame);
-	// 	});
-	// 	this.dataChange();
-	// 	return frameArr;
-	// }
-
-	// /**
-	//  * @desc	改变可见状态
-	//  */
-	// public toggleVisible( layerId: string ) {
-	// 	let layer: LayerModel = this.getLayerById( layerId );
-	// 	if(layer.element) {
-	// 		layer.element.visible = !layer.element.visible;
-	// 		this.dataChange();
-	// 	}
-	// }
-
-	// /**
-	//  * @desc	触发janvas渲染的唯一入口
-	//  */
-	// public dataChange() {
-	// 	// clearTimeout(this._dataChangeTimer);
-	// 	// this._dataChangeTimer = setTimeout(() => {
-	// 		this.dataChangeEvent.emit(this);
-	// 	// }, 200);
-	// }
 	
 }
