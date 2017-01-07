@@ -72,11 +72,11 @@ export class TimelineComponent implements OnInit {
 	}
 
 	public changeActiveToKeyFrames() {
-		this.service.setData(this.service.changeToKeyFrames(this.activeOptions.toJS()));
+		this.service.setData(this.service.setToKeyFrames(this.activeOptions.toJS()));
 	}
 
 	public changeActiveToEmptyKeyFrames() {
-		this.service.setData(this.service.changeToEmptyKeyFrames(this.activeOptions.toJS()));
+		this.service.setData(this.service.setToKeyFrames(this.activeOptions.toJS(), { isEmptyFrame: true }));
 	}
 
 	public changeActiveToFrames() {

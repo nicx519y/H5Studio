@@ -162,11 +162,17 @@ export class TimelineService {
 		this.setData(tempData);
 	}
 
-	public changeToKeyFrames(options: {
+	public setToKeyFrames(options: {
 		elementId: string,
 		start: number,
 		duration: number,
-	}[]): List<LayerModel> {
+	}[], frameOption: {
+		isEmptyFrame: boolean,
+		elementState?: ElementStateModel,
+	} = {
+		isEmptyFrame: false,
+		elementState: null,
+	}): List<LayerModel> {
 		let data: List<LayerModel> = this.changeToFrames(options)
 			.map(layer => {
 				let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
@@ -175,56 +181,38 @@ export class TimelineService {
 				let idx2: number = obj.start + obj.duration - 1;
 				let frames: List<FrameModel> = layer.get('frames');
 				for(let i = idx; i <= idx2; i ++) {
-					let frame: FrameModel = frames.find(frame => frame.get('index') === i);
-					if(frame) continue;
-					//克隆上一个关键帧，作为新的关键帧
-					let newFrame: FrameModel = FrameModel.clone(frames.findLast(frame => frame.get('index') < i))
-						.set('elementState', null)
-							.set('index', i);
-					frames = frames.push(newFrame);
-				}
-				frames = frames.sort((a, b) => {
-					if(a.get('index') > b.get('index')) return 1;
-					if(a.get('index') < b.get('index')) return -1;
-					if(a.get('index') === b.get('index')) return 0;
-				}).toList();
-				return layer.set('frames', frames);
-			}).toList();
-		return this.resetDuration(data);
-	}
-
-	public changeToEmptyKeyFrames(options: {
-		elementId: string,
-		start: number,
-		duration: number,
-	}[]): List<LayerModel> {
-		let data: List<LayerModel> = this.changeToFrames(options)
-			.map(layer => {
-				let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
-				if(!obj) return layer;
-				let idx: number = obj.start;
-				let idx2: number = obj.start + obj.duration - 1;
-				let frames: List<FrameModel> = layer.get('frames');
-				for(let i = idx; i <= idx2; i ++) {
-					let frameIdx: number = frames.findIndex(frame => frame.get('index') === i);
-					if(frameIdx >= 0) {	//删除原有关键帧
-						frames = frames.setIn([frameIdx, 'elementState'], null);
-						frames = frames.setIn([frameIdx, 'isEmptyFrame'], true);
+					let fidx: number = frames.findIndex(frame => frame.get('index') === i);
+					if(fidx >= 0) {
+						let frame: FrameModel = frames.get(fidx);
+						if(frameOption.isEmptyFrame) {
+							frame = frame.set('isEmptyFrame', frameOption.isEmptyFrame)
+								.set('elementState', null)
+								.set('tweenType', TweenType.none)
+								.set('tween', MF.g(TweenModel));
+						} else {
+							frame = frame.set('isEmptyFrame', frameOption.isEmptyFrame)
+								.set('elementState', frameOption.elementState);
+						}
+						frames = frames.set(fidx, frame);
 					} else {
-						let newFrame: FrameModel = MF.g(FrameModel, {
-							elementState: null,
-							isEmptyFrame: true,
-							tweenType: TweenType.none,
-							index: i,
-						});
-						frames = frames.push(newFrame);
+						let newFrame: FrameModel;
+						//克隆上一个关键帧，作为新的关键帧
+						if(!frameOption.isEmptyFrame) {
+							newFrame = FrameModel.clone(frames.findLast(frame => frame.get('index') < i))
+								.set('elementState', frameOption.elementState)
+									.set('index', i);
+						} else {
+							newFrame = MF.g(FrameModel, {
+								isEmptyFrame: frameOption.isEmptyFrame,
+								index: i,
+								elementState: null,
+								tweenType: TweenType.none,
+								tween: MF.g(TweenModel),
+							});
+						}
+						frames = frames.insert(frames.findLastIndex(frame => frame.get('index') < i) + 1, newFrame);
 					}
 				}
-				frames = frames.sort((a, b) => {
-					if(a.get('index') > b.get('index')) return 1;
-					if(a.get('index') < b.get('index')) return -1;
-					if(a.get('index') === b.get('index')) return 0;
-				}).toList();
 				return layer.set('frames', frames);
 			}).toList();
 		return this.resetDuration(data);
@@ -256,11 +244,10 @@ export class TimelineService {
 			let idx: number = obj.start;
 			let idx2: number = obj.start + obj.duration - 1;
 			let frames: List<FrameModel> = layer.get('frames');
-			while(idx <= idx2) {
-				let n: number = frames.findIndex(frame => frame.get('index') === idx);
+			for(let i = idx; i <= idx2; i ++) {
+				let n: number = frames.findIndex(frame => frame.get('index') === i);
 				if(n >= 0)
 					frames = frames.delete(n);
-				idx ++;
 			}
 			return layer.set('frames', frames);
 		}).toList();
@@ -330,13 +317,6 @@ export class TimelineService {
 	}
 
 	public moveFrames(idxs: number[], eleIds: string[]) {
-
-	}
-
-	public changeKeyFramesState(frameIdx: number, changes: {
-		layerId: string,
-		frame: any,
-	}[]) {
 
 	}
 
