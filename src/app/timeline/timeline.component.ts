@@ -72,32 +72,32 @@ export class TimelineComponent implements OnInit {
 	}
 
 	public changeActiveToKeyFrames() {
-		this.service.setData(this.service.setToKeyFrames(this.activeOptions.toJS()));
+		this.service.setTimelineData(this.service.setToKeyFrames(this.activeOptions.toJS()));
 	}
 
 	public changeActiveToEmptyKeyFrames() {
-		this.service.setData(this.service.setToKeyFrames(this.activeOptions.toJS(), { isEmptyFrame: true }));
+		this.service.setTimelineData(this.service.setToKeyFrames(this.activeOptions.toJS(), { isEmptyFrame: true }));
 	}
 
 	public changeActiveToFrames() {
-		this.service.setData(this.service.changeToFrames(this.activeOptions.toJS()));
+		this.service.setTimelineData(this.service.changeToFrames(this.activeOptions.toJS()));
 	}
 
 	public removeActiveKeyFrames() {
-		this.service.setData(this.service.removeKeyFrames(this.activeOptions.toJS()));
+		this.service.setTimelineData(this.service.removeKeyFrames(this.activeOptions.toJS()));
 	}
 
 	public removeActiveFrames() {
-		this.service.setData(this.service.removeFrames(this.activeOptions.toJS()));
+		this.service.setTimelineData(this.service.removeFrames(this.activeOptions.toJS()));
 	}
 	
 	public createActiveTweens() {
-		this.service.setData(this.service.setTweens(this.activeOptions.toJS()));
+		this.service.setTimelineData(this.service.setTweens(this.activeOptions.toJS()));
 	}
 
 	public removeActiveTweens() {
 		console.log('remove tweens.');
-		this.service.setData(this.service.setTweens(this.activeOptions.toJS(), {
+		this.service.setTimelineData(this.service.setTweens(this.activeOptions.toJS(), {
 			type: TweenType.none,
 			tween: MF.g(TweenModel),
 		}));
@@ -124,7 +124,7 @@ export class TimelineComponent implements OnInit {
 		let index: number = this.model.findIndex(layer => layer.getIn(['element', 'id']) === eleId);
 		if(index < 0) return;
 		let isVisible: boolean = this.model.getIn([index, 'element', 'visible']);
-		this.service.setData(this.model.setIn([index, 'element', 'visible'], !isVisible));
+		this.service.setTimelineData(this.model.setIn([index, 'element', 'visible'], !isVisible));
 	}
 
 	private timelineBoxMouseEventHandler(evt: MouseEvent) {
@@ -215,7 +215,7 @@ export class TimelineComponent implements OnInit {
 	 * 更改一个图层的name
 	 */
 	private submitLayerName(index: number, value: string) {
-		this.service.setData(this.model.setIn([index, 'name'], value));
+		this.service.setTimelineData(this.model.setIn([index, 'name'], value));
 	}
 
 	ngOnInit() {
@@ -246,6 +246,11 @@ export class TimelineComponent implements OnInit {
 		if(changes.hasOwnProperty('activeOptions') && this.layers) {
 			this.setLayersActive();
 		}
+
+		if(changes.hasOwnProperty('model')) {
+
+		}
+		
 	}
 
 }

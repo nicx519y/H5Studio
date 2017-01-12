@@ -12,12 +12,16 @@ import {
     SimpleChange,
     EventEmitter,
     ChangeDetectorRef,
+    OnDestroy,
 } from '@angular/core';
-import { MainService } from '../main.service';
-import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel, TimelineModel } from '../models';
+import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel, PageModel, ItemModel, MF } from '../models';
 import { TimelineService } from '../timeline.service';
-import { AttrsService, AttrMode } from '../attrs.service';
 import Developer from '@JDB/janvas-developer/app/main/developer';
+// import { MainService } from '../main.service';
+// import { AttrsService, AttrMode } from '../attrs.service';
+
+/// <reference path="immutable/dist/immutable.d.ts" />
+import { List, Map } from 'immutable';
 
 @Component({
     selector: 'ide-canvas',
@@ -26,11 +30,7 @@ import Developer from '@JDB/janvas-developer/app/main/developer';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CanvasComponent implements OnInit {
-    private _mode: EditorState;
-    private _page: string = '';
-    private _frameIdx: number = 0;
     private _activeElements: string[] = [];
-    private data: any;
     private janvas: any;
 
     @ViewChild('dev')
@@ -39,18 +39,86 @@ export class CanvasComponent implements OnInit {
     @ViewChild('box')
     private box: ElementRef;
 
+    @Input()
+    private mode: EditorState = EditorState.choose;
+
+    @Input()
+    private activeOptions: List<Map<string, any>> = Immutable.List<Map<string, number>>();
+
+    @Input()
+    private activePageModel: PageModel;
+
+    @Input()
+    private itemsModel: List<ItemModel>;
+
     constructor(
-        private service: MainService,
         private timelineService: TimelineService,
-        private attrsService: AttrsService,
+        // private attrsService: AttrsService,
         private container: ViewContainerRef,
     ) {
     }
 
-    @Input()
-    public set mode(mode: EditorState) {
-        this._mode = mode;
+    /**
+     * element某一帧的状态生成器
+     */
+    public elementStateCreator(eleId: string, frameIdx: number): ElementStateModel {
+        if(!this.janvas) return null;
+        let data = this.makeJanvasData().toJS();
+        if(!data) return null;
+        this.janvas.updateJanvasData(data, {
+            page: this.activePageModel.get('id'),
+            frameIndex: frameIdx,
+        });
+        let obj = this.janvas.getElementState(eleId);
+        console.log('Create ElementState: ', obj);
+        return MF.g(ElementStateModel, obj);
+    }
 
+    @HostListener('window:resize')
+    private janvasResize(target=null) {
+        let w: number = this.container.element.nativeElement.offsetWidth;
+        let h: number = this.container.element.nativeElement.offsetHeight;
+        this.box.nativeElement.style.width = w + 'px';
+        this.box.nativeElement.style.height = h + 'px';
+        (target || this.janvas).resizeJanvasDev(w, h);
+    }
+
+    private janvasInit() {
+        let data = this.makeJanvasData().toJS();
+        console.log('Before janvasInit: ', data);
+        this.janvas = new Developer(
+            'dev',
+            {
+                canvasWidth: 10, //canvas width
+                canvasHeight: 10, //canvas height
+                data: data //janvas data
+            },
+            (target) => {
+                target.changeMode(Developer.MODE.READ_MODE);
+                target.addEventHandler(Developer.EVENTS.ELEMENT_SELECTED, this.janvasSelectedHandler.bind(this));
+                target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGED, this.janvasChangedHandler.bind(this));
+                target.addEventHandler(Developer.EVENTS.ELEMENT_ADDED, this.janvasAddedHandler.bind(this));
+                this.janvasResize(target);
+            }
+        );
+        this.modeChange();
+    }
+
+    private janvasUpdate() {
+        if(!this.janvas) return;
+        let activeFrame: number = this.getActiveFirstFrame();
+        let data = this.makeJanvasData().toJS();
+        console.log('Before janvasUpdate: ', data);
+        let page: string = this.activePageModel.get('id');
+        data && this.janvas.updateJanvasData(data, {
+            page: page,
+            frameIndex: Math.max(0, activeFrame),
+            elementList: this.activeOptions.map(ao => ao.get('elementId')).toArray()
+        });
+    }
+
+    private modeChange() {
+        let mode = this.mode;
         if(this.janvas) {
             switch(mode) {
                 case EditorState.none:
@@ -63,7 +131,7 @@ export class CanvasComponent implements OnInit {
                     this.janvas.changeMode(Developer.MODE.TEXT_MODE);
                     break;
                 case EditorState.zoom: 
-                    
+                    //...todo
                     break;
                 case EditorState.draw:
                     this.janvas.changeMode(Developer.MODE.DRAW_MODE);
@@ -72,160 +140,151 @@ export class CanvasComponent implements OnInit {
         }
     }
 
-    @Input()
-    public set activePage(p: string) {
-        if(this._page != p) {
-            this._page = p;
-            this._frameIdx = 0;
-            if(this.janvas) {
-                this.timelineService.setActionOptions({
-                    start: -1,
-                    duration: 0,
-                    layers: []
-                });
-                this.janvas && this.janvasUpdate();
-            }
-        }
-    }
-
-    @Input()
-    public set activeFrame(f: number) {
-        if(this._frameIdx != f && f >= 0) {
-            this._frameIdx = f;
-            this.janvas && this.janvasUpdate();
-        }
-    }
-
-    @Input()
-    private mainData: MainModel;
-
-    // @Input()
-    // public set activeElements(elements: string[]) {
-    //     let result: boolean = false;
-    //     if(elements.length != this._activeElements.length) 
-    //         result = true;
-    //     else {
-    //         for(let ele of elements) {
-    //             if(this._activeElements.indexOf(ele) < 0) {
-    //                 result = true;
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     if(result) {
-    //         this._activeElements = elements;
-    //         this.janvas.selectElement(elements);
-    //     }
-    // }
-
-    @HostListener('window:resize')
-    private janvasResize(target=null) {
-        let w: number = this.container.element.nativeElement.offsetWidth;
-        let h: number = this.container.element.nativeElement.offsetHeight;
-        this.box.nativeElement.style.width = w + 'px';
-        this.box.nativeElement.style.height = h + 'px';
-        (target || this.janvas).resizeJanvasDev(w, h);
-    }
-
-    private initJanvas() {
-        this.janvas = new Developer(
-            'dev',
-            {
-                canvasWidth: 10, //canvas width
-                canvasHeight: 10, //canvas height
-                data: new MainModel() //janvas data
-            },
-            (target) => {
-                target.changeMode(Developer.MODE.READ_MODE);
-                target.addEventHandler(Developer.EVENTS.ELEMENT_SELECTED, ele => this.janvasSelectedHandler(ele));
-                target.addEventHandler(Developer.EVENTS.ELEMENT_CHANGED, ele => this.janvasChangedHandler(ele));
-                target.addEventHandler(Developer.EVENTS.ELEMENT_ADDED, obj => this.janvasAddedHandler(obj));
-                this.janvasResize(target);
-            }
-        );
-        this.mode = this._mode;
-        this.service.timelineChange.subscribe(() => this.janvasUpdate());
+    /**
+     * 合成传入janvas内部的数据
+     */
+    private makeJanvasData(): MainModel {
+        let data: MainModel = MF.g(MainModel, {
+            pages: Immutable.List<PageModel>().push(this.activePageModel),
+            library: this.itemsModel,
+        });
+        
+        return data;
     }
 
     private janvasSelectedHandler(eleArr: any[]) {
-        this.timelineService.setElementsSelected(eleArr);
+        if(!eleArr || eleArr.length <= 0) {
+            this.timelineService.resetActiveOptions();
+        } else {
+            let minFrame: number = Math.min.apply(null, eleArr.map(ele => ele.frameIndex));
+            let eleList: string[] = eleArr.map(ele => ele.elementId);
+            let thisEleList: string[] = this.getActiveElement();
+
+            //事件返回的选中的element和现有的完全一致 最小帧和现在的最小帧一致
+            if(eleList.length == thisEleList.length
+                && Math.min.apply(null, eleList.map(ele => thisEleList.indexOf(ele))) >= 0
+                && minFrame == this.getActiveFirstFrame()) {
+                return;
+            }
+
+            let opt = eleArr.map(ele => { 
+                return { elementId: ele.elementId, start: ele.frameIndex, duration: 1 };
+            });
+            
+            this.timelineService.setActiveOptions(opt, false);
+        }
     }
 
     private janvasChangedHandler(eleArr: any[]) {
         if(!eleArr || eleArr.length <= 0) return;
-        let frameIndex: number = eleArr[0].frameIndex;
-        let layerIds: string[] = eleArr.map(ele => { return ele.layerId });
-        this.timelineService.changeToKeyFrames([frameIndex], layerIds);
-        let changes = eleArr.map(ele => {
+        let ao = eleArr.map(ele => {
             return {
-                layerId: ele.layerId,
-                frame: {
-                    elementState: ele.state
-                },
+                elementId: ele.id,
+                start: ele.frameIndex,
+                duration: 1,
             };
         });
-        this.timelineService.changeKeyFramesState(this._frameIdx, changes);
+        let fo = eleArr.map(ele => {
+            return {
+                elementId: ele.id,
+                isEmptyFrame: false,
+                elementState: ele.state,
+            }
+        });
+        this.timelineService.setTimelineData(this.timelineService.setToKeyFrames(ao, fo));
     }
 
     private janvasAddedHandler(obj: any) {
 
     }
 
-    private janvasUpdate() {
-        this.data = this.service.data.getValue();
-        let page: string = this._page;
-        let frame: number = Math.max(this._frameIdx, 0);
-        this.data && this.janvas.updateJanvasData(this.data, {
-            page: page,
-            frameIndex: frame,
-        });
+    private selectElements() {
+        this.janvas && this.janvas.selectElement(this.getActiveElement());
     }
 
-    private timelineActionInput() {
-        this.janvas.selectElement(this.timelineService.elementsWithActionLayer);
+    /**
+	 * 获取active状态的最小帧，最小值0，默认0
+	 */
+	private getActiveFirstFrame(ao: List<Map<string, any>> = null): number {
+        if(!ao) ao = this.activeOptions;
+		if(ao.size <= 0) return -1;
+		return Math.max(Math.min.apply(null, ao.map(ao => ao.get('start')).toArray()));
+	}
+
+    private getActiveElement(ao: List<Map<string, any>> = null): string[] {
+        if(!ao) ao = this.activeOptions;
+        return ao.map(a => a.get('elementId')).toArray();
     }
 
-    private attrsChange(options: {
-        key: string,
-        value: any,
-    }[]) {
-        let mode: AttrMode = this.attrsService.mode;
-        switch(mode) {
-            case AttrMode.property:
-                this.propertiesChange(options);
-                break;
-            case AttrMode.fontSetter:
-                break;
-            case AttrMode.multipleProperties:
-                break;
-            default:
-                break;
+    private activeOptionsChangeHandler(changes: SimpleChange) {
+        console.log(changes);
+        if(changes.isFirstChange 
+        || this.getActiveFirstFrame(changes.currentValue) !== this.getActiveFirstFrame(changes.previousValue)) {
+            this.janvasUpdate();
+        } else {
+            this.selectElements();
         }
     }
+    
 
-    private propertiesChange(options: any) {
-        let frameIndex: number = this.timelineService.actionFrame;
-        let layerId: string = this.timelineService.actionOption.layers[0];
-        this.timelineService.changeToKeyFrames(frameIndex, frameIndex, [layerId]);
-        let changes = [{
-            layerId: layerId,
-            frame: {
-                elementState: options
-            },
-        }];
-        this.timelineService.changeKeyFramesState(this._frameIdx, changes);
-    }
+    // private attrsChange(options: {
+    //     key: string,
+    //     value: any,
+    // }[]) {
+    //     let mode: AttrMode = this.attrsService.mode;
+    //     switch(mode) {
+    //         case AttrMode.property:
+    //             this.propertiesChange(options);
+    //             break;
+    //         case AttrMode.fontSetter:
+    //             break;
+    //         case AttrMode.multipleProperties:
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }
+
+    // private propertiesChange(options: any) {
+    //     let frameIndex: number = this.timelineService.actionFrame;
+    //     let layerId: string = this.timelineService.actionOption.layers[0];
+    //     this.timelineService.changeToKeyFrames(frameIndex, frameIndex, [layerId]);
+    //     let changes = [{
+    //         layerId: layerId,
+    //         frame: {
+    //             elementState: options
+    //         },
+    //     }];
+    //     // this.timelineService.changeKeyFramesState(this._frameIdx, changes);
+    // }
 
     ngOnInit() {
-        setTimeout(this.initJanvas.bind(this), 100);
-        this.timelineService.actionInputEvent.subscribe(() => this.timelineActionInput());
-        this.attrsService.attrsChangeEvent.subscribe((options) => this.attrsChange(options));
+        
     }
 
-    ngOnChanges(change) {
-        console.log(change);
-        if(change.mainData) {
-            console.log(this.mainData);
+    ngOnDestroy() {
+        this.janvas.removeEventHandler(Developer.EVENTS.ELEMENT_SELECTED, this.janvasSelectedHandler.bind(this));
+        this.janvas.removeEventHandler(Developer.EVENTS.ELEMENT_CHANGED, this.janvasChangedHandler.bind(this));
+        this.janvas.removeEventHandler(Developer.EVENTS.ELEMENT_ADDED, this.janvasAddedHandler.bind(this));
+    }
+
+    ngAfterViewInit() {
+        this.janvasInit();
+        this.timelineService.registerElementStateCreator(this.elementStateCreator.bind(this));
+    }
+
+    ngOnChanges(changes) {
+        if(changes.hasOwnProperty('mode')) {
+            this.modeChange();
+        }
+        if(changes.hasOwnProperty('activeOptions')) {
+            this.activeOptionsChangeHandler(changes.activeOptions);
+        }
+        if(changes.hasOwnProperty('activePageModel')) {
+            console.log('Active page model change: ', changes);
+            this.janvasUpdate();
         }
     }
+    
+    
 }

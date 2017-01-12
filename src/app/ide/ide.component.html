@@ -43,26 +43,31 @@
 				<ide-accordion>
 					<ide-panel [title]="'页面'" [isOpen]="true" [closeAble]="false" >
 						<div block="main">
-							<ide-page-list #pageList [model]="pagesService.getData()" [active]="pagesService.active" ></ide-page-list>
+							<ide-page-list #pageList [model]="pagesService.getData()" [editedPageId]="timelineService.getActivePageId()"  ></ide-page-list>
 						</div>
 					</ide-panel>
 				</ide-accordion>
 			</div>
 			<div block="centertop" >
-
+				<ide-onion-skin [stageName]="timelineService.getData().name" ></ide-onion-skin>
 			</div>
 			<div block="centerleft">
-
+				<ide-toolsbar #toolsbar ></ide-toolsbar>
 			</div>
 			<div block="center">
-
+				<ide-canvas #canvas 
+					[mode]="toolsbar.state" 
+					[activePageModel]="timelineService.getData()" 
+					[itemsModel]="itemsService.getData()"
+					[activeOptions]="timelineService.getActiveOptions()"
+				></ide-canvas>
 			</div>
 			<div block="bottom">
 				<ide-accordion>
 					<ide-panel [title]="'时间轴'" [hasTitle]="false" [isOpen]="true" [hasTools]="true" [closeAble]="false" [autoHeight]="300" #timelinepanel>
 						<div block="main">
 							<ide-timeline #timeline 
-								[model]="timelineService.getData()" 
+								[model]="timelineService._data" 
 								[activeOptions]="timelineService.getActiveOptions()"
 								[frameCount]="timelineService.getFrameCount()" 
 							></ide-timeline>
@@ -110,7 +115,7 @@
 				<ide-accordion>
 					<ide-panel [title]="'素材库'" [isOpen]="true" [hasTools]="true" [autoHeight]="300" #itempanel>
 						<div block="main">
-							<ide-item-list #itemList [model]="itemsService.getData()" [active]="itemsService.active" ></ide-item-list>
+							<ide-item-list #itemList [model]="itemsService.getData()" [active]="itemsService.active" [editedPage]="timelineService.getActivePageId()" ></ide-item-list>
 						</div>
 						<div block="tools">
 							<div>

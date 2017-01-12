@@ -1,23 +1,18 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
-import { ItemModel, ItemType, BitmapModel, MF } from './models';
+import { ItemModel, ItemType, BitmapModel, PageModel, MF } from './models';
+import { DataResource } from './data-resource';
 
 /// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
 import { List, Map } from 'immutable';
 
 @Injectable()
-export class ItemsService {
+export class ItemsService implements DataResource {
 
-	private _data: List<ItemModel>;
+	private _data: List<ItemModel> = Immutable.List<ItemModel>();
 	private _active: number = -1;
 
 	constructor() {
-		this._data = Immutable.List<ItemModel>();
-		this._data = this._data.push(new ItemModel({
-			name: 'item1'
-		}));
-		this._data = this._data.push(new ItemModel({
-			name: 'item2'
-		}));
+
 	}
 
 	public setData(data: List<ItemModel>) {
@@ -26,6 +21,16 @@ export class ItemsService {
 
 	public getData() {
 		return this._data;
+	}
+
+	public fetch(path: any[]): any {
+		return this._data.getIn(path);
+	}
+
+	public writeback(data: any, path: any[]) {
+		if(!Immutable.is(this._data.getIn(path), data)) {
+			this._data = this._data.setIn(path, data);
+		}
 	}
 
 	public set active(index: number) {
@@ -76,12 +81,22 @@ export class ItemsService {
 		this._data = data;
 	}
 
+	public addMovieClips(pages: List<PageModel>) {
+		let items = pages.map(page => MF.g(ItemModel, {
+			name: page.get('name'),
+			type: ItemType.movieclip,
+			thumbnail: '',
+			source: pages,
+		}));
+		this.addItems(items as List<ItemModel>);
+	}
+
 	public addBitmaps(bitmaps: List<BitmapModel>) {
 		let items = bitmaps.map(bitmap => MF.g(ItemModel, {
 			name: bitmap.get('name'),
 			type: ItemType.bitmap,
 			thumbnail: bitmap.get('url'),
-			source: bitmap.get('url'),
+			source: bitmap,
 		}));
 		this.addItems(items as List<ItemModel>);
 	}

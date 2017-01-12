@@ -27,13 +27,13 @@ import { TimelineComponent } from '../timeline/timeline.component';
 import { TimelineRulerComponent } from '../timeline-ruler/timeline-ruler.component';
 import { TimelineService } from '../timeline.service';
 
+import { OnionSkinComponent } from '../onion-skin/onion-skin.component';
+import { ToolsbarComponent } from '../toolsbar/toolsbar.component';
+import { CanvasComponent } from '../canvas/canvas.component';
 // import { AttrFormComponent } from '../attr-form/attr-form.component';
 // import { AttrsComponent } from '../attrs/attrs.component';
-// import { CanvasComponent } from '../canvas/canvas.component';
 // import { HotKeysComponent } from '../hot-keys/hot-keys.component';
-// import { ToolsbarComponent } from '../toolsbar/toolsbar.component';
 // import { PageConfigerComponent } from '../page-configer/page-configer.component';
-// import { OnionSkinComponent } from '../onion-skin/onion-skin.component';
 
 // import { MainService } from '../main.service';
 // import { AttrsService } from '../attrs.service';
@@ -65,13 +65,13 @@ const ROUTES: Routes = [
 		LayerComponent,
 		TimelineComponent,
 		TimelineRulerComponent,
+		OnionSkinComponent,
+		ToolsbarComponent,
+		CanvasComponent,
 		// AttrFormComponent,
 		// AttrsComponent,
-		// CanvasComponent,
 		// HotKeysComponent,
-		// ToolsbarComponent,
 		// PageConfigerComponent,
-		// OnionSkinComponent,
 	],
 	providers: [
 		// MainService,

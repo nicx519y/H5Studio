@@ -99,3 +99,6 @@ li.unactive:hover {
 	color: #333;
 }
 
+.editing .item-pic ide-previewer {
+	border-color: rgba(204, 153, 0, 0.5);
+}

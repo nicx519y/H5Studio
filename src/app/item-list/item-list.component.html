@@ -1,7 +1,9 @@
 <ul class="itemslist"  >
 	<li *ngFor="let opt of model; let idx = index;" 
-		[ngClass]="{true: 'active', false: 'unactive'}[idx===service.active]"
-		(click)="changeActive(idx); " #itemContainer >
+		[class.active]="idx===service.active"
+		[class.unactive]="idx!==service.active"
+		[class.editing]="isEditedPage(idx)"
+		(click)="changeActive(idx); " #itemContainer  >
 		<div *ngIf="idx===service.active" class="activebox" >
 			<div class="item-pic" >
 				<ide-previewer [src]="opt.thumbnail" [width]="38" [height]="38" ></ide-previewer>

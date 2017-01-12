@@ -107,11 +107,13 @@ function createNewId() {
 
 export class MF {
 	static g(model, options: any = {}) {
-		return new model(Object.assign(options, {
-			id: createNewId()
-		}));
+		if(!options.id || options.id == '') {
+			Object.assign(options, {
+				id: createNewId()
+			})
+		}
+		return new model(options);
 	}
-
 }
 
 export class BackgroundModel extends Immutable.Record({
@@ -134,7 +136,9 @@ export class TextModel extends Immutable.Record({
 	italic: false,						//斜体
 	underline: false,					//下划线
 	lineheight: 20,						//行高
-}) {}
+}) {
+	
+}
 
 export class ShapeModel extends Immutable.Record({
 	id: '',
@@ -260,7 +264,7 @@ export class PageModel extends Immutable.Record({
 	name: '',
 	background: new BackgroundModel(),
 	thumbnail: '',
-	timeline: Immutable.List<LayerModel>(),
+	layers: Immutable.List<LayerModel>(),
 }) {}
 
 export class SwiperModel extends Immutable.Record({

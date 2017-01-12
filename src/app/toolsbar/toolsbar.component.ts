@@ -32,17 +32,11 @@ export class ToolsbarComponent implements OnInit {
 		},
 	];
 	
-	@Output()
-	public stageChangeEvent: EventEmitter<EditorState> = new EventEmitter();
-
 	constructor() {
 
 	}
 
 	public changeState( state: EditorState ) {
-		if( this.state != state ) {
-			this.stageChangeEvent.emit( state );
-		}
 		this.state = state;
 	}
 

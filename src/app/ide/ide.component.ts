@@ -1,10 +1,12 @@
-import { Component, ViewContainerRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewContainerRef, ChangeDetectionStrategy, enableProdMode } from '@angular/core';
 import { PagesService } from '../pages.service';
 // import { MainService } from '../main.service';
 import { ItemsService } from '../items.service';
 // import { AttrsService } from '../attrs.service';
 import { BitmapImporterService } from '../bitmap-importer.service';
 import { TimelineService } from '../timeline.service';
+
+enableProdMode();	//防止出现一些dev版本才会出现的错误 
 
 @Component({
 	selector: 'ide',
@@ -22,7 +24,6 @@ export class IdeComponent {
 		private timelineService: TimelineService,
 		private bitmapImporterService: BitmapImporterService,
 	){
-		
 	}
 
 	public saveData() {
@@ -44,5 +45,8 @@ export class IdeComponent {
 
 	public fullscreen() {
 		document.documentElement.webkitRequestFullscreen();
+	}
+
+	ngAfterViewInit() {
 	}
 }
