@@ -5,6 +5,7 @@ import { ItemsService } from '../items.service';
 // import { AttrsService } from '../attrs.service';
 import { BitmapImporterService } from '../bitmap-importer.service';
 import { TimelineService } from '../timeline.service';
+import { PageConfigerService } from '../page-configer.service';
 
 enableProdMode();	//防止出现一些dev版本才会出现的错误 
 
@@ -23,6 +24,7 @@ export class IdeComponent {
 		private itemsService: ItemsService,
 		private timelineService: TimelineService,
 		private bitmapImporterService: BitmapImporterService,
+		private pageConfigerService: PageConfigerService,
 	){
 	}
 

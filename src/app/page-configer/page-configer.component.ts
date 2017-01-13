@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, ChangeDetectionStrategy } from '@angular/core';
 import { PageConfigerService } from '../page-configer.service';
 import { ModalComponent } from '../modal/modal.component';
 import { PageType, Direction, SwiperEffect, BackgroundModel, SwiperModel, StageModel } from '../models';
@@ -15,15 +15,22 @@ import {
 	PropertyFileSelectModel,
 } from '../properties';
 
+/// <reference path="immutable/dist/immutable.d.ts" />
+import { List, Map } from 'immutable';
+
 @Component({
 	selector: 'ide-page-configer',
 	templateUrl: './page-configer.component.html',
 	styleUrls: ['./page-configer.component.css', '../../assets/modal.form.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageConfigerComponent implements OnInit {
 
+	@Input()
+	private model: Map<string, any>;
+
 	@ViewChild('modal')
-	modal: ModalComponent;
+	private modal: ModalComponent;
 
 	public options: PropertyBasicModel<any>[];
 
@@ -31,29 +38,41 @@ export class PageConfigerComponent implements OnInit {
 		private service: PageConfigerService
 	) {
 
+		
+	}
+
+	public show() {
+		this.modal.show();
+	}
+
+	public hide() {
+		this.modal.hide();
+	}
+
+	private saveData() {
+		this.options.forEach(opt => this.model = this.model.setIn(opt.dataPath, opt.getValue()));
+	}
+	
+	ngOnInit() {
 		let title = new PropertyTextboxModel({
 			label: '标题：',
 			key: 'title',
-			value: service.config.stage.title,
-			model: service.config.stage,
+			value: this.model.getIn(['stage', 'title']),
 		});
 		let backgroundColor = new PropertyColorpickerModel({
 			label: '背景色：',
 			key: 'color',
-			value: service.config.stage.background.color,
-			model: service.config.stage.background,
+			value: this.model.getIn(['stage', 'background', 'color']),
 		});
 		let backgroundImage = new PropertyFileSelectModel({
 			label: '背景图片：',
 			key: 'image',
-			value: service.config.stage.background.image,
-			model: service.config.stage.background,
+			value: this.model.getIn(['stage', 'background', 'image']),
 		});
 		let backgroundRepeat = new PropertySingleCheckboxModel({
 			label: '背景重复：',
 			key: 'repeat',
-			value: service.config.stage.background.repeat,
-			model: service.config.stage.background,
+			value: this.model.getIn(['stage', 'background', 'repeat']),
 		});
 		let pageType = new PropertyDropdownModel({
 			label: '变换模式：',
@@ -65,14 +84,12 @@ export class PageConfigerComponent implements OnInit {
 				key: 'swiper',
 				value: PageType.swiper
 			}],
-			value: service.config.stage.pageType,
-			model: service.config.stage,
+			value: this.model.getIn(['stage', 'pageTpye']),
 		});
 		let initialSlide = new PropertyNumberModel({
 			label: '起始页：',
 			key: 'initialSlide',
-			value: service.config.swiper.initialSlide,
-			model: service.config.swiper,
+			value: this.model.getIn(['swiper', 'initialSlide']),
 		});
 		let direction = new PropertyDropdownModel({
 			label: '页面变换方向：',
@@ -84,14 +101,12 @@ export class PageConfigerComponent implements OnInit {
 				key: '横向',
 				value: Direction.horizontal
 			}],
-			value: service.config.swiper.direction,
-			model: service.config.swiper,
+			value: this.model.getIn(['swiper', 'direction']),
 		});
 		let speed = new PropertyNumberModel({
 			label: '变换动画速度：',
 			key: 'speed',
-			value: service.config.swiper.speed,
-			model: service.config.swiper,
+			value: this.model.getIn(['swiper', 'speed']),
 		});
 		let effect = new PropertyDropdownModel({
 			label: '变换动画特效：',
@@ -100,20 +115,17 @@ export class PageConfigerComponent implements OnInit {
 				key: 'Slide',
 				value: SwiperEffect.slide
 			}],
-			value: service.config.swiper.effect,
-			model: service.config.swiper,
+			value: this.model.getIn(['swiper', 'effect']),
 		});
 		let loop = new PropertySingleCheckboxModel({
 			label: '循环播放：',
 			key: 'loop',
-			value: service.config.swiper.loop,
-			model: service.config.swiper,
+			value: this.model.getIn(['swiper', 'loop']),
 		});
 		let autoPlay = new PropertySingleCheckboxModel({
 			label: '自动播放：',
 			key: 'autoPlay',
-			value: service.config.swiper.autoPlay,
-			model: service.config.swiper,
+			value: this.model.getIn(['swiper', 'autoPlay']),
 		});
 
 		this.options = [
@@ -129,19 +141,5 @@ export class PageConfigerComponent implements OnInit {
 			loop,
 			autoPlay,
 		];
-	}
-
-	public show() {
-		this.modal.show();
-	}
-
-	public hide() {
-		this.options.forEach(option => option.setModel());
-		this.modal.hide();
-	}
-
-	
-	ngOnInit() {
-
 	}
 }

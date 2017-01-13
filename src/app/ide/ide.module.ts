@@ -30,14 +30,16 @@ import { TimelineService } from '../timeline.service';
 import { OnionSkinComponent } from '../onion-skin/onion-skin.component';
 import { ToolsbarComponent } from '../toolsbar/toolsbar.component';
 import { CanvasComponent } from '../canvas/canvas.component';
-// import { AttrFormComponent } from '../attr-form/attr-form.component';
+
+import { PageConfigerComponent } from '../page-configer/page-configer.component';
+import { PageConfigerService } from '../page-configer.service';
+
+import { AttrFormComponent } from '../attr-form/attr-form.component';
 // import { AttrsComponent } from '../attrs/attrs.component';
+// import { AttrsService } from '../attrs.service';
 // import { HotKeysComponent } from '../hot-keys/hot-keys.component';
-// import { PageConfigerComponent } from '../page-configer/page-configer.component';
 
 // import { MainService } from '../main.service';
-// import { AttrsService } from '../attrs.service';
-// import { PageConfigerService } from '../page-configer.service';
 
 const ROUTES: Routes = [
 	{path: 'studio', component: IdeComponent}
@@ -68,10 +70,10 @@ const ROUTES: Routes = [
 		OnionSkinComponent,
 		ToolsbarComponent,
 		CanvasComponent,
-		// AttrFormComponent,
+		PageConfigerComponent,
+		AttrFormComponent,
 		// AttrsComponent,
 		// HotKeysComponent,
-		// PageConfigerComponent,
 	],
 	providers: [
 		// MainService,
@@ -79,8 +81,8 @@ const ROUTES: Routes = [
 		PagesService,
 		BitmapImporterService,
 		TimelineService,
+		PageConfigerService,
 		// AttrsService,
-		// PageConfigerService,
 	],
 	exports: [
 		IdeComponent

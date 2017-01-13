@@ -57,6 +57,7 @@
 			<div block="center">
 				<ide-canvas #canvas 
 					[mode]="toolsbar.state" 
+					[hasData]="timelineService.hasData()"
 					[activePageModel]="timelineService.getData()" 
 					[itemsModel]="itemsService.getData()"
 					[activeOptions]="timelineService.getActiveOptions()"
@@ -140,3 +141,4 @@
 </app-layout>
 
 <ide-bitmap-importer #bitmapImporter [model]="bitmapImporterService.getData()" ></ide-bitmap-importer>
+<ide-page-configer #pageConfiger [model]="pageConfigerService.getData()" ></ide-page-configer>

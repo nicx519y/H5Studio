@@ -9,10 +9,11 @@ import {
     Input, 
     Output,
     ChangeDetectionStrategy,
-    SimpleChange,
     EventEmitter,
     ChangeDetectorRef,
     OnDestroy,
+    SimpleChanges,
+    SimpleChange,
 } from '@angular/core';
 import { MainModel, EditorState, ElementModel, ElementStateModel, FrameModel, PageModel, ItemModel, MF } from '../models';
 import { TimelineService } from '../timeline.service';
@@ -43,6 +44,9 @@ export class CanvasComponent implements OnInit {
     private mode: EditorState = EditorState.choose;
 
     @Input()
+    private hasData: boolean;
+
+    @Input()
     private activeOptions: List<Map<string, any>> = Immutable.List<Map<string, number>>();
 
     @Input()
@@ -50,6 +54,8 @@ export class CanvasComponent implements OnInit {
 
     @Input()
     private itemsModel: List<ItemModel>;
+
+    private isJanvasInited: boolean;
 
     constructor(
         private timelineService: TimelineService,
@@ -84,6 +90,7 @@ export class CanvasComponent implements OnInit {
     }
 
     private janvasInit() {
+        if(this.isJanvasInited) return;
         let data = this.makeJanvasData().toJS();
         console.log('Before janvasInit: ', data);
         this.janvas = new Developer(
@@ -102,6 +109,7 @@ export class CanvasComponent implements OnInit {
             }
         );
         this.modeChange();
+        this.isJanvasInited = true;
     }
 
     private janvasUpdate() {
@@ -154,7 +162,7 @@ export class CanvasComponent implements OnInit {
 
     private janvasSelectedHandler(eleArr: any[]) {
         if(!eleArr || eleArr.length <= 0) {
-            this.timelineService.resetActiveOptions();
+            return;
         } else {
             let minFrame: number = Math.min.apply(null, eleArr.map(ele => ele.frameIndex));
             let eleList: string[] = eleArr.map(ele => ele.elementId);
@@ -171,7 +179,8 @@ export class CanvasComponent implements OnInit {
                 return { elementId: ele.elementId, start: ele.frameIndex, duration: 1 };
             });
             
-            this.timelineService.setActiveOptions(opt, false);
+            if(opt.length >= 0)
+                this.timelineService.setActiveOptions(opt, false);
         }
     }
 
@@ -198,10 +207,6 @@ export class CanvasComponent implements OnInit {
 
     }
 
-    private selectElements() {
-        this.janvas && this.janvas.selectElement(this.getActiveElement());
-    }
-
     /**
 	 * 获取active状态的最小帧，最小值0，默认0
 	 */
@@ -217,47 +222,14 @@ export class CanvasComponent implements OnInit {
     }
 
     private activeOptionsChangeHandler(changes: SimpleChange) {
-        console.log(changes);
-        if(changes.isFirstChange 
+        if(changes.isFirstChange()
         || this.getActiveFirstFrame(changes.currentValue) !== this.getActiveFirstFrame(changes.previousValue)) {
             this.janvasUpdate();
         } else {
-            this.selectElements();
+            this.janvas && this.janvas.selectElement(this.getActiveElement());
         }
     }
     
-
-    // private attrsChange(options: {
-    //     key: string,
-    //     value: any,
-    // }[]) {
-    //     let mode: AttrMode = this.attrsService.mode;
-    //     switch(mode) {
-    //         case AttrMode.property:
-    //             this.propertiesChange(options);
-    //             break;
-    //         case AttrMode.fontSetter:
-    //             break;
-    //         case AttrMode.multipleProperties:
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // }
-
-    // private propertiesChange(options: any) {
-    //     let frameIndex: number = this.timelineService.actionFrame;
-    //     let layerId: string = this.timelineService.actionOption.layers[0];
-    //     this.timelineService.changeToKeyFrames(frameIndex, frameIndex, [layerId]);
-    //     let changes = [{
-    //         layerId: layerId,
-    //         frame: {
-    //             elementState: options
-    //         },
-    //     }];
-    //     // this.timelineService.changeKeyFramesState(this._frameIdx, changes);
-    // }
-
     ngOnInit() {
         
     }
@@ -269,20 +241,21 @@ export class CanvasComponent implements OnInit {
     }
 
     ngAfterViewInit() {
-        this.janvasInit();
         this.timelineService.registerElementStateCreator(this.elementStateCreator.bind(this));
     }
 
-    ngOnChanges(changes) {
+    ngOnChanges(changes: SimpleChanges) {
+        if(changes.hasOwnProperty('hasData') && this.hasData === true) {
+            this.janvasInit();
+        }
+        if(changes.hasOwnProperty('activePageModel') && this.hasData) {
+            this.janvasUpdate();
+        }
         if(changes.hasOwnProperty('mode')) {
             this.modeChange();
         }
         if(changes.hasOwnProperty('activeOptions')) {
-            this.activeOptionsChangeHandler(changes.activeOptions);
-        }
-        if(changes.hasOwnProperty('activePageModel')) {
-            console.log('Active page model change: ', changes);
-            this.janvasUpdate();
+            this.activeOptionsChangeHandler(changes['activeOptions']);
         }
     }
     

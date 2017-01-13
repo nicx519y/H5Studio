@@ -261,24 +261,20 @@ export class TimelineService {
 			.map(layer => {
 				let obj = options.find(opt => opt.elementId === layer.getIn(['element', 'id']));
 				if(!obj) return layer;
-				let idx: number = obj.start;
-				let idx2: number = obj.start + obj.duration - 1;
 				let frames: List<FrameModel> = layer.get('frames');
 				let eleId: string = layer.getIn(['element', 'id']);
-				for(let i = idx; i <= idx2; i ++) {
+				for(let i = obj.start; i <= obj.start + obj.duration - 1; i ++) {
 					let fidx: number = frames.findIndex(frame => frame.get('index') === i);
 					let frameOption = fos.find(opt => opt.elementId === eleId);
 					if(fidx >= 0) {
-						let frame: FrameModel = frames.get(fidx);
+						let frame: FrameModel = frames.get(fidx).set('isEmptyFrame', frameOption.isEmptyFrame);
 						if(frameOption.isEmptyFrame) {
-							frame = frame.set('isEmptyFrame', frameOption.isEmptyFrame)
-								.set('elementState', null)
+							frame = frame
 								.set('tweenType', TweenType.none)
 								.set('tween', MF.g(TweenModel));
-						} else {
-							frame = frame.set('isEmptyFrame', frameOption.isEmptyFrame)
-								.set('elementState', MF.g(ElementStateModel, frameOption.elementState));
 						}
+
+						frame = this.createElementStateOfKeyFrame(frame, eleId, i, frameOption.elementState);
 						frames = frames.set(fidx, frame);
 					} else {
 						let newFrame: FrameModel;
@@ -294,17 +290,28 @@ export class TimelineService {
 								tween: MF.g(TweenModel),
 							});
 						}
-						if(this._elementStateCreator) {
-							newFrame = newFrame.set('elementState', this._elementStateCreator(eleId, i));
-						} else {
-							newFrame = newFrame.set('elementState', MF.g(ElementStateModel, frameOption.elementState));
-						}
+
+						newFrame = this.createElementStateOfKeyFrame(newFrame, eleId, i, frameOption.elementState);
 						frames = frames.insert(frames.findLastIndex(frame => frame.get('index') < i) + 1, newFrame);
 					}
 				}
 				return layer.set('frames', frames);
 			}).toList();
 		return this.resetDuration(data);
+	}
+
+	private createElementStateOfKeyFrame(frame: FrameModel, elementId: string, index: number, elementState: {
+		isEmptyFrame: boolean,
+		elementState?: ElementStateModel,
+	} = null): FrameModel {
+		if(elementState) {
+			frame = frame.set('elementState', MF.g(ElementStateModel, elementState));
+		} else if(this._elementStateCreator) {
+			frame = frame.set('elementState', this._elementStateCreator(elementId, index));
+		} else {
+			frame = frame.set('elementState', null);
+		}
+		return frame;
 	}
 
 	public changeToFrames(options: {
